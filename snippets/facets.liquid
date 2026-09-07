@@ -971,7 +971,7 @@
             id="FacetFiltersFormMobile"
             class="mobile-facets drawer__container fixed inset-0 z-9 pointer-events-none"
             data-drawer-target="Drawer-Facets"
-            data-drawer-direction="right"
+            data-drawer-direction="{% if filter_type == 'horizontal' %}left{% else %}right{% endif %}"
           >
             <div
               id="Drawer-Facets-Overlay"
@@ -1526,6 +1526,9 @@
 
                 {{ children }}
 
+                {%- liquid
+                  assign drawer_facets_count = results.results_count | default: results.products_count
+                -%}
                 <div class="mobile-facets__footer">
                   <facet-remove class="mobile-facets__clear-wrapper items-center flex justify-center">
                     <a href="{{ results_url }}" class="mobile-facets__clear underlined-link">
@@ -1534,10 +1537,14 @@
                   </facet-remove>
                   <button
                     type="button"
-                    class="button button--primary"style="height:41px"
+                    class="button button--primary mobile-facets__apply-btn"
                     onclick="this.closest('.mobile-facets__wrapper').querySelector('summary').click()"
                   >
-                    {{ 'products.facets.apply' | t }}
+                    {%- if drawer_facets_count == 1 -%}
+                      View 1 item
+                    {%- else -%}
+                      View {{ drawer_facets_count }} items
+                    {%- endif -%}
                   </button>
                 </div>
               </div>

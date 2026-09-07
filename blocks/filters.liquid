@@ -73,6 +73,7 @@
 -%}
 
 {{ 'component-facets.css' | asset_url | stylesheet_tag }}
+{% if bl_stts.filter_style == 'horizontal' %}{{ 'facets-filter-button.css' | asset_url | stylesheet_tag }}{% endif %}
 <script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
 
 <div

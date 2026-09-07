@@ -7,6 +7,12 @@ class FacetFiltersForm extends HTMLElement {
       this.onSubmitHandler(event);
     }, 800);
 
+    // Price range has no "Apply" button — auto-submit a short moment after the
+    // shopper stops dragging the slider / typing an amount.
+    this.debouncedOnSubmitPrice = theme.utils.debounce((event) => {
+      this.onSubmitHandler(event);
+    }, 700);
+
     const facetForm = this.querySelector('form');
     facetForm.addEventListener('input', this.onInputChange.bind(this));
 
@@ -375,12 +381,19 @@ class FacetFiltersForm extends HTMLElement {
   }
 
   onInputChange(event) {
-    // Check if the input is a price range input
+    // The price slider and its amount fields have no Apply button — submit them
+    // on their own (slightly slower) debounce so a drag can settle first.
     const isPriceRangeInput = event.target.classList.contains('filter__price_change') ||
                              event.target.classList.contains('filter__price_number');
 
-    // Only auto-submit if it's not a price range input
-    if (!isPriceRangeInput) {
+    if (isPriceRangeInput) {
+      // The bare range slider carries no `name`; point the submit at the amount
+      // field it drives so the value is picked up and focus isn't stolen.
+      const target = event.target.classList.contains('filter__price_change')
+        ? event.target.closest('price-range')?.querySelector('.filter__price_number') || event.target
+        : event.target;
+      this.debouncedOnSubmitPrice({ target, srcElement: target, preventDefault() {} });
+    } else {
       this.debouncedOnSubmit(event);
     }
   }
@@ -470,7 +483,7 @@ class PriceRange extends HTMLElement {
   onRangeChange(event) {
     // this.adjustToValidValues(event.currentTarget);
     this.setMinAndMaxValues();
-    // Note: Form submission is now handled by the apply button click
+    // Note: the filter auto-submits via FacetFiltersForm.onInputChange (debounced)
   }
 
   onKeyDown(event) {

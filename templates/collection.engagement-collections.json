@@ -2392,7 +2392,7 @@
           "type": "filters",
           "static": true,
           "settings": {
-            "filter_style": "vertical",
+            "filter_style": "horizontal",
             "filter_position": "left",
             "filter_width": "full-width",
             "heading_label_case": "normal-case",

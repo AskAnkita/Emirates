@@ -1,0 +1,401 @@
+/* ==========================================================================
+   Horizontal filters shown as one clean toolbar row:
+
+     [ Filter ]  ...........................  5 products   [ Sort By  v ]
+
+   - "Filter" button (left) opens the theme's filter drawer, on every screen.
+   - "Sort By" control stays on the toolbar (right) on every screen.
+   - On laptop / desktop the drawer is wider and its own "SORT BY" row is
+     hidden (the toolbar control covers it); on mobile the drawer keeps it.
+   - A comfortable gap separates the toolbar from the product grid.
+   Only loaded when the filters block uses filter_style: horizontal.
+   ========================================================================== */
+
+.facets-block-wrapper--horizontal {
+  /* space between the toolbar and the product list below it */
+  margin-block-end: 2.4rem;
+}
+@media screen and (min-width: 750px) {
+  /* span the full row so the gutter below lines up exactly with the product grid */
+  .facets-block-wrapper--horizontal {
+    grid-column: 1 / -1 !important;
+  }
+}
+@media screen and (min-width: 1025px) {
+  .facets-block-wrapper--horizontal {
+    margin-block-end: 4rem;
+  }
+}
+
+.facets-block-wrapper--horizontal .facets-container {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem 2rem;
+  width: 100%;
+  padding-top: 0;
+  /* line the toolbar up with the product grid's left / right gutter */
+  padding-inline: var(--padding-inline-start, 1.5rem) var(--padding-inline-end, 1.5rem);
+}
+@media screen and (min-width: 750px) {
+  .facets-block-wrapper--horizontal .facets-container {
+    padding-inline: var(--padding-inline-start, 3rem) var(--padding-inline-end, 3rem);
+  }
+}
+
+/* Left slot: the Filter button */
+.facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper {
+  order: -1;
+  flex: 0 0 auto;
+}
+
+/* Right slot: the sort form. The theme forces this to width:100% on >=750px,
+   which makes it take its own line — override so it shrinks to its content
+   and can be pushed to the right edge of the row. */
+.facets-block-wrapper--horizontal .facets-container > facet-filters-form.facets {
+  flex: 0 0 auto;
+  width: auto !important;
+  max-width: none !important;
+  margin-left: auto;
+  padding-inline: 0 !important;
+}
+.facets-block-wrapper--horizontal .facets-container > facet-filters-form.facets .facets__form {
+  width: auto !important;
+  gap: 0;
+}
+.facets-block-wrapper--horizontal .sorting-wrapper {
+  flex: 0 0 auto;
+  width: auto !important;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-end;
+  gap: 1.6rem;
+}
+.facets-block-wrapper--horizontal .sorting-wrapper .results-count {
+  align-self: center;
+  color: rgb(var(--color-foreground-rgb) / 0.6);
+  font-size: 1.3rem;
+  white-space: nowrap;
+}
+
+.facets-block-wrapper--horizontal .mobile-facets__disclosure {
+  justify-content: flex-start !important;
+}
+.facets-block-wrapper--horizontal #facets-divider {
+  display: none;
+}
+
+@media screen and (min-width: 1025px) {
+  /* hide the inline row of filter dropdowns — the button + drawer replace it */
+  .facets-block-wrapper--horizontal #FacetsWrapperDesktop {
+    display: none !important;
+  }
+  /* reveal the "Filter" button + drawer on desktop */
+  .facets-block-wrapper--horizontal .mobile-facets__wrapper.large-up-hide {
+    display: flex !important;
+  }
+  .facets-block-wrapper--horizontal .mobile-facets .drawer__overlay:empty.lg\:none {
+    display: block !important;
+  }
+  .facets-block-wrapper--horizontal .mobile-facets__heading.small-hide.medium-hide {
+    display: block !important;
+  }
+  .facets-block-wrapper--horizontal .mobile-facets .active-facets-mobile.large-up-hide {
+    display: flex !important;
+  }
+
+  /* the standalone "Sort by" stays on the PLP toolbar; drop the duplicate
+     "SORT BY" row from inside the filter drawer on laptop / desktop */
+  .facets-block-wrapper--horizontal [id^="Details-Mobile-SortBy"] {
+    display: none !important;
+  }
+
+  /* a roomier filter drawer on the bigger screens */
+  .facets-block-wrapper--horizontal .mobile-facets__inner {
+    width: 52rem !important;
+    max-width: 52rem !important;
+  }
+}
+
+body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening) {
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Filter + Sort by = two toolbar controls of the IDENTICAL size / shape.
+   Filter is the solid (filled) one, Sort by is the outlined one.
+   -------------------------------------------------------------------------- */
+.facets-block-wrapper--horizontal .mobile-facets__open,
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field > div {
+  box-sizing: border-box;
+  min-height: 5.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 2.2rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Left: the "Filter" button — solid fill, label then icon.
+   --filter-button-bg is the brand dark green; change it here if the brand changes. */
+.facets-block-wrapper--horizontal .mobile-facets__open {
+  --filter-button-bg: #1e3c32;
+  width: auto;
+  border: 1px solid var(--filter-button-bg);
+  color: #fff;
+  background: var(--filter-button-bg);
+}
+.facets-block-wrapper--horizontal .mobile-facets__open:hover {
+  background: #264c40;
+  border-color: #264c40;
+}
+.facets-block-wrapper--horizontal .mobile-facets__open-label {
+  text-decoration: none !important;
+  order: 1;
+}
+.facets-block-wrapper--horizontal .mobile-facets__open .svg-wrapper {
+  order: 2;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+/* --------------------------------------------------------------------------
+   Right: Sort by — one outlined control; the panel drops flush beneath it,
+   same width, with roomy option spacing (no second floating box).
+   -------------------------------------------------------------------------- */
+.facets-block-wrapper--horizontal .facet-filters.sorting {
+  margin: 0;
+}
+
+/* the whole control: "Sort by:"  +  current value ........... caret, in ONE box */
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field > div {
+  position: relative;
+  min-width: 22rem;
+  border: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
+  background: var(--color-background);
+}
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field-label {
+  color: var(--color-foreground);
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+/* value stays next to the label; caret is pushed to the right edge */
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__sort {
+  position: static;
+  flex: 1;
+}
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__sort > summary,
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__sort > summary > span {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  gap: 0.6rem;
+}
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__sort > summary > span > .svg-wrapper,
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__sort > summary > span > svg {
+  margin-left: auto;
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+/* kill the theme's own panel border / underline so there's no double outline */
+.facets-block-wrapper--horizontal .facet-filters.sorting .facets__panel,
+.facets-block-wrapper--horizontal .facet-filters.sorting .facets__summary,
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__sort {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* the open panel: flush under the box, exactly as wide, generous padding */
+.facets-block-wrapper--horizontal #Details-SortBy[open] #SortByDropdown {
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: -1px;
+  z-index: 60;
+  min-width: 0;
+  padding: 0.8rem 1.8rem;
+  background: var(--color-background, #fff);
+  border: 1px solid rgb(var(--color-foreground-rgb) / 0.28);
+  box-shadow: 0 14px 34px rgb(var(--color-foreground-rgb) / 0.12);
+}
+.facets-block-wrapper--horizontal #SortByDropdown ul {
+  margin: 0;
+}
+.facets-block-wrapper--horizontal #SortByDropdown .facet-filters__sort_item {
+  padding: 1.1rem 0 !important;
+}
+.facets-block-wrapper--horizontal #SortByDropdown .facet-checkbox {
+  width: 100%;
+}
+.facets-block-wrapper--horizontal #SortByDropdown .label {
+  font-size: 1.4rem;
+  color: rgb(var(--color-foreground-rgb) / 0.75);
+}
+.facets-block-wrapper--horizontal #SortByDropdown .facet-filters__sort_item.selected .label {
+  color: var(--color-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   Filter drawer rows: roomy, and just ONE light hairline between accordions.
+   (The theme draws a medium-grey rule under every header — 7 stacked rules
+   read as clutter.)
+   -------------------------------------------------------------------------- */
+.facets-block-wrapper--horizontal .mobile-facets__main {
+  row-gap: 0;
+  padding-top: 0.4rem;
+  padding-bottom: 2rem;
+}
+
+/* the theme parks the footer at `bottom: -3rem`, so its lower part gets
+   clipped by the drawer's scroll area — pin it flush, and lay the two
+   controls out as an equal-width pair:  [ CLEAR ALL ] [ VIEW N ITEMS ]. */
+.facets-block-wrapper--horizontal .mobile-facets__footer {
+  bottom: 0;
+  padding: 1.6rem 2rem calc(1.8rem + env(safe-area-inset-bottom, 0px));
+  gap: 1.2rem;
+  align-items: stretch;
+}
+.facets-block-wrapper--horizontal .mobile-facets__footer > * {
+  flex: 1 1 0;
+  width: 50%;
+  min-width: 0;
+  margin: 0;
+}
+/* Clear all — outlined button, the visual equal of the primary */
+.facets-block-wrapper--horizontal .mobile-facets__footer .mobile-facets__clear-wrapper {
+  display: flex;
+}
+.facets-block-wrapper--horizontal .mobile-facets__footer .mobile-facets__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 5.2rem;
+  padding: 0 2rem;
+  border: 1px solid rgb(var(--color-foreground-rgb) / 0.35);
+  color: var(--color-foreground);
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.facets-block-wrapper--horizontal .mobile-facets__footer .mobile-facets__clear:hover {
+  border-color: var(--color-foreground);
+  background: rgb(var(--color-foreground-rgb) / 0.04);
+}
+/* VIEW N ITEMS — solid primary, matches the toolbar "Filter" button */
+.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary {
+  height: auto !important;
+  min-height: 5.2rem;
+  width: 100%;
+  margin: 0;
+  padding: 0 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #1e3c32;
+  background: #1e3c32;
+  color: #fff;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary:hover {
+  background: #264c40;
+  border-color: #264c40;
+}
+.facets-block-wrapper--horizontal .mobile-facets__main .mobile-facets__summary {
+  padding-block: 1.9rem;
+  margin-bottom: 0;
+}
+/* drop the theme's per-header rule + inner padding that doubles the spacing */
+.facets-block-wrapper--horizontal .mobile-facets__main .mobile-facets__summary > * {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+/* one hairline strictly BETWEEN accordions (none above the first / below the last) */
+.facets-block-wrapper--horizontal .mobile-facets__main > accordion-custom + accordion-custom {
+  border-top: 1px solid rgb(var(--color-foreground-rgb) / 0.12);
+}
+/* breathing room under an expanded section so its options don't crowd
+   the next header */
+.facets-block-wrapper--horizontal .mobile-facets__main details[open] > .mobile-facets__submenu {
+  padding-bottom: 1.6rem;
+}
+
+/* The accordion JS (AccordionCustom.transition) freezes an inline pixel
+   `height` on the open <details> and on .details-content, taken from a
+   scrollHeight snapshot before layout has settled. Paired with
+   `.details-content { overflow: clip }`, that slices the last control off
+   (e.g. the price "Apply" button) and lets the next section ride up over
+   it. Let an open panel size to its real content instead. */
+.facets-block-wrapper--horizontal .mobile-facets__main accordion-custom > details[open],
+.facets-block-wrapper--horizontal .mobile-facets__main details[open] > .mobile-facets__submenu {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* the price block has no Apply button (it auto-applies) — just give the
+   amount fields a little breathing room before the next section */
+.facets-block-wrapper--horizontal .mobile-facets__submenu .facets__priceblock {
+  margin-bottom: 0;
+  padding-bottom: 0.4rem;
+}
+
+/* don't show an empty "Clear all" pills row on the toolbar when nothing
+   is filtered */
+.facets-block-wrapper--horizontal .active-facets-desktop:not(:has(.active-facets__button)) {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Drawer slides in from the LEFT, like the menu drawer
+   -------------------------------------------------------------------------- */
+.facets-block-wrapper--horizontal .mobile-facets__inner {
+  margin-left: 0;
+  margin-right: auto;
+  border-width: 0 0.1rem 0 0;
+}
+.js .facets-block-wrapper--horizontal .disclosure-has-popup:not(.menu-opening) .mobile-facets__inner {
+  transform: translateX(-100%);
+}
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening .mobile-facets__inner {
+  transform: translateX(0);
+}
+.facets-block-wrapper--horizontal .mobile-facets .drawer__close {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* --------------------------------------------------------------------------
+   Rows revealed one by one, like the menu drawer items
+   -------------------------------------------------------------------------- */
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening .active-facets-mobile,
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening [id^="Details-Mobile-SortBy"],
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom {
+  animation: menu-drawer-item-open var(--drawer-animation-speed, 0.2s) var(--ease-out-smooth, ease) backwards;
+}
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening .active-facets-mobile { animation-delay: 0.10s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening [id^="Details-Mobile-SortBy"] { animation-delay: 0.18s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom:nth-of-type(1) { animation-delay: 0.26s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom:nth-of-type(2) { animation-delay: 0.34s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom:nth-of-type(3) { animation-delay: 0.42s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom:nth-of-type(4) { animation-delay: 0.50s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom:nth-of-type(5) { animation-delay: 0.58s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom:nth-of-type(6) { animation-delay: 0.66s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom:nth-of-type(7) { animation-delay: 0.74s; }
+.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening accordion-custom:nth-of-type(n + 8) { animation-delay: 0.82s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening * { animation: none !important; }
+}

@@ -285,10 +285,6 @@
               },
               "blocks": {}
             },
-            "judge_me_reviews_preview_badge_xYCXcX": {
-              "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-              "settings": {}
-            },
             "product_info_cCKb8b": {
               "type": "product-info",
               "name": "t:names.product_info",
@@ -4698,7 +4694,6 @@
           "block_order": [
             "group_icgrde",
             "price_wUxKFf",
-            "judge_me_reviews_preview_badge_xYCXcX",
             "product_info_cCKb8b",
             "variant_picker_R3rGDr",
             "product_tabs_egEPBa",
@@ -4929,7 +4924,7 @@
             "link": "",
             "video_loop": true,
             "video_autoplay": false,
-            "image_position": "contain",
+            "image_position": "cover",
             "video_position": "cover",
             "animation_type": "none"
           },
@@ -5220,7 +5215,7 @@
         "position_offset": 10,
         "media_width": "medium",
         "media_height": "custom",
-        "media_height_custom": 30,
+        "media_height_custom": 50,
         "color_scheme": "scheme-1",
         "padding-block-start": 0,
         "padding-block-end": 0
@@ -5235,7 +5230,7 @@
             "image": "shopify://shop_images/Product_Details.png",
             "link": "",
             "hide_on_mobile": false,
-            "image_ratio": "adapt",
+            "image_ratio": "landscape",
             "width": "custom",
             "unit": "percent",
             "custom_width": 100,
@@ -5253,7 +5248,7 @@
             "border": "solid",
             "border_width": 0,
             "border_opacity": 0,
-            "border_radius": 20,
+            "border_radius": 0,
             "animation_type": "none",
             "disable_parallax_mobile": false,
             "parallax_speed": 0.5,
@@ -5517,10 +5512,7 @@
         "image_KnWAtA",
         "group_yJTzHk"
       ],
-      "custom_css": [
-        ".spacing-style.layout-panel-flex.layout-panel-flex--row.mobile-column.section-content-wrapper {background: #eff0eb; padding: 60px; border-radius: 24px;}",
-        "@media screen and (max-width: 767px) {.spacing-style.layout-panel-flex.layout-panel-flex--row.mobile-column.section-content-wrapper {background: #eff0eb; padding: 50px 18px; border-radius: 10px; }}"
-      ],
+      "custom_css": [],
       "name": "t:names.image_with_text",
       "settings": {
         "content_direction": "row",
@@ -5552,9 +5544,9 @@
         "gradient_direction": "to top",
         "image_behavior": "none",
         "padding-block-start": 0,
-        "padding-block-end": 90,
-        "padding-inline-start": 65,
-        "padding-inline-end": 65
+        "padding-block-end": 60,
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
       }
     },
     "section_XGCFja": {
@@ -6109,7 +6101,7 @@
         "judge_me_reviews_review_widget_dVbbk7": {
           "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
-            "review_data": "sample_data",
+            "review_data": "real_data",
             "max_width": 1200,
             "show_shop_reviews": false,
             "empty_state": "empty_widget"
@@ -6121,7 +6113,8 @@
       ],
       "settings": {
         "include_margins": true
-      }
+      },
+      "disabled": true
     },
     "media_with_text_C6mnew": {
       "type": "media-with-text",
@@ -6359,7 +6352,7 @@
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
-                "image_ratio": "adapt",
+                "image_ratio": "landscape",
                 "border": "solid",
                 "border_width": 0,
                 "border_opacity": 0,
@@ -6605,7 +6598,7 @@
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
-                "image_ratio": "adapt",
+                "image_ratio": "landscape",
                 "border": "solid",
                 "border_width": 0,
                 "border_opacity": 0,
@@ -6851,7 +6844,7 @@
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
-                "image_ratio": "adapt",
+                "image_ratio": "landscape",
                 "border": "solid",
                 "border_width": 0,
                 "border_opacity": 0,

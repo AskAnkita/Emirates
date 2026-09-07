@@ -54,6 +54,8 @@
             "dot_appearance": false,
             "dot_background": "#ffffff",
             "dot_border_radius": 0,
+            "show_skin_tone_controller": false,
+            "skin_tone_image_index": 2,
             "aspect_ratio": "adapt",
             "constrain_to_viewport": false,
             "media_fit": "cover",
@@ -283,10 +285,6 @@
                 "padding-inline-end": 0
               },
               "blocks": {}
-            },
-            "judge_me_reviews_preview_badge_xYCXcX": {
-              "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-              "settings": {}
             },
             "product_info_cCKb8b": {
               "type": "product-info",
@@ -3903,7 +3901,6 @@
           "block_order": [
             "group_icgrde",
             "price_wUxKFf",
-            "judge_me_reviews_preview_badge_xYCXcX",
             "product_info_cCKb8b",
             "variant_picker_R3rGDr",
             "product_tabs_egEPBa",
@@ -4135,7 +4132,7 @@
             "link": "",
             "video_loop": true,
             "video_autoplay": false,
-            "image_position": "contain",
+            "image_position": "cover",
             "video_position": "cover",
             "animation_type": "none"
           },
@@ -4426,7 +4423,7 @@
         "position_offset": 10,
         "media_width": "medium",
         "media_height": "custom",
-        "media_height_custom": 30,
+        "media_height_custom": 50,
         "color_scheme": "scheme-1",
         "padding-block-start": 0,
         "padding-block-end": 0
@@ -4441,7 +4438,7 @@
             "image": "shopify://shop_images/Product_Details.png",
             "link": "",
             "hide_on_mobile": false,
-            "image_ratio": "adapt",
+            "image_ratio": "landscape",
             "width": "custom",
             "unit": "percent",
             "custom_width": 100,
@@ -4459,7 +4456,7 @@
             "border": "solid",
             "border_width": 0,
             "border_opacity": 0,
-            "border_radius": 20,
+            "border_radius": 0,
             "animation_type": "none",
             "disable_parallax_mobile": false,
             "parallax_speed": 0.5,
@@ -4723,10 +4720,7 @@
         "image_KnWAtA",
         "group_yJTzHk"
       ],
-      "custom_css": [
-        ".spacing-style.layout-panel-flex.layout-panel-flex--row.mobile-column.section-content-wrapper {background: #eff0eb; padding: 60px; border-radius: 24px;}",
-        "@media screen and (max-width: 767px) {.spacing-style.layout-panel-flex.layout-panel-flex--row.mobile-column.section-content-wrapper {background: #eff0eb; padding: 50px 18px; border-radius: 10px; }}"
-      ],
+      "custom_css": [],
       "name": "t:names.image_with_text",
       "settings": {
         "content_direction": "row",
@@ -4758,9 +4752,9 @@
         "gradient_direction": "to top",
         "image_behavior": "none",
         "padding-block-start": 0,
-        "padding-block-end": 90,
-        "padding-inline-start": 65,
-        "padding-inline-end": 65
+        "padding-block-end": 60,
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
       }
     },
     "section_XGCFja": {
@@ -5269,6 +5263,7 @@
         "group_FfhFKp",
         "image_T7NYFK"
       ],
+      "disabled": true,
       "custom_css": [
         ".spacing-style.layout-panel-flex.layout-panel-flex--row.mobile-column.section-content-wrapper {background: #f9f9f9; padding: 60px; border-radius: 24px;}",
         "@media screen and (max-width: 767px) {.spacing-style.layout-panel-flex.layout-panel-flex--row.mobile-column.section-content-wrapper {background: #f9f9f9; padding: 50px 18px; border-radius: 24px; }}"
@@ -5315,7 +5310,7 @@
         "judge_me_reviews_review_widget_dVbbk7": {
           "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
-            "review_data": "sample_data",
+            "review_data": "real_data",
             "max_width": 1200,
             "show_shop_reviews": false,
             "empty_state": "empty_widget"
@@ -5327,7 +5322,8 @@
       ],
       "settings": {
         "include_margins": true
-      }
+      },
+      "disabled": true
     },
     "media_with_text_C6mnew": {
       "type": "media-with-text",
@@ -5561,11 +5557,11 @@
                 "scheme_shadow": "#000000",
                 "background_media": "image",
                 "video_position": "cover",
-                "background_image": "shopify://shop_images/1.png",
+                "background_image": "shopify://shop_images/e7b1e9b4-e3b4-485d-b4fd-5937173e6fb5_87536148-1f17-44ef-94df-3e9e74f5ae64.png",
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
-                "image_ratio": "adapt",
+                "image_ratio": "landscape",
                 "border": "solid",
                 "border_width": 0,
                 "border_opacity": 0,
@@ -5807,11 +5803,11 @@
                 "scheme_shadow": "#000000",
                 "background_media": "image",
                 "video_position": "cover",
-                "background_image": "shopify://shop_images/2_fcaa1f69-7598-427f-a910-96b326b1df31.png",
+                "background_image": "shopify://shop_images/ChatGPT_Image_Aug_21_2026_06_18_04_PM.png",
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
-                "image_ratio": "adapt",
+                "image_ratio": "landscape",
                 "border": "solid",
                 "border_width": 0,
                 "border_opacity": 0,
@@ -6053,11 +6049,11 @@
                 "scheme_shadow": "#000000",
                 "background_media": "image",
                 "video_position": "cover",
-                "background_image": "shopify://shop_images/1.png",
+                "background_image": "shopify://shop_images/890b66f0-1741-4a22-81b5-3711a41c76b6_bf62bc72-c30a-4c8f-bfec-879262370255.png",
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
-                "image_ratio": "adapt",
+                "image_ratio": "landscape",
                 "border": "solid",
                 "border_width": 0,
                 "border_opacity": 0,

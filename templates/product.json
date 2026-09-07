@@ -4506,17 +4506,17 @@
             "scheme_shadow": "#000000",
             "background_media": "image",
             "video_position": "cover",
-            "background_image": "shopify://shop_images/f6cc54f0-29f2-472c-942b-eeab914fbaf5.png",
+            "background_image": "shopify://shop_images/5dc795e5-b2f6-4f7d-a29c-962030f32db8.png",
             "background_image_position": "cover",
             "content_overlay": true,
-            "content_match_height": false,
+            "content_match_height": true,
             "image_ratio": "adapt",
             "border": "none",
             "border_width": 1,
             "border_opacity": 0,
             "border_radius": 0,
             "toggle_overlay": true,
-            "overlay_color": "#00000059",
+            "overlay_color": "#00000073",
             "extend_left_overlay": false,
             "extend_right_overlay": false,
             "overlay_style": "solid",
@@ -4545,46 +4545,10 @@
             "padding-inline-end": 0
           },
           "blocks": {
-            "image_CQCx94": {
-              "type": "image",
-              "name": "t:names.image",
-              "settings": {
-                "image": "shopify://shop_images/sol-collection.svg",
-                "link": "",
-                "hide_on_mobile": false,
-                "image_ratio": "adapt",
-                "width": "fit-content",
-                "unit": "percent",
-                "custom_width": 100,
-                "custom_width_pixel": 100,
-                "width_tablet": "fit-content",
-                "unit_tablet": "percent",
-                "custom_width_tablet": 100,
-                "custom_width_tablet_pixel": 100,
-                "width_mobile": "fit-content",
-                "unit_mobile": "percent",
-                "custom_width_mobile": 100,
-                "custom_width_mobile_pixel": 100,
-                "height": "fit",
-                "image_position": "cover",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "animation_type": "none",
-                "disable_parallax_mobile": false,
-                "parallax_speed": 0.5,
-                "padding-block-start": 0,
-                "padding-inline-end": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0
-              },
-              "blocks": {}
-            },
             "text_nBTYhc": {
               "type": "text",
               "settings": {
-                "text": "<p>Every detail matters.<br/>Discover our award-winning Signature Collections.</p>",
+                "text": "<h2 style=\"color:#ffffff;\">Signature Collections</h2><h4 style=\"color:#ffffff;\">Every detail matters</h4><p style=\"color:#ffffff;\">Hand-set by master jewellers with the world's finest diamonds — designs made to be worn for a lifetime, and passed on.</p>",
                 "collection_description_only": false,
                 "collapse_text": false,
                 "typing_text": false,
@@ -4712,7 +4676,6 @@
             }
           },
           "block_order": [
-            "image_CQCx94",
             "text_nBTYhc",
             "button_NiMUTn"
           ]

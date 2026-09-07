@@ -2285,6 +2285,120 @@ details[open] > summary .icon-plus-wrapper {
   --card-grid-per-row: 1;
 }
 
+/* Multicolumn: single-row horizontal scroller when items exceed the column count */
+@media screen and (min-width: 750px) {
+  .grid-layout.grid-layout--overflow-scroll {
+    display: flex;
+    grid: none;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 1px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .grid-layout.grid-layout--overflow-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .grid-layout.grid-layout--overflow-scroll > .grid__item {
+    --overflow-cols: var(--overflow-cols-tablet, 3);
+    flex: 0 0
+      calc(
+        (100% - var(--grid-desktop-horizontal-spacing, 12px) * (var(--overflow-cols) - 1)) /
+          var(--overflow-cols)
+      );
+    scroll-snap-align: start;
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  .grid-layout.grid-layout--overflow-scroll > .grid__item {
+    --overflow-cols: var(--overflow-cols-desktop, 6);
+  }
+}
+
+/* Multicolumn scroller: circular prev/next arrows, matching the theme carousel arrows */
+.multicolumn-scroller {
+  position: relative;
+}
+
+.multicolumn-scroller__btn {
+  position: absolute;
+  top: 40%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max(4rem, var(--arrow-width, 4.8rem));
+  height: max(4rem, var(--arrow-height, 4.8rem));
+  padding: 0;
+  color: var(--arrow-color, currentColor);
+  background-color: var(--arrow-background, rgb(255 255 255));
+  border: var(--arrow-border-thickness, 1px) solid var(--arrow-border, currentColor);
+  border-radius: var(--arrow-radius, 50%);
+  cursor: pointer;
+  transition: opacity var(--animation-speed-slow, 0.3s) var(--cubic-fast, ease),
+    color 0.2s ease, background-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .multicolumn-scroller__btn:hover {
+    color: var(--arrow-color-hover, var(--arrow-color));
+    background-color: var(--arrow-background-hover, var(--arrow-background));
+  }
+}
+
+.multicolumn-scroller__btn:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.multicolumn-scroller__btn[disabled] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.multicolumn-scroller--no-nav .multicolumn-scroller__btn {
+  display: none;
+}
+
+.multicolumn-scroller__btn .icon-arrow {
+  width: var(--arrow-icon-size, 1.5rem);
+}
+
+.multicolumn-scroller__btn--prev {
+  left: 0.8rem;
+}
+
+.multicolumn-scroller__btn--prev .icon-arrow {
+  transform: rotate(180deg);
+}
+
+.multicolumn-scroller__btn--next {
+  right: 0.8rem;
+}
+
+@media screen and (max-width: 749px) {
+  .multicolumn-scroller__btn {
+    display: none;
+  }
+}
+
+/* Multicolumn scrolling sections: keep every image the same height */
+.grid-layout--overflow-scroll .image-block,
+.collection-carousel-swiper-component .image-block {
+  width: 100%;
+}
+
+.grid-layout--overflow-scroll .image-block__image,
+.collection-carousel-swiper-component .image-block__image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--multicolumn-media-ratio, 1 / 1);
+}
+
 @media screen and (max-width: 749px) {
   .max-sm\:grid-layout--3 {
     --card-grid-per-row: 3;

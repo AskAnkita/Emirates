@@ -3556,8 +3556,8 @@
         "overlay_style": "solid",
         "gradient_direction": "to top",
         "image_behavior": "none",
-        "padding-block-start": 90,
-        "padding-block-end": 4,
+        "padding-block-start": 32,
+        "padding-block-end": 64,
         "padding-inline-start": 100,
         "padding-inline-end": 100
       }

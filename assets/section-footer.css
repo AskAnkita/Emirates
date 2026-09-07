@@ -424,3 +424,10 @@
 .section-footer .email-signup__button--icon:focus-visible {
   background-color: #1f1f1f;
 }
+
+/* Collection pages: the tinted blurb section that sits directly above the
+   footer — lift it away from the section above with a real gap (the section
+   schema exposes padding only, not margin). */
+.template-collection .section-wrapper:has(> .section.color-scheme-8) {
+  margin-block-start: 6.4rem;
+}

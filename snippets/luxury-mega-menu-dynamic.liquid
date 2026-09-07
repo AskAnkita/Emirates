@@ -1,0 +1,515 @@
+{%- comment -%}
+  Renders the luxury mega menu dynamically from Shopify menu data, in the
+  columns-plus-promo-images-plus-best-sellers layout used across the store.
+
+  Accepts:
+  - link: {Object} A menu link with child items. Each child becomes its own
+    text column, in nav order, except "Stone" (always moved last, next to
+    the images) and "Best Sellers" (broken out into the pill row instead).
+  - section_settings: {Object} Section settings for colors and styling
+  - enhancement_block: {Object} Optional block of type "luxury_mega_menu"
+    whose settings.nav_label matches link.title. When present, its
+    featured images and "best sellers" row are appended to the panel;
+    when absent, the panel renders as a plain column list.
+
+  Usage:
+    {% render 'luxury-mega-menu-dynamic', link: link, section_settings: section.settings, enhancement_block: enhancement_block %}
+{%- endcomment -%}
+
+{%- liquid
+  assign uid = link.handle | replace: '-', '' | replace: '_', '' | downcase
+  assign groups = link.links
+  assign es = enhancement_block.settings
+
+  assign show_media = false
+  if enhancement_block != blank
+    assign show_media = true
+  endif
+
+  # If the store's navigation already has a "Best Sellers" child item, use its
+  # real links to drive the bottom pill row (and leave it out of the text
+  # columns, so it isn't shown twice with two different sets of values).
+  assign bestsellers_group = blank
+  for childlink in groups
+    assign lower_title = childlink.title | downcase | strip
+    if lower_title == 'best sellers' or lower_title == 'bestsellers' or lower_title == 'best seller'
+      assign bestsellers_group = childlink
+    endif
+  endfor
+
+  assign show_bestsellers_row = false
+  assign bestsellers_heading = ''
+  if bestsellers_group != blank and bestsellers_group.links != blank
+    assign show_bestsellers_row = true
+    assign bestsellers_heading = bestsellers_group.title
+  elsif show_media and es.button1_label != blank
+    assign show_bestsellers_row = true
+    assign bestsellers_heading = es.buttons_heading
+  endif
+
+  # "Stone" is pulled out of its natural position and rendered last, so it
+  # sits as the final text column right next to the promo images.
+  assign stone_group = blank
+  for childlink in groups
+    assign lower_title = childlink.title | downcase | strip
+    if lower_title == 'stone'
+      assign stone_group = childlink
+    endif
+  endfor
+
+  # Menus with fewer text columns have room to spare, so give them a second
+  # promo image (and size both images down a bit to fit).
+  assign text_column_count = groups.size
+  if bestsellers_group != blank
+    assign text_column_count = text_column_count | minus: 1
+  endif
+
+  assign image_count = 1
+  assign image_width = 480
+  if text_column_count <= 3
+    assign image_count = 2
+    assign image_width = 340
+  endif
+
+  # Styling: use the enhancement block's settings when available, otherwise
+  # fall back to the same neutral defaults as the rest of the menu.
+  assign panel_bg = es.panel_background | default: '#ffffff'
+  assign heading_color = es.heading_color | default: '#000000'
+  assign heading_size = es.heading_font_size | default: 12
+  assign heading_weight = es.heading_font_weight | default: 700
+  assign heading_spacing = es.heading_letter_spacing | default: 1
+  assign heading_margin = es.heading_margin_bottom | default: 15
+  assign link_color = es.link_color | default: '#666666'
+  assign link_hover = es.link_hover_color | default: '#000000'
+  assign link_size = es.link_font_size | default: 14
+  assign link_spacing = es.link_spacing | default: 10
+  assign divider_color = es.divider_color | default: '#e6e6e6'
+  assign column_gap = es.column_gap | default: 40
+  # Keeps columns visually even: any group with more links than this shows a
+  # "View all" link to the rest instead of the full uneven-length list.
+  assign column_link_cap = 5
+  assign group_spacing = es.group_spacing | default: 20
+  assign section_spacing = es.section_spacing | default: 30
+  assign content_max_width = es.content_max_width | default: 1500
+  assign padding_v = es.panel_padding_vertical | default: 40
+  assign padding_h = es.panel_padding_horizontal | default: 40
+  assign button_text_color = es.button_text_color | default: '#000000'
+  assign button_border_color = es.button_border_color | default: '#000000'
+  assign button_hover_text = es.button_hover_text_color | default: '#ffffff'
+  assign button_hover_bg = es.button_hover_background | default: '#000000'
+  assign button_hover_border = es.button_hover_border_color | default: '#000000'
+  assign button_font_size = es.button_font_size | default: 13
+  assign button_padding_v = es.button_padding_vertical | default: 10
+  assign button_padding_h = es.button_padding_horizontal | default: 20
+  assign button_border_width = es.button_border_width | default: 1
+  assign button_radius = es.button_border_radius | default: 0
+  assign button_gap = es.button_gap | default: 12
+
+  assign divider_half = column_gap | divided_by: 2
+-%}
+
+{% style %}
+  /* The menu wrapper is the positioning context so every panel is
+     centred on the nav rather than on its own trigger. */
+  .header__menu-wrapper {
+    position: relative;
+  }
+
+  .luxury-mm-{{ uid }} {
+    display: inline-block;
+    position: static;
+  }
+
+  .luxury-mm-trigger-{{ uid }} {
+    position: relative;
+    display: inline-block;
+  }
+
+  .luxury-mm-trigger-{{ uid }} > a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    padding: 10px 15px;
+    font-family: var(--button-type-font-link, inherit);
+    font-size: var(--button-font-size-link, 1.4rem);
+    font-weight: var(--button-font-weight-link, inherit);
+    text-transform: var(--text-transform, none);
+    white-space: nowrap;
+  }
+
+  .luxury-mm-panel-{{ uid }} {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 100vw;
+    max-width: 100vw;
+    transform: translateX(-50%) translateY(-8px);
+    background-color: {{ panel_bg }};
+    border-top: 1px solid {{ divider_color }};
+    box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+    z-index: 1000;
+  }
+
+  .luxury-mm-{{ uid }}:hover .luxury-mm-panel-{{ uid }},
+  .luxury-mm-{{ uid }}:focus-within .luxury-mm-panel-{{ uid }} {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .luxury-mm-content-{{ uid }} {
+    max-width: {{ content_max_width }}px;
+    margin: 0 auto;
+    padding: {{ padding_v }}px {{ padding_h }}px;
+  }
+
+  .luxury-mm-grid-{{ uid }} {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    gap: {{ column_gap }}px;
+  }
+
+  .luxury-mm-textcols-{{ uid }} {
+    display: flex;
+    flex-wrap: wrap;
+    /* Lets this block shrink and wrap its own columns onto a second row
+       under a squeeze, instead of forcing the (non-shrinking) images block
+       below it onto a new line. */
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: {{ column_gap }}px;
+    row-gap: {{ section_spacing }}px;
+  }
+
+  .luxury-mm-col-{{ uid }} {
+    position: relative;
+    min-width: 150px;
+  }
+
+  .luxury-mm-col-{{ uid }}:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -{{ divider_half }}px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: {{ divider_color }};
+  }
+
+  .luxury-mm-heading-{{ uid }} {
+    font-weight: {{ heading_weight }};
+    text-transform: uppercase;
+    font-size: {{ heading_size }}px;
+    color: {{ heading_color }};
+    margin: 0 0 {{ heading_margin }}px;
+    letter-spacing: {{ heading_spacing }}px;
+  }
+
+  .luxury-mm-links-{{ uid }} {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .luxury-mm-links-{{ uid }} li {
+    margin-bottom: {{ link_spacing }}px;
+  }
+
+  .luxury-mm-links-{{ uid }} li:last-child {
+    margin-bottom: 0;
+  }
+
+  .luxury-mm-links-{{ uid }} a {
+    text-decoration: none;
+    color: {{ link_color }};
+    font-size: {{ link_size }}px;
+    transition: color 0.2s ease;
+    display: block;
+  }
+
+  .luxury-mm-links-{{ uid }} a:hover {
+    color: {{ link_hover }};
+  }
+
+  .luxury-mm-viewall-{{ uid }} {
+    color: {{ heading_color }} !important;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .luxury-mm-images-{{ uid }} {
+    display: flex;
+    gap: 24px;
+    flex: 0 0 auto;
+    padding-left: {{ column_gap }}px;
+    border-left: 1px solid {{ divider_color }};
+  }
+
+  .luxury-mm-image-item-{{ uid }} {
+    flex: 0 0 auto;
+    width: {{ image_width }}px;
+  }
+
+  .luxury-mm-image-item-{{ uid }} a {
+    display: block;
+    overflow: hidden;
+  }
+
+  /* Fixed (not aspect-ratio-driven) height so the image band lines up with
+     the text columns, which run 5 links deep plus a heading. */
+  .luxury-mm-image-item-{{ uid }} img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .luxury-mm-image-item-{{ uid }} a:hover img {
+    transform: scale(1.04);
+  }
+
+  .luxury-mm-placeholder-{{ uid }} {
+    width: 100%;
+    height: 230px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .luxury-mm-placeholder-{{ uid }} svg {
+    width: 30%;
+    height: 30%;
+    opacity: 0.3;
+  }
+
+  .luxury-mm-rule-{{ uid }} {
+    height: 1px;
+    background-color: {{ divider_color }};
+    margin: {{ section_spacing }}px 0;
+  }
+
+  .luxury-mm-buttons-heading-{{ uid }} {
+    font-weight: {{ heading_weight }};
+    text-transform: uppercase;
+    font-size: {{ heading_size }}px;
+    color: {{ heading_color }};
+    letter-spacing: {{ heading_spacing }}px;
+    margin: 0 0 {{ heading_margin }}px;
+  }
+
+  .luxury-mm-buttons-{{ uid }} {
+    display: flex;
+    gap: {{ button_gap }}px;
+    flex-wrap: wrap;
+  }
+
+  .luxury-mm-button-{{ uid }} {
+    padding: {{ button_padding_v }}px {{ button_padding_h }}px;
+    border: {{ button_border_width }}px solid {{ button_border_color }};
+    background-color: transparent;
+    color: {{ button_text_color }};
+    text-decoration: none;
+    font-size: {{ button_font_size }}px;
+    transition: all 0.2s ease;
+    border-radius: {{ button_radius }}px;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .luxury-mm-button-{{ uid }}:hover {
+    background-color: {{ button_hover_bg }};
+    color: {{ button_hover_text }};
+    border-color: {{ button_hover_border }};
+  }
+
+  @media screen and (max-width: 1199px) {
+    .luxury-mm-grid-{{ uid }} {
+      flex-direction: column;
+    }
+
+    .luxury-mm-images-{{ uid }} {
+      width: 100%;
+      flex-wrap: wrap;
+      padding-left: 0;
+      border-left: none;
+      padding-top: {{ section_spacing }}px;
+      border-top: 1px solid {{ divider_color }};
+    }
+
+    .luxury-mm-image-item-{{ uid }} {
+      width: 100%;
+      max-width: {{ image_width }}px;
+    }
+  }
+
+  @media screen and (max-width: 989px) {
+    .luxury-mm-{{ uid }} {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+<div class="luxury-mm-{{ uid }}">
+  <div class="luxury-mm-trigger-{{ uid }}">
+    <a
+      href="{{ link.url }}"
+      {% if link.current %}aria-current="page"{% endif %}
+    >
+      {{ link.title | escape }}
+    </a>
+  </div>
+
+  {%- if groups != blank -%}
+    <div class="luxury-mm-panel-{{ uid }}">
+      <div class="luxury-mm-content-{{ uid }}">
+        <div class="luxury-mm-grid-{{ uid }}">
+          <div class="luxury-mm-textcols-{{ uid }}">
+            {%- comment -%}
+              "Best Sellers" (when present) is broken out into the pill row
+              below, so it's left out of the text columns to avoid showing it
+              twice. "Stone" is pulled out of its natural position too, and
+              rendered last below so it lands right next to the images.
+            {%- endcomment -%}
+
+            {%- comment -%} One column per group, in nav order {%- endcomment -%}
+            {%- for childlink in groups -%}
+              {%- liquid
+                assign item_lower = childlink.title | downcase | strip
+                assign skip_item = false
+                if item_lower == 'stone'
+                  assign skip_item = true
+                endif
+                if bestsellers_group != blank and childlink.title == bestsellers_group.title
+                  assign skip_item = true
+                endif
+              -%}
+              {%- unless skip_item -%}
+                <div class="luxury-mm-col-{{ uid }}">
+                  <h3 class="luxury-mm-heading-{{ uid }}">{{ childlink.title | escape }}</h3>
+                  {%- if childlink.links != blank -%}
+                    <ul class="luxury-mm-links-{{ uid }}">
+                      {%- for grandchildlink in childlink.links limit: column_link_cap -%}
+                        <li>
+                          <a
+                            href="{{ grandchildlink.url }}"
+                            {% if grandchildlink.current %}aria-current="page"{% endif %}
+                          >
+                            {{ grandchildlink.title | escape }}
+                          </a>
+                        </li>
+                      {%- endfor -%}
+                      {%- if childlink.links.size > column_link_cap -%}
+                        <li><a href="{{ childlink.url }}" class="luxury-mm-viewall-{{ uid }}">View all</a></li>
+                      {%- endif -%}
+                    </ul>
+                  {%- else -%}
+                    <ul class="luxury-mm-links-{{ uid }}">
+                      <li><a href="{{ childlink.url }}">View All</a></li>
+                    </ul>
+                  {%- endif -%}
+                </div>
+              {%- endunless -%}
+            {%- endfor -%}
+
+            {%- comment -%} Stone column: always last, right before the images {%- endcomment -%}
+            {%- if stone_group != blank -%}
+              <div class="luxury-mm-col-{{ uid }}">
+                <h3 class="luxury-mm-heading-{{ uid }}">{{ stone_group.title | escape }}</h3>
+                {%- if stone_group.links != blank -%}
+                  <ul class="luxury-mm-links-{{ uid }}">
+                    {%- for grandchildlink in stone_group.links limit: column_link_cap -%}
+                      <li>
+                        <a
+                          href="{{ grandchildlink.url }}"
+                          {% if grandchildlink.current %}aria-current="page"{% endif %}
+                        >
+                          {{ grandchildlink.title | escape }}
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                    {%- if stone_group.links.size > column_link_cap -%}
+                      <li><a href="{{ stone_group.url }}" class="luxury-mm-viewall-{{ uid }}">View all</a></li>
+                    {%- endif -%}
+                  </ul>
+                {%- else -%}
+                  <ul class="luxury-mm-links-{{ uid }}">
+                    <li><a href="{{ stone_group.url }}">View All</a></li>
+                  </ul>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+
+          {%- if show_media -%}
+            <div class="luxury-mm-images-{{ uid }}">
+              {%- comment -%} One image for busier menus, two when there's room to spare {%- endcomment -%}
+              {%- for n in (1..image_count) -%}
+                {%- liquid
+                  assign image_key = 'featured_image' | append: n
+                  assign image_url_key = 'featured_image' | append: n | append: '_url'
+                  assign image = es[image_key]
+                -%}
+                <div class="luxury-mm-image-item-{{ uid }}">
+                  {% if es[image_url_key] != blank %}<a href="{{ es[image_url_key] }}">{% endif %}
+                  {% if image != blank %}
+                    <img
+                      src="{{ image | image_url: width: 600 }}"
+                      srcset="{{ image | image_url: width: 400 }} 400w, {{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w"
+                      sizes="(min-width: 990px) 360px, 100vw"
+                      alt="{{ image.alt | escape }}"
+                      loading="lazy"
+                      width="{{ image.width }}"
+                      height="{{ image.height }}"
+                    >
+                  {% else %}
+                    <div class="luxury-mm-placeholder-{{ uid }}">
+                      {{ 'image' | placeholder_svg_tag }}
+                    </div>
+                  {% endif %}
+                  {% if es[image_url_key] != blank %}</a>{% endif %}
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        {%- if show_bestsellers_row -%}
+          <div class="luxury-mm-rule-{{ uid }}"></div>
+
+          {% if bestsellers_heading != blank %}
+            <h3 class="luxury-mm-buttons-heading-{{ uid }}">{{ bestsellers_heading | escape }}</h3>
+          {% endif %}
+
+          <div class="luxury-mm-buttons-{{ uid }}">
+            {%- if bestsellers_group != blank -%}
+              {%- comment -%} Pull the pill labels straight from the "Best Sellers" nav item {%- endcomment -%}
+              {%- for grandchildlink in bestsellers_group.links -%}
+                <a href="{{ grandchildlink.url }}" class="luxury-mm-button-{{ uid }}">{{ grandchildlink.title | escape }}</a>
+              {%- endfor -%}
+            {%- else -%}
+              {%- comment -%} Fallback: no matching nav item, use the block's configured buttons {%- endcomment -%}
+              {% for i in (1..5) %}
+                {%- liquid
+                  assign label_key = 'button' | append: i | append: '_label'
+                  assign url_key = 'button' | append: i | append: '_url'
+                -%}
+                {% if es[label_key] != blank %}
+                  <a href="{{ es[url_key] | default: '#' }}" class="luxury-mm-button-{{ uid }}">{{ es[label_key] }}</a>
+                {% endif %}
+              {% endfor %}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+</div>

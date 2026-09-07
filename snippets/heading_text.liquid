@@ -1,0 +1,46 @@
+{%- liquid
+  assign bl_stts = block.settings
+
+  assign plain_text = bl_stts.text | strip_newlines | strip_html | strip
+
+  assign p_left = bl_stts.padding_left
+  assign p_right = bl_stts.padding_right
+  assign p_top = bl_stts.padding_top
+  assign p_bottom = bl_stts.padding_bottom
+
+  assign width = bl_stts.width_option
+
+  assign heading_size = bl_stts.heading_size
+
+  assign alignment = bl_stts.alignment
+
+  assign border = bl_stts.border
+-%}
+
+{% if border != 'none' %}
+  {%- render 'heading-border-styles' -%}
+{% endif %}
+
+
+{%- capture attr -%}
+ class="{% if border != 'none' %}heading-border--{{ border }}{% endif %} w-{{ width }} {{ alignment }}" {{ block.shopify_attributes }}
+ style="
+ {% if border != 'none' %}
+  {%- render 'border-override', settings: bl_stts -%}
+ {% endif %}
+ {% if p_left != 0 %}--pl:{{ p_left }}px;{% endif %}
+ {% if p_top != 0 %}--pt:{{ p_top }}px;{% endif %}
+ {% if p_bottom != 0 %}--pb:{{ p_bottom }}px;{% endif %}
+ {% if p_right != 0 %}--pr:{{ p_right }}px;{% endif %}
+ "
+{%- endcapture -%}
+
+<div {{ attr }}>
+  <h2 class="{{ heading_size }}">
+    {% if placeholder_text != blank and plain_text == blank %}
+      {{ placeholder_text }}
+    {% elsif plain_text != blank %}
+      {{ plain_text }}
+    {% endif %}
+  </h2>
+</div>

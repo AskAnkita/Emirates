@@ -1,0 +1,38 @@
+{%- comment -%}
+    Renders the CSS variables for the `position` styles needed for responsive scaling.
+    Intended for use with the `position-style` class.
+
+    <div class="position-style" style="{% render 'position-style', settings: block.settings %}">
+
+    Accepts:
+        settings: {block.settings || section.settings}
+        suffix: {string}
+{%- endcomment -%}
+{%- liquid
+    assign properties = 'position' | split: ','
+    assign directions = 'horizontal,vertical' | split: ','
+    assign devices = 'desktop,mobile' | split: ','
+-%}
+{%- capture variables -%}
+    {%- for device in devices -%}
+        {%- for property in properties -%}
+            {%- for direction in directions -%}
+                {%-liquid
+                    assign name = property | append: '-' | append: direction
+                    if device == 'mobile'
+                        assign name = name | append: '-mobile'
+                    endif
+                    assign setting_id = name
+                    if suffix != blank
+                        assign setting_id = setting_id | append: '-' | append: suffix
+                    endif
+                    assign value = settings[setting_id]
+                -%}
+                {%- if value != blank -%}
+                    --{{ name }}: {{ value }}%;
+                {%- endif -%}
+            {%- endfor -%}
+        {%- endfor -%}
+    {%- endfor -%}
+{%- endcapture -%}
+{{- variables | strip | strip_newlines -}}

@@ -1,0 +1,523 @@
+{%- liquid
+    assign section_width = section.settings.section_width
+    assign page_width_custom = section.settings.page_width_custom
+    assign enable_jump_to_product = section.settings.enable_jump_to_product
+    assign product = closest.product
+    
+    assign color_scheme = section.settings.color_scheme
+    assign ratio = 1
+    assign image_ratio = section.settings.image_ratio
+    assign background_image = section.settings.background_image
+    assign background_media = section.settings.background_media
+    assign video = section.settings.video | default: settings.video
+    assign video_position = section.settings.video_position
+    assign background_image_position = section.settings.background_image_position
+    assign placeholder = section.settings.placeholder
+    assign enable_parallax = section.settings.enable_parallax
+    assign parallax_speed = section.settings.parallax_speed
+    assign horizontal_position = section.settings.horizontal_position
+    assign vertical_position = section.settings.vertical_position
+    assign link = section.settings.link
+    assign open_in_new_tab = section.settings.open_in_new_tab
+    assign border = section.settings.border
+    assign height = section.settings.height
+    assign width = section.settings.width
+    assign disable_parallax_mobile = section.settings.disable_parallax_mobile
+    assign toggle_overlay = section.settings.toggle_overlay
+
+    case image_ratio
+      when 'landscape'
+        assign ratio = '16 / 9'
+      when 'portrait'
+        assign ratio = '4 / 5'
+      when 'adapt'
+        if background_image != blank
+          assign ratio = background_image.aspect_ratio
+          else
+          assign ratio = video.aspect_ratio
+        endif
+    endcase
+
+    if ratio == 0 or ratio == null
+      assign ratio = 1
+    endif
+
+    assign element = 'div'
+    if enable_parallax == 'parallax_items'
+      assign element = 'parallax-element'
+      assign class_content = ' parallax--target'
+    endif
+  -%}
+
+<div class="featured-product-banner-container small-hide color-{{ color_scheme }} section section--{{ section_width }}"
+style="
+  {% if section_width == 'custom' %}
+    --page-content-width: {{ page_width_custom | divided_by: 10 }}rem;
+    --page-width: calc(var(--page-content-width) + var(--page-margin) * 2);
+  {% endif %}
+"
+>
+  {% capture children %}
+    {% if enable_jump_to_product %}
+      {% render 'jump-to-product', product: product %}
+    {% endif %}
+  {% endcapture %}
+
+  {% capture attributes %}
+    {{ section.shopify_attributes }}
+    {% if enable_parallax == 'parallax_items' %}
+      is="content"
+      data-parallax="true"
+      data-speed="{{ parallax_speed }}"
+      data-horizontal-position="{{ horizontal_position }}% {{ horizontal_position }}%"
+      data-vertical-position="{{ vertical_position }}% {{ vertical_position }}%"
+    {% endif %}
+  {% endcapture %}
+
+  {%- capture group_block_class -%}
+    group-block relative
+    group-block--height-{{ height }}
+    group-block--width-{{ width }}
+    {% if border != 'none' %}border-style{% endif %}
+    spacing-style
+    size-style
+    shadow-style
+    group-block--content-overlay
+  {%- endcapture -%}
+
+  <{{ element }}
+    class="{{ group_block_class | strip | strip_newlines }}"
+    style="
+      {% if border != 'none' %}
+        {% render 'border-override', settings: section.settings %}
+      {% endif %}
+      {% render 'spacing-style', settings: section.settings %}
+      {% render 'size-style', settings: section.settings %}
+      {% render 'shadow-style', settings: section.settings %}
+    "
+    {{ attributes }}
+    data-testid="group-block"
+    {% if enable_parallax == 'parallax_items' and disable_parallax_mobile %}
+      data-disable-parallax-mobile="true"
+    {% endif %}
+  >
+    {%- if link != blank -%}
+      <a
+        href="{{ link }}"
+        class="group-block__link"
+        aria-label="Group Block Link"
+        {% if open_in_new_tab %}
+          target="_blank" rel="noopener"
+        {% endif %}
+      ></a>
+    {%- endif -%}
+
+    <div class="group-block__media-wrapper{% if background_image == blank %} media--empty{% endif %}{% if background_media == 'none' %} none{% endif %}">
+      {% render 'background-media',
+        background_media: background_media,
+        background_video: video,
+        background_video_position: video_position,
+        background_image: background_image,
+        background_image_position: background_image_position,
+        placeholder: placeholder,
+        ratio: ratio,
+        enable_parallax: enable_parallax,
+      %}
+      {{- children -}}
+    </div>
+    {% if toggle_overlay %}
+      {% render 'overlay', settings: section.settings, layer: '0' %}
+    {% endif %}
+  </{{ element }}>
+</div>
+
+{% schema %}
+{
+  "name": "Featured product banner",
+  "limit": 1,
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "page_width_custom",
+      "min": 1000,
+      "max": 2000,
+      "step": 10,
+      "default": 1570,
+      "unit": "px",
+      "label": "t:settings.page_width",
+      "visible_if": "{{ section.settings.section_width == 'custom' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_jump_to_product",
+      "label": "Enable jump to product",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "sticky_pos_bottom",
+      "label": "t:settings.sticky_position_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24,
+      "visible_if": "{{ section.settings.enable_jump_to_product == true }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "background_media",
+      "label": "t:settings.background_media",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "image",
+          "label": "t:options.image"
+        },
+        {
+          "value": "video",
+          "label": "t:options.video"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:settings.video",
+      "visible_if": "{{ section.settings.background_media == 'video' }}"
+    },
+    {
+      "type": "select",
+      "id": "video_position",
+      "label": "t:settings.video_position",
+      "options": [
+        {
+          "value": "cover",
+          "label": "t:options.cover"
+        },
+        {
+          "value": "contain",
+          "label": "t:options.contain"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ section.settings.background_media == 'video' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "t:settings.image",
+      "visible_if": "{{ section.settings.background_media == 'image' }}"
+    },
+    {
+      "type": "select",
+      "id": "background_image_position",
+      "label": "t:settings.image_position",
+      "options": [
+        {
+          "value": "cover",
+          "label": "t:options.cover"
+        },
+        {
+          "value": "fit",
+          "label": "t:options.fit"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ section.settings.background_media == 'image' }}"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:options.auto"
+        },
+        {
+          "value": "portrait",
+          "label": "t:options.portrait"
+        },
+        {
+          "value": "square",
+          "label": "t:options.square"
+        },
+        {
+          "value": "landscape",
+          "label": "t:options.landscape"
+        }
+      ],
+      "default": "adapt",
+      "label": "t:settings.image_ratio",
+      "visible_if": "{{ section.settings.background_media == 'image' or section.settings.background_media == 'video' }}"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "t:settings.borders",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:options.solid"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "label": "t:settings.border_width",
+      "default": 1,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.border_opacity",
+      "default": 0,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:settings.border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "toggle_overlay",
+      "label": "t:settings.background_overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "t:settings.overlay_color",
+      "alpha": true,
+      "default": "#00000026",
+      "visible_if": "{{ section.settings.toggle_overlay }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "extend_left_overlay",
+      "label": "t:settings.extend_left_overlay",
+      "default": false,
+      "visible_if": "{{ section.settings.toggle_overlay }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "extend_right_overlay",
+      "label": "t:settings.extend_right_overlay",
+      "default": false,
+      "visible_if": "{{ section.settings.toggle_overlay }}"
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "t:settings.overlay_style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "t:options.solid"
+        },
+        {
+          "value": "gradient",
+          "label": "t:options.gradient"
+        }
+      ],
+      "default": "solid",
+      "visible_if": "{{ section.settings.toggle_overlay }}"
+    },
+    {
+      "type": "select",
+      "id": "gradient_direction",
+      "label": "t:settings.gradient_direction",
+      "options": [
+        {
+          "value": "to top",
+          "label": "t:options.up"
+        },
+        {
+          "value": "to bottom",
+          "label": "t:options.down"
+        }
+      ],
+      "default": "to top",
+      "visible_if": "{{ section.settings.toggle_overlay and section.settings.overlay_style == 'gradient' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.animation"
+    },
+    {
+      "type": "select",
+      "id": "enable_parallax",
+      "label": "t:settings.enable_parallax_scroll",
+      "default": "none",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "parallax_items",
+          "label": "Items"
+        },
+        {
+          "value": "parallax_background",
+          "label": "Background"
+        },
+        {
+          "value": "reveal_on_scroll",
+          "label": "Reveal on scroll"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_parallax_mobile",
+      "label": "t:settings.disable_parallax_scroll_on_mobile",
+      "default": false,
+      "visible_if": "{{ section.settings.enable_parallax == 'parallax_items' }}"
+    },
+    {
+      "type": "range",
+      "id": "parallax_speed",
+      "label": "t:settings.parallax_speed",
+      "min": 0,
+      "max": 4,
+      "step": 0.5,
+      "default": 0.5,
+      "visible_if": "{{ section.settings.enable_parallax == 'parallax_items' }}"
+    },
+    {
+      "type": "range",
+      "id": "horizontal_position",
+      "min": -50,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.horizontal_position",
+      "default": 0,
+      "visible_if": "{{ section.settings.enable_parallax == 'parallax_items' }}"
+    },
+    {
+      "type": "range",
+      "id": "vertical_position",
+      "min": -50,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.vertical_position",
+      "default": 0,
+      "visible_if": "{{ section.settings.enable_parallax == 'parallax_items' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.section_padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.left",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.right",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.bottom",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured product banner"
+    }
+  ]
+}
+{% endschema %}

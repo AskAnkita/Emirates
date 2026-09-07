@@ -1,0 +1,53 @@
+{%- liquid
+  echo 'vendor.css' | asset_url | stylesheet_tag: preload: true
+  echo 'base.css' | asset_url | stylesheet_tag: preload: true
+  
+  if direction == 'rtl'
+    echo 'rtl.css' | asset_url | stylesheet_tag: preload: true
+  endif
+-%}
+
+<link rel="stylesheet" href="{{ 'section.css' | asset_url }}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-slider.css' | asset_url }}" media="print" onload="this.media='all'">
+
+{%- if settings.show_countdown -%}
+  <link rel="stylesheet" href="{{ 'component-card-countdown.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+{%- if settings.show_calculator_free_shipping_message -%}
+  <link rel="stylesheet" href="{{ 'component-calculator-shipping.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+{%- if settings.swatch != blank -%}
+  <link rel="stylesheet" href="{{ 'component-swatch.css' | asset_url }}"  media="print" onload="this.media='all'">
+{%- endif -%}
+{%- if settings.predictive_search_enabled -%}
+  <link rel="stylesheet" href="{{ 'component-predictive-search.css' | asset_url }}"  media="print" onload="this.media='all'">
+{%- endif -%}
+
+<link rel="stylesheet" href="{{ 'component-card.css' | asset_url }}"  media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}"  media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}"  media="print" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'animation.css' | asset_url }}"  media="print" onload="this.media='all'">
+
+{% comment %} Fallback for browsers that don't support preload {% endcomment %}
+<noscript>
+  <link rel="stylesheet" href="{{ 'section.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'component-slider.css' | asset_url }}">
+
+  {%- if settings.show_countdown -%}
+      <link rel="stylesheet" href="{{ 'component-card-countdown.css' | asset_url }}">
+  {%- endif -%}
+  {%- if settings.show_calculator_free_shipping_message -%}
+      <link rel="stylesheet" href="{{ 'component-calculator-shipping.css' | asset_url }}">
+  {%- endif -%}
+  {%- if settings.swatch != blank -%}
+      <link rel="stylesheet" href="{{ 'component-swatch.css' | asset_url }}">
+  {%- endif -%}
+  {%- if settings.predictive_search_enabled -%}
+      <link rel="stylesheet" href="{{ 'component-predictive-search.css' | asset_url }}">
+  {%- endif -%}
+
+  <link rel="stylesheet" href="{{ 'component-card.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'component-price.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'animation.css' | asset_url }}">
+</noscript>

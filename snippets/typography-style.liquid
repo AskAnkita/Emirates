@@ -1,0 +1,85 @@
+{%- comment -%}
+  Intended for blocks and sections that provide values for all the referenced settings.
+
+  <div class="spacing-style" style="{%  render 'spacing-style', settings: section.settings %}">
+
+   Accepts:
+      settings: {settings || section.settings}
+{%- endcomment -%}
+{%- liquid
+  assign preset = preset | default: settings.type_preset
+  assign font_size = font_size | default: settings.font_size
+  assign font = font | default: settings.font
+  assign weight = weight | default: settings.weight
+  assign case = case | default: settings.case
+  assign wrap = wrap | default: settings.wrap
+  assign line_height = line_height | default: settings.line_height
+  assign letter_spacing = letter_spacing | default: settings.letter_spacing
+  assign color = color | default: settings.color
+  assign button_link = button_link | default: settings.button_link
+  assign font_style = font_style | default: settings.font_style
+-%}
+
+{%- capture variables -%}
+  {%- if preset != 'rte' and color != "" -%}
+    --color: {{ color }};
+  {%- endif -%}
+  {%- if preset == 'custom' -%}
+    {%- liquid
+      unless type
+        comment
+          When choosing to customize the font, picking a specific font size
+          determines the type of text block.
+        endcomment
+        if font_size != ''
+          assign font_size_value = font_size | split: 'rem' | first | times: 1.0
+
+          if font_size_value > 4.5
+            assign type = 'display'
+          elsif font_size_value > 3.5
+            assign type = 'heading'
+          else
+            assign type = 'body'
+          endif
+        endif
+      endunless
+    -%}
+    {%- if font_size != blank -%}
+      {%- liquid
+        assign font_size_cutoff = 4.8
+        if font_size_value < font_size_cutoff
+          assign fluid_size_min_rem = font_size_value | plus: 1 | times: 0.5
+        else
+          assign fluid_size_min_rem = font_size_value | times: 0.5
+        endif
+        assign fluid_size = font_size_value
+        assign fluid_size_max_rem = font_size_value
+
+      -%}
+
+      --font-size: clamp({{fluid_size_min_rem}}rem, {{fluid_size}}vw, {{fluid_size_max_rem}}rem);
+    {%- endif -%}
+    {%- if weight != blank -%}
+      --font-weight: {{ weight }};
+    {% else %}
+      --font-weight: {{ font | replace: 'family', 'weight' }};
+    {%- endif -%}
+    --font-family: {{ font }};
+    --text-transform: {{ case }};
+    --text-wrap: {{ wrap }};
+    {% if preset == 'custom' and font_size == blank %}
+      --line-height--display: var(--line-height--display-{{ line_height }});
+      --line-height--heading: var(--line-height--heading-{{ line_height }});
+      --line-height--body: var(--line-height--body-{{ line_height }});
+    {% else %}
+      --line-height: var(--line-height--{{ type }}-{{ line_height }});
+    {% endif %}
+    --letter-spacing: var(--letter-spacing--{{ type }}-{{ letter_spacing }});
+  {%- endif -%}
+  {%- if button_link == true -%}
+    --text-wrap: {{ wrap }};
+    --text-transform: {{ case }};
+    --font-style: {{ font_style }};
+  {%- endif -%}
+{%- endcapture -%}
+{{- variables | strip | strip_newlines -}}

@@ -1,0 +1,742 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+{%- if section.settings.enable_shop_login_button == false -%}
+  {%- assign hide_shop_login_button = true -%}
+{%- endif -%}
+
+{%- liquid
+  assign heading_font_size = section.settings.heading_font_size
+  assign heading_case = section.settings.heading_case
+
+  capture heading_class
+    echo 'class="login-title"'
+  endcapture
+
+  capture heading_styles
+    echo '--font-size--h2: ' | append: heading_font_size | append: ';'
+    echo '--font-h2--case: ' | append: heading_case | append: ';'
+  endcapture
+
+  assign text_font_size = section.settings.text_font_size
+
+  capture text_styles
+    echo '--font-body-size: ' | append: text_font_size | append: ';'
+  endcapture
+
+  assign label_font_size = section.settings.label_font_size
+  assign label_styles = '--font-label-size: ' | append: label_font_size | append: ';'
+
+  assign input_font_size = section.settings.input_font_size
+  assign input_styles = '--font-input-size: ' | append: input_font_size | append: ';'
+
+  assign field_margin = section.settings.gap
+  assign field_margin_styles = '--field-margin: ' | append: field_margin | append: 'px;'
+-%}
+
+{% capture form_styles %}
+  {{ label_styles }}
+  {{ input_styles }}
+  {{ field_margin_styles }}
+  {% render 'spacing-style', settings: section.settings %}
+{% endcapture %}
+
+  {% comment %} assign form_styles = label_styles | append: input_styles | append: field_margin_styles | append: '--margin-block-start: ' | append: section.settings.margin-block-start | append: 'px;' {% endcomment %}
+<div
+  class="section customer login spacing color-{{ section.settings.color_scheme }}"
+  style="
+    --p-spacing-t: {{ section.settings.padding_top }}px;
+    --p-spacing-b: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <h2 id="recover" tabindex="-1" class="center">
+    {{ 'customer.recover_password.title' | t }}
+  </h2>
+  <div>
+    <p class="center">
+      {{ 'customer.recover_password.subtext' | t }}
+    </p>
+
+    {%- form 'recover_customer_password', class: 'form-reset-password' -%}
+      {% assign recover_success = form.posted_successfully? %}
+      <div class="field spacing-style" style="{{ form_styles }}">
+        <label for="RecoverEmail">
+          {{ 'customer.login_page.email' | t }}
+        </label>
+        <input
+          type="email"
+          value=""
+          name="email"
+          id="RecoverEmail"
+          autocorrect="off"
+          autocapitalize="off"
+          autocomplete="email"
+          {% if form.errors %}
+            aria-invalid="true"
+            aria-describedby="RecoverEmail-email-error"
+            autofocus
+          {% endif %}
+          placeholder="{{ 'customer.login_page.email' | t }}"
+        >
+      </div>
+      {%- if form.errors -%}
+        <small id="RecoverEmail-email-error" class="form__message">
+          <span class="svg-wrapper">
+            {{- 'icon-error.svg' | inline_asset_content -}}
+          </span>
+          {{ form.errors.messages.form }}
+        </small>
+      {%- endif -%}
+
+      <div class="field items-center gap-xl">
+        <button class="button button--primary button--reset-password">
+          <span class="button-overflow relative overflow-hidden" data-button-text="{{ 'customer.login_page.submit' | t }}">
+            <span class="button-text-main inline-block relative z-1">
+              {{ 'customer.login_page.submit' | t }}
+            </span>
+          </span>
+        </button>
+
+        <a href="#login" class="link link--text link--underline">
+          {{ 'customer.login_page.cancel' | t }}
+        </a>
+      </div>
+    {%- endform -%}
+  </div>
+
+  <div>
+    <div class="flex max-sm:flex-wrap">
+      <div class="login-row--item login-row--item-left">
+        <h2
+          id="login"
+          tabindex="-1"
+          {{ heading_class }}
+          style="{{ heading_styles }}"
+        >
+          {{ 'customer.login_page.title' | t }}
+        </h2>
+        <div class="login-text" style="{{ text_styles }}">
+          {{ 'customer.recover_password.subtext' | t }}
+        </div>
+        {%- if recover_success == true -%}
+          <h3 class="form__message" tabindex="-1" autofocus>
+            <div class="alertBox alertBox--success">
+              <span class="svg-wrapper">
+                {{- 'icon-success.svg' | inline_asset_content -}}
+              </span>
+              {{ 'customer.recover_password.success' | t }}
+            </div>
+          </h3>
+        {%- endif -%}
+        {%- form 'customer_login', novalidate: 'novalidate', class: 'spacing-style', style: form_styles -%}
+          {%- if form.errors -%}
+            <h2 class="form__message" tabindex="-1" autofocus>
+              <span class="visually-hidden">{{ 'accessibility.error' | t }} </span>
+              <span class="svg-wrapper">
+                {{- 'icon-error.svg' | inline_asset_content -}}
+              </span>
+              {{ 'content.form.error_heading' | t }}
+            </h2>
+            <div class="alertBox alertBox--error">
+              <div class="alertBox-message">
+                {{ form.errors | default_errors }}
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- if shop.features.login_with_shop_classic_customer_accounts? -%}
+            <section name="sign-in-with-shop-provider">
+              {{ shop | login_button: hide_button: hide_shop_login_button }}
+
+              {%- unless hide_shop_login_button -%}
+                <p>
+                  {{ 'customer.login_page.alternate_provider_separator' | t }}
+                </p>
+              {%- endunless -%}
+            </section>
+          {%- endif -%}
+
+          <div class="field">
+            <label for="CustomerEmail">
+              {{ 'customer.login_page.email' | t }}
+            </label>
+            <input
+              type="email"
+              name="customer[email]"
+              id="CustomerEmail"
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+              placeholder="{{ 'customer.login_page.email' | t }}"
+              {% if form.errors contains 'form' %}
+                aria-invalid="true"
+              {% endif %}
+            >
+          </div>
+
+          {%- if form.password_needed -%}
+            <div class="field">
+              <label for="CustomerPassword">
+                {{ 'customer.login_page.password' | t }}
+              </label>
+              <input
+                type="password"
+                value=""
+                name="customer[password]"
+                id="CustomerPassword"
+                autocomplete="current-password"
+                placeholder="{{ 'customer.login_page.password' | t }}"
+                {% if form.errors contains 'form' %}
+                  aria-invalid="true"
+                {% endif %}
+              >
+            </div>
+          {%- endif -%}
+          <div class="field items-center gap-4xl">
+            <button class="button button--primary button--login">
+              <span class="button-overflow relative overflow-hidden" data-button-text="{{ 'customer.login_page.title' | t }}">
+                <span class="button-text-main inline-block relative z-1">
+                  {{ 'customer.login_page.title' | t }}
+                </span>
+              </span>
+            </button>
+
+            {% comment %}
+              <a href="{{ routes.account_register_url }}">
+                {{ 'customer.login_page.create_account' | t }}
+              </a>
+            {% endcomment %}
+
+            <a href="#recover" class="link link--text link--underline">
+              {{ 'customer.login_page.forgot_password' | t }}
+            </a>
+          </div>
+        {%- endform -%}
+      </div>
+      <div class="login-row--item login-row--item-right">
+        <div class="login-item">
+          <h2
+            {{ heading_class }}
+            style="{{ heading_styles }}"
+          >
+            {{ 'customer.register.title' | t }}
+          </h2>
+          <div class="page-wrapper">
+            <div class="login-text" style="{{ text_styles }}">
+              {{ 'customer.register.text' | t }}
+            </div>
+            {%- form 'create_customer', class: 'create-customer-form spacing-style', style: form_styles -%}
+              {%- if form.errors -%}
+                <h2 class="form__message" tabindex="-1" autofocus>
+                  <span class="visually-hidden">{{ 'accessibility.error' | t }} </span>
+                  <span class="svg-wrapper">
+                    {{- 'icon-error.svg' | inline_asset_content -}}
+                  </span>
+                  {{ 'content.form.error_heading' | t }}
+                </h2>
+                <div class="alertBox alertBox--error">
+                  <div class="alertBox-message">
+                    <ul>
+                      {%- for field in form.errors -%}
+                        <li>
+                          {%- if field == 'form' -%}
+                            {{ form.errors.messages[field] }}
+                          {%- else -%}
+                            <a href="#RegisterForm-{{ field }}" class="link link-underline">
+                              <span class="text">
+                                {{ form.errors.translated_fields[field] | capitalize }}
+                                {{ form.errors.messages[field] }}
+                              </span>
+                            </a>
+                          {%- endif -%}
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+                </div>
+              {% endif %}
+              <div class="field{% if form.errors contains "first_name" %} field--error{% endif %}">
+                <label class="form-label" for="RegisterForm-FirstName">
+                  {{ 'customer.register.first_name' | t }}
+                </label>
+                <input
+                  class="form-input form-input-placeholder{% if form.errors contains "first_name" %} error{% endif %}"
+                  type="text"
+                  name="customer[first_name]"
+                  id="RegisterForm-FirstName"
+                  {% if form.first_name %}
+                    value="{{ form.first_name }}"
+                  {% endif %}
+                  autocomplete="given-name"
+                  placeholder="{{ 'customer.register.first_name' | t }}"
+                >
+              </div>
+              <div class="field{% if form.errors contains "last_name" %} field--error{% endif %}">
+                <label class="form-label" for="RegisterForm-LastName">
+                  {{ 'customer.register.last_name' | t }}
+                </label>
+                <input
+                  class="form-input form-input-placeholder{% if form.errors contains "last_name" %} error{% endif %}"
+                  type="text"
+                  name="customer[last_name]"
+                  id="RegisterForm-LastName"
+                  {% if form.last_name %}
+                    value="{{ form.last_name }}"
+                  {% endif %}
+                  autocomplete="family-name"
+                  placeholder="{{ 'customer.register.last_name' | t }}"
+                >
+              </div>
+              <div class="field{% if form.errors contains "email" %} field--error{% endif %}">
+                <label class="form-label" for="RegisterForm-email">
+                  {{ 'customer.register.email' | t }}
+                  <em>*</em>
+                </label>
+                <input
+                  class="form-input form-input-placeholder{% if form.errors contains "email" %} error{% endif %}"
+                  type="email"
+                  name="customer[email]"
+                  id="RegisterForm-email"
+                  {% if form.email %}
+                    value="{{ form.email }}"
+                  {% endif %}
+                  spellcheck="false"
+                  autocapitalize="off"
+                  autocomplete="email"
+                  aria-required="true"
+                  {% if form.errors contains 'email' %}
+                    aria-invalid="true"
+                    aria-describedby="RegisterForm-email-error"
+                  {% endif %}
+                  required
+                  placeholder="{{ 'customer.register.email' | t }}"
+                >
+              </div>
+              <div class="field{% if form.errors contains "password" %} field--error{% endif %}">
+                <label class="form-label" for="password">
+                  {{ 'customer.register.password' | t }}
+                  <em>*</em>
+                </label>
+                <input
+                  class="form-input form-input-placeholder{% if form.errors contains "password" %} error{% endif %}"
+                  type="password"
+                  name="customer[password]"
+                  id="RegisterForm-password"
+                  aria-required="true"
+                  {% if form.errors contains 'password' %}
+                    aria-invalid="true"
+                    aria-describedby="RegisterForm-password-error"
+                  {% endif %}
+                  placeholder="{{ 'customer.register.password' | t }}"
+                  required
+                >
+              </div>
+              <div class="form-actions" style="--mt: var(--margin-xl)">
+                <button class="button">
+                  <span class="button-overflow relative overflow-hidden" data-button-text="{{ 'customer.register.create_an_account' | t }}">
+                    <span class="button-text-main inline-block relative z-1">
+                      {{ 'customer.register.create_an_account' | t }}
+                    </span>
+                  </span>
+                </button>
+              </div>
+            {%- endform -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {%- if shop.checkout.guest_login -%}
+    <div>
+      <hr>
+      <h2>{{ 'customer.login_page.guest_title' | t }}</h2>
+
+      {%- form 'guest_login' -%}
+        <button>
+          {{ 'customer.login_page.guest_continue' | t }}
+        </button>
+      {%- endform -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.login",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_shop_login_button",
+      "label": "t:settings.enable_sign_in_with_shop_button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        },
+        {
+          "value": "3.4rem",
+          "label": "34px"
+        },
+        {
+          "value": "3.6rem",
+          "label": "36px"
+        },
+        {
+          "value": "4.0rem",
+          "label": "40px"
+        },
+        {
+          "value": "5.0rem",
+          "label": "50px"
+        },
+        {
+          "value": "6.0rem",
+          "label": "60px"
+        },
+        {
+          "value": "7.0rem",
+          "label": "70px"
+        },
+        {
+          "value": "8.0rem",
+          "label": "80px"
+        },
+        {
+          "value": "9.0rem",
+          "label": "90px"
+        },
+        {
+          "value": "10.0rem",
+          "label": "100px"
+        },
+        {
+          "value": "12.0rem",
+          "label": "120px"
+        }
+      ],
+      "default": "2.0rem"
+    },
+    {
+      "type": "select",
+      "id": "heading_case",
+      "label": "t:settings.case",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:options.uppercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "t:options.capitalize"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "header",
+      "content": "t:content.text"
+    },
+    {
+      "type": "select",
+      "id": "text_font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        },
+        {
+          "value": "3.4rem",
+          "label": "34px"
+        },
+        {
+          "value": "3.6rem",
+          "label": "36px"
+        },
+        {
+          "value": "4.0rem",
+          "label": "40px"
+        },
+        {
+          "value": "5.0rem",
+          "label": "50px"
+        }
+      ],
+      "default": "2.0rem"
+    },
+    {
+      "type": "header",
+      "content": "Form"
+    },
+    {
+      "type": "range",
+      "id": "margin-block-start",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.spacing_top",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "label_font_size",
+      "label": "Label size",
+      "options": [
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        }
+      ],
+      "default": "2.0rem"
+    },
+    {
+      "type": "select",
+      "id": "input_font_size",
+      "label": "Input size",
+      "options": [
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        }
+      ],
+      "default": "2.0rem"
+    },
+    {
+      "type": "header",
+      "content": "t:content.colors"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "info": "t:info.has_cards_info",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.section_padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.bottom",
+      "default": 36
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,24 @@
+{%- capture children -%}
+  {%- content_for 'blocks' -%}
+{%- endcapture -%}
+
+<nav class="site-nav-mobile menu-drawer__navigation">
+  {{- children -}}
+</nav>
+
+{% schema %}
+{
+  "name": "t:names.contents",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_menu-tab-list"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.contents"
+    }
+  ]
+}
+{% endschema %}

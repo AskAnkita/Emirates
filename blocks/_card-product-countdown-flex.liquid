@@ -1,0 +1,48 @@
+{%- liquid
+  assign card_product = block.settings.product
+-%}
+
+{%- if card_product and card_product != empty -%}
+  {%- if settings.show_countdown -%}
+    {%- liquid
+      assign countdown_type = settings.countdown_type
+      assign countdown_time = settings.countdown_time
+      assign countdown_collection = settings.countdown_collection | downcase | handle
+    -%}
+
+    <div class="card--block-countdown">
+      <div class="card__countdown" style="--bottom: 4rem;">
+        {% render 'product-countdown',
+          type: 'card',
+          product: card_product,
+          countdown_type: countdown_type,
+          countdown_time: countdown_time,
+          countdown_collection: countdown_collection
+        %}
+      </div>
+    </div>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "t:names.product_countdown",
+    "tag": null,
+    "settings": [
+      {
+        "type": "product",
+        "id": "product",
+        "label": "t:settings.product"
+      }
+    ],
+    "presets": [
+      {
+        "name": "t:names.product_countdown",
+        "category": "t:categories.product",
+        "settings": {
+          "product": "{{ closest.product }}"
+        }
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,50 @@
+{% comment %}
+  Usage:
+  {% render 'highlight-style', order: "1,2,3", keys: 'key_1_, key_2_, key_3_', compare: compare, color: color, settings: section.settings %}
+{% endcomment %}
+
+{%- liquid
+  assign order = order | split: ','
+  assign keys = keys | split: ','
+  assign compare = compare | downcase | strip | handle
+-%}
+{%- capture variable_highlight_title -%}
+  {%- for key in keys -%}
+    {%- for i in order -%}
+      {%- liquid
+        assign name = key | split: '_' | first
+        assign item_setting_id = key | append: i
+        assign highlight_title = settings[item_setting_id]
+        assign value = highlight_title | downcase | split: ','
+
+        assign color_setting_id = key | append: 'color'
+        assign color = settings[color_setting_id]
+
+        assign bg_setting_id = key | append: 'bg'
+        assign bg = settings[bg_setting_id]
+      -%}
+      {%- if value != blank -%}
+        {%- capture list_style -%}
+          {% for item in value %}
+            {%- assign item_handle = item | strip | handle -%}
+            {%- if item_handle == compare %}
+              {%- if color != blank -%}
+              --{{ name }}-color:{{ color }};
+              --{{ name }}-color-rgb:{{ color.rgb }};
+              {%- endif -%}
+              {%- if bg != blank -%}
+                --{{ name }}-bg:{{ bg }};
+                --{{ name }}-bg-rgb:{{ bg.rgb }};
+              {%- endif -%}
+            {%- endif -%}
+            {% unless forloop.last %}
+              <!--@list/split-->
+            {% endunless %}
+          {% endfor %}
+        {%- endcapture -%}
+        {{ list_style | strip | split: '<!--@list/split-->' }}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{{ variable_highlight_title | strip | strip_newlines }}

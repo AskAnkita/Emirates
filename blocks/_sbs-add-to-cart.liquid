@@ -1,0 +1,257 @@
+
+
+{% doc %}
+  This block is used to display the add to cart button.
+  Intended for product-form.liquid block.
+
+  @param {string} can_add_to_cart - Whether the product can be added to the cart
+  @param {string} add_to_cart_text - The text of the add to cart button
+{% enddoc %}
+
+{% liquid
+  assign class = 'add-to-cart-button '
+  assign id = 'ProductSubmitButton-' | append: section.id
+  assign button_style = button_style | default: settings.button_style
+%}
+
+<div
+  class="add-to-cart-button-container flex"
+  {{ block.shopify_attributes }}
+  style="--add-to-cart-font-case: {{ settings.button_text_case_primary }};"
+>
+    <div class="productView-prev clearfix">
+    <a role="link" aria-disabled="true" data-action="prev" class="btn-step-variant btn-prev__variant">
+        <span class="visually-hidden">{{ 'products.product.step_by_step.previous' | t }}</span>{% render 'icon-chevron-left' %}
+    </a>
+    </div>
+    <a
+        class="
+        btn-next__variant
+        size-style
+        button
+        product-form__submit button--full-width
+        {% if button_style == 'outline' %}button--outline{% endif %}
+        "
+        role="link" 
+        aria-disabled="true"
+        data-action="next"
+        style="
+        {% render 'size-style', settings: block.settings %}
+        {% render 'button-style', settings: block.settings %}
+        "
+    >
+        {{ 'products.product.step_by_step.next' | t }}
+    </a>
+    {% render 'add-to-cart-button',
+        id: id,
+        class: class,
+        can_add_to_cart: can_add_to_cart,
+        product: closest.product,
+        add_to_cart_text: add_to_cart_text,
+        settings: block.settings,
+        step_by_step: true
+    %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.add_to_cart",
+  "tag": null,
+  "settings": [
+    {
+      "type": "select",
+      "id": "style_class",
+      "label": "t:settings.style",
+      "options": [
+        {
+          "value": "button",
+          "label": "t:options.primary"
+        },
+        {
+          "value": "button-secondary",
+          "label": "t:options.secondary"
+        }
+      ],
+      "default": "button-secondary"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "outline",
+          "label": "t:options.outline"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width_desktop",
+      "options": [
+        {
+          "value": "100%",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "100%"
+    },
+    {
+      "type": "select",
+      "id": "unit",
+      "label": "t:settings.unit",
+      "visible_if": "{{ block.settings.width == 'custom' }}",
+      "options": [
+        {
+          "value": "pixel",
+          "label": "t:options.pixel"
+        },
+        {
+          "value": "percent",
+          "label": "t:options.percent"
+        }
+      ],
+      "default": "percent"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' and block.settings.unit == 'percent' }}"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_pixel",
+      "label": "t:settings.custom_width",
+      "min": 100,
+      "max": 500,
+      "step": 5,
+      "unit": "px",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' and block.settings.unit == 'pixel' }}"
+    },
+    {
+      "type": "range",
+      "id": "buttons_padding_vertical",
+      "label": "t:settings.vertical_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "range",
+      "id": "buttons_padding_horizontal",
+      "label": "t:settings.horizontal_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:settings.width_mobile",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fit-content"
+    },
+    {
+      "type": "select",
+      "id": "unit_mobile",
+      "label": "t:settings.unit",
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}",
+      "options": [
+        {
+          "value": "pixel",
+          "label": "t:options.pixel"
+        },
+        {
+          "value": "percent",
+          "label": "t:options.percent"
+        }
+      ],
+      "default": "percent"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' and block.settings.unit_mobile == 'percent' }}"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile_pixel",
+      "label": "t:settings.custom_width",
+      "min": 100,
+      "max": 500,
+      "step": 5,
+      "unit": "px",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' and block.settings.unit_mobile == 'pixel' }}"
+    },
+    {
+      "type": "range",
+      "id": "buttons_padding_vertical_mobile",
+      "label": "t:settings.vertical_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+    {
+      "type": "range",
+      "id": "buttons_padding_horizontal_mobile",
+      "label": "t:settings.horizontal_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    }
+  ]
+}
+{% endschema %}

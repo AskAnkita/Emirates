@@ -1,0 +1,58 @@
+{%- liquid
+  assign space_between = space_between | default: settings.space_between
+  assign slide_autoplay = autoplay | default: settings.autoplay
+  assign loop = loop | default: settings.loop
+  assign centered_slides = centered_slides | default: settings.centered_slides
+  assign pagination_type = pagination_type | default: settings.pagination_type
+  assign autoplay_speed = autoplay_speed | default: settings.autoplay_speed
+-%}
+
+{% if space_between %}
+  data-space-between="{{ space_between }}"
+{% endif %}
+{% if slide_autoplay %}
+  data-slide-autoplay="{{ slide_autoplay }}"
+  aria-live="polite"
+  data-swiper-autoplay="{{ autoplay_speed }}"
+{% endif %}
+{% if loop %}
+  data-loop="{{ loop }}"
+{% endif %}
+{% if centered_slides %}
+  data-centered-slides="{{ centered_slides }}"
+{% endif %}
+{% if parallax %}
+  data-parallax="{{ parallax }}"
+{% endif %}
+{% if speed %}
+  data-speed="{{ speed }}"
+{% endif %}
+{% if pagination_type == 'dynamic' %}
+  data-pagination-type="bullets"
+  data-dynamic-bullets="true"
+{% else %}
+  data-pagination-type="{{ pagination_type }}"
+{% endif %}
+{% if slides_per_view %}
+  data-slides-per-view="{{ slides_per_view }}"
+{% endif %}
+{%- if breakpoints -%}
+  data-breakpoints='{{ breakpoints }}'
+{%- endif -%}
+{%- if watch_slides_progress -%}
+  data-watch-slides-progress="true"
+{% endif %}
+{%- if auto_height -%}
+  data-auto-height="true"
+{%- endif -%}
+{%- if direction == 'vertical' -%}
+  data-direction="vertical"
+  data-mousewheel="true"
+{%- endif -%}
+{%- if thumbnail_position -%}
+  data-thumbnail-position="{{ thumbnail_position }}"
+  data-thumbnail-direction="{{ thumbnail_direction }}"
+{%- endif -%}
+{%- if effect -%}
+  data-effect="{{ effect }}"
+{%- endif -%}

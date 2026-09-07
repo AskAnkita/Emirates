@@ -1,0 +1,24 @@
+{%- liquid
+  assign is_card_title_custom_width = is_card_title_custom_width | default: false
+  if collection and collection.handle
+    assign href_product_url = '/collections/' | append: collection.handle | append: '/products/' | append: card_product.handle
+  else
+    assign href_product_url = card_product.url
+  endif
+-%}
+
+<div class="card__heading">
+  <a
+    href="{{ href_product_url }}"
+    id="StandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }}"
+    class="full-unstyled-link card-title-change"
+    aria-labelledby="StandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }} NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}"
+  >
+    {% render 'text',
+      fallback_text: card_product.title,
+      block: block,
+      is_card_heading: true,
+      is_card_title_custom_width: is_card_title_custom_width
+    %}
+  </a>
+</div>

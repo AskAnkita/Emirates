@@ -1,0 +1,137 @@
+{%- liquid
+  assign font = '--font-announcement-text: var(--font-[font]--family); ' | replace: '[font]', block.settings.font
+  assign font_size = '--font-announcement-text-size: [font_size]; ' | replace: '[font_size]', block.settings.font_size
+  assign form_style = font | append: font_size
+  assign font_weight = 'font-weight: [font_weight]; ' | replace: '[font_weight]', block.settings.font_weight
+  assign text_align = 'text-align: [text_align]; ' | replace: '[text_align]', block.settings.text_align
+-%}
+<div
+  class="swiper-slide"
+  id="Slide-{{ block.id }}"
+  {{ block.shopify_attributes }}
+  role="group"
+  aria-roledescription="{{ 'content.announcement' | t }}"
+  aria-label="{{ 'content.announcement' | t }}"
+>
+  <div
+    class="announcement-bar__announcement"
+    role="region"
+    aria-label="{{ 'content.announcement' | t }}"
+    {{ block.shopify_attributes }}
+    style="{{ form_style }}"
+  >
+    <p class="announcement-bar__message" style="{{ font_weight }} {{ text_align }}">
+      <span>{{ block.settings.text }}</span>
+    </p>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.announcement_text",
+  "tag": null,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "t:options.text",
+      "default": "Share information about your brand with your customers."
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:settings.font",
+      "options": [
+        {
+          "value": "heading",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "subheading",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "body",
+          "label": "t:options.body"
+        }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "1rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        }
+      ],
+      "default": "1.2rem"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "t:settings.button_text_weight",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "400",
+          "label": "t:options.regular"
+        },
+        {
+          "value": "600",
+          "label": "t:options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:options.bold"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "t:settings.text_alignment_mobile",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "center"
+    }
+  ],
+  "presets": [
+    { "name": "t:names.announcement_text" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,100 @@
+{% liquid
+  assign text_1 = block.settings.text_1 | truncate: 20
+  assign text_2 = block.settings.text_2 | truncate: 20
+  assign text_3 = block.settings.text_3 | truncate: 20
+  assign stop_on_hover = block.settings.stop_on_hover
+  assign text_color = block.settings.text_color
+  assign circle_color = block.settings.circle_color
+%}
+
+{%- capture style_attributes -%}
+    --text-color: {{ text_color }};
+    --circle-color: {{ circle_color }};
+{%- endcapture -%}
+
+<div class="circle-container{% if stop_on_hover %} stop-on-hover{% endif %}" style="{{ style_attributes }}">
+  <div class="play-icon"></div>
+  {% if text_1 != blank or text_2 != blank or text_3 != blank %}
+    <svg class="textcircle" viewBox="0 0 500 500">
+      <defs>
+        <path id="textcircle" d="M250,400 a150,150 0 0,1 0,-300a150,150 0 0,1 0,300Z"></path>
+      </defs>
+      <text vertical-align="middle">
+        {% if text_1 != blank %}
+          <textPath xlink:href="#textcircle" startOffset="0%">
+            {{ text_1 }}
+          </textPath>
+        {% endif %}
+        {% if text_2 != blank %}
+          <textPath xlink:href="#textcircle" startOffset="33%">
+            {{ text_2 }}
+          </textPath>
+        {% endif %}
+        {% if text_3 != blank %}
+          <textPath xlink:href="#textcircle" startOffset="66%">
+            {{ text_3 }}
+          </textPath>
+        {% endif %}
+      </text>
+    </svg>
+  {% endif %}
+
+  <script src="{{ 'lookbook-circle-text.js' | asset_url }}" defer="defer"></script>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.lookbook_circle_text",
+  "blocks": [],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:settings.text_color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "circle_color",
+      "label": "t:settings.circle_color",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "stop_on_hover",
+      "label": "t:settings.stop_on_hover",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "text_1",
+      "label": "t:settings.text_1",
+      "default": "Text Content 1",
+      "info": "t:info.maximum_characters"
+    },
+    {
+      "type": "text",
+      "id": "text_2",
+      "label": "t:settings.text_2",
+      "default": "Text Content 2",
+      "info": "t:info.maximum_characters"
+    },
+    {
+      "type": "text",
+      "id": "text_3",
+      "label": "t:settings.text_3",
+      "default": "Text Content 3",
+      "info": "t:info.maximum_characters"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.lookbook_circle_text"
+    }
+  ]
+}
+{% endschema %}

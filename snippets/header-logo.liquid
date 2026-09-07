@@ -1,0 +1,136 @@
+{%- liquid
+  assign sec_stts = section.settings
+
+  assign menu_tab = blocks | where: 'type', 'menu_tab'
+  if menu_tab.size > 0
+    assign has_menu_tab = true
+  else
+    assign has_menu_tab = false
+  endif
+
+  assign main_logo = custom_logo | default: settings.logo
+  assign main_logo_svg = settings.logo_svg
+
+  assign use_inverse_logo = false
+
+  if sec_stts.enable_transparent_header_home and template.name == 'index' and sec_stts.home_color_scheme == 'inverse'
+    assign use_inverse_logo = true
+  elsif sec_stts.enable_transparent_header_product and template.name == 'product' and sec_stts.product_color_scheme == 'inverse'
+    assign use_inverse_logo = true
+  elsif sec_stts.enable_transparent_header_collection and template.name == 'collection' and sec_stts.collection_color_scheme == 'inverse'
+    assign use_inverse_logo = true
+  endif
+
+  assign logo_block_style = '--header-logo-spacing-left: ' | append: sec_stts.logo_spacing_left | append: 'px; --header-logo-spacing-right: ' | append: sec_stts.logo_spacing_right | append: 'px;'
+
+  if use_inverse_logo
+    if settings.logo_inverse != blank
+      assign inverse_logo = settings.logo_inverse
+    else
+      assign inverse_logo = main_logo
+    endif
+
+    if settings.logo_svg_inverse != blank
+      assign inverse_logo_svg = settings.logo_svg_inverse
+    else
+      assign inverse_logo_svg = main_logo_svg
+    endif
+  endif
+
+  assign aspect_ratio = main_logo.aspect_ratio | default: 1
+  assign inverse_logo_aspect_ratio = inverse_logo.aspect_ratio | default: 1
+
+  if sec_stts.logo_width == blank
+    assign logo_width = settings.logo_width
+    assign logo_width_mobile = settings.logo_width_mobile
+    assign logo_height = logo_width | divided_by: aspect_ratio | ceil
+    assign logo_height_mobile = logo_width_mobile | divided_by: aspect_ratio | ceil
+  else
+    assign logo_width = sec_stts.logo_width
+    assign logo_width_mobile = sec_stts.logo_width_mobile
+    assign logo_height = sec_stts.logo_width | divided_by: aspect_ratio | ceil
+    assign logo_height_mobile = sec_stts.logo_width_mobile | divided_by: aspect_ratio | ceil
+  endif
+
+  assign logo_style = '--header-logo-image-width: ' | append: logo_width | append: 'px;' | append: '--header-logo-image-width-mobile: ' | append: logo_width_mobile | append: 'px; --header-logo-image-height: ' | append: logo_height | append: 'px; --header-logo-image-height-mobile: ' | append: logo_height_mobile | append: 'px; --aspect-ratio: ' | append: aspect_ratio | append: ';'
+
+  assign inverse_logo_height = sec_stts.logo_width | divided_by: inverse_logo_aspect_ratio | ceil
+  assign inverse_logo_height_mobile = sec_stts.logo_width_mobile | divided_by: inverse_logo_aspect_ratio | ceil
+  assign inverse_logo_style = '--header-logo-image-width: ' | append: sec_stts.logo_width | append: 'px;' | append: '--header-logo-image-width-mobile: ' | append: sec_stts.logo_width_mobile | append: 'px; --header-logo-image-height: ' | append: inverse_logo_height | append: 'px; --header-logo-image-height-mobile: ' | append: inverse_logo_height_mobile | append: 'px; --aspect-ratio: ' | append: inverse_logo_aspect_ratio | append: ';'
+-%}
+<div
+  class="
+    header-block header-logo grid__item block {{ class }}
+  "
+  {% unless preload_screen %}
+    data-main-logo
+  {% endunless %}
+  style="
+    {{ logo_block_style }}
+     --aspect-ratio: {{ aspect_ratio }};
+  "
+>
+  {% unless preload_screen %}
+    {%- if request.page_type == 'index'-%}
+      <h1 class="header__heading">
+    {%- endif -%}
+  {% endunless %}
+  <a href="{{ routes.root_url }}" class="header__heading-link inline-block link link--text focus-inset{% if has_menu_tab %} header-menu--tab{% endif %}{% if has_menu_tab == true %} hidden{% endif %}" data-logo-page aria-label="{{ shop.name }}" rel="preload" as="image">
+    <div class="header__heading-logo-wrapper w-full inline-block relative{% if main_logo == blank and main_logo_svg == blank %} no-logo{% endif %}" style="{{ logo_style }}">
+      {%- capture text_fallback -%}
+        <span class="logo-fallback h2">{{ shop.name }}</span>
+      {%- endcapture -%} 
+      <span
+        class="header-logo__image-container header-logo__image-container--original{% unless preload_screen %}{% if main_logo == blank and main_logo_svg == blank %} is-empty{% endif %}{% endunless %}"
+        data-testid="header-logo"
+      >
+        {%- if main_logo != blank -%}
+          {% render 'image',
+            image: main_logo,
+            class: 'header-logo__image',
+            height: block_settings.custom_height,
+            text_fallback: text_fallback,
+            style: logo_style,
+            preload: true
+          %}
+        {%- elsif main_logo_svg != blank -%}
+          {{ main_logo_svg }}
+        {%- else -%}
+          {{ text_fallback }}
+        {%- endif -%}
+      </span>
+
+      {% if use_inverse_logo %}
+        <span
+          class="header-logo__image-container header-logo__image-container--inverse{% unless preload_screen %}{% if inverse_logo == blank and inverse_logo_svg == blank %} is-empty{% endif %}{% endunless %}"
+          data-testid="header-logo-inverse"
+          style="{{ inverse_logo_style }}"
+        >
+          {%- if inverse_logo != blank -%}
+            {% render 'image',
+              image: inverse_logo,
+              class: 'header-logo__image',
+              height: block_settings.custom_height,
+              text_fallback: text_fallback,
+              style: inverse_logo_style,
+              preload: true
+            %}
+          {%- elsif inverse_logo_svg != blank -%}
+            {{ inverse_logo_svg }}
+          {%- else -%}
+            {{ text_fallback }}
+          {%- endif -%}
+        </span>
+      {% endif %}
+
+      {% if preload_screen %}
+        <div class="loading-bar overflow-hidden"></div>
+      {% endif %}
+    </div>
+  </a>
+  {% unless preload_screen %}
+    {%- if request.page_type == 'index'-%}
+      </h1>
+    {%- endif -%}
+  {%- endunless -%}
+</div>

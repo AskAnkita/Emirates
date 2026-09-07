@@ -1,0 +1,35 @@
+{%- liquid
+  assign card_article = block.settings.article
+-%}
+
+<div class="blog-post-block__image-container relative w-full">
+  <a href="{{ card_article.url }}">
+    {% content_for 'block', id: 'image', type: '_blog-post-image', image: card_article.image, card_article: card_article %}
+  </a>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.article_group_media",
+  "class": "group-article-media",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_card-article-group-infor"
+    }
+  ],
+  "settings": [
+    {
+      "type": "article",
+      "id": "article",
+      "label": "t:settings.article"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.article_group_media"
+    }
+  ]
+}
+{% endschema %}

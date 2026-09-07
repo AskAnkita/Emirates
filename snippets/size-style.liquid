@@ -1,0 +1,52 @@
+{%- comment -%}
+  Intended for blocks and sections that provide values for all the referenced settings.
+  Accepts:
+  settings: {block.settings || section.settings}
+{%- endcomment -%}
+
+{%- if settings.width == 'custom' -%}
+  {%- if settings.unit == 'pixel' -%}
+    --size-style-width: {{ settings.custom_width_pixel }}px;
+  {%- else -%}
+    --size-style-width: {{ settings.custom_width }}%;
+  {%- endif -%}
+{%- elsif settings.width == 'fill' or settings.width == '100%' -%}
+  --size-style-width: 100%;
+{%- elsif settings.width == 'fit-content' -%}
+  --size-style-width: {{ settings.width }};
+{%- endif -%}
+
+{%- if settings.height == 'custom' -%}
+  --size-style-height: {{ settings.custom_height }}%;
+{%- elsif settings.height == 'fill' or settings.height == '100%' -%}
+  --size-style-height: 100%;
+{%- elsif settings.height == 'fit-content' -%}
+  --size-style-height: {{ settings.height }};
+{%- endif -%}
+
+{%- if settings.width_tablet == 'custom' -%}
+  {%- if settings.unit_tablet == 'pixel' -%}
+    --size-style-width-tablet: {{ settings.custom_width_tablet_pixel }}px;
+  {%- else -%}
+    --size-style-width-tablet: {{ settings.custom_width_tablet }}%;
+  {%- endif -%}
+{%- elsif settings.width_tablet == 'fill' or settings.width_tablet == '100%' -%}
+  --size-style-width-tablet: 100%;
+{%- elsif settings.width_tablet == 'fit-content' -%}
+  --size-style-width-tablet: {{ settings.width_tablet }};
+{%- endif -%}
+
+{%- if settings.width_mobile == 'custom' -%}
+  {%- if settings.unit_mobile == 'pixel' -%}
+    --size-style-width-mobile: {{ settings.custom_width_mobile_pixel }}px;
+  {%- else -%}
+    --size-style-width-mobile: {{ settings.custom_width_mobile }}%;
+  {%- endif -%}
+  --size-style-width-mobile-min: {{ settings.custom_width_mobile }}%;
+{%- elsif settings.width_mobile == 'fill' or settings.width_mobile == '100%' -%}
+  --size-style-width-mobile: 100%; 
+  --size-style-width-mobile-min: 5rem;
+{%- elsif settings.width_mobile == 'fit-content' -%}
+  --size-style-width-mobile: {{ settings.width_mobile }}; 
+  --size-style-width-mobile-min: {{ settings.width_mobile }};
+{%- endif -%}

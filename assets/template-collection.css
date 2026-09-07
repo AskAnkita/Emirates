@@ -1,0 +1,109 @@
+@media screen and (max-width: 749px) {
+  .collection .grid__item:only-child {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+.collection .loading-overlay {
+  position: absolute;
+  z-index: 1;
+  width: 1.8rem;
+  background-color: var(--color-background);
+}
+
+.collection .loading-overlay .loading__spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+@media screen and (max-width: 749px) {
+  .collection .loading-overlay {
+    top: 0;
+    right: 0;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .collection .loading-overlay {
+    left: 0;
+  }
+}
+
+.collection .loading-overlay {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+  width: 100%;
+  padding: 0 1.5rem;
+  opacity: var(--opacity-70);
+}
+
+@media screen and (min-width: 750px) {
+  .collection .loading-overlay {
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
+}
+
+.collection.loading .loading-overlay {
+  display: block;
+}
+
+.collection--empty .title-wrapper {
+  margin-top: 10rem;
+  margin-bottom: 15rem;
+}
+
+.collection__description > * {
+  margin: 0;
+}
+
+.collection__title.title-wrapper {
+  margin-bottom: 2.5rem;
+}
+
+.collection__title .title:not(:only-child) {
+  margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 1025px) {
+  .collection__title--desktop-slider .title {
+    margin-bottom: 2.5rem;
+  }
+}
+
+.collection__view-all a:not(.link) {
+  margin-top: 1rem;
+}
+
+@media screen and (min-width: 750px) {
+  .product-vertical.has_slide_mobile .swiper-wrapper {
+    display: grid;
+  }
+}
+
+.product-vertical .swiper-slide.flex {
+  display: flex;
+}
+
+.collection .widget-layout--spotlight {
+  .swiper {
+    width: 100%;
+    background: var(--color-background);
+  }
+}
+
+/* Mint fix layout disable filter */
+@media screen and (min-width: 750px) {
+  .template-collection:not(:has(.facets-block-wrapper)) {
+    grid-template-columns: 1fr;
+  }
+  .template-collection:not(:has(.facets-block-wrapper)) .main-collection-grid {
+    grid-column: 1 / 1;
+  }
+}

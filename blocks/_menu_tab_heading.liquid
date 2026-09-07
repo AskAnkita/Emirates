@@ -1,0 +1,38 @@
+{%- liquid
+  assign stts = block.settings
+-%}
+
+{%- capture class -%}
+  mobile--multi-tab-button link link--text cursor-pointer tabs-component-panel-trigger
+{%- endcapture -%}
+
+<a
+  href="#"
+  class="{{ class }}"
+  role="button"
+  aria-label="{{ stts.title }}"
+  data-tab-heading
+  data-tab-heading-target="{{ stts.title }}"
+>
+  <span>{{ stts.title }}</span>
+</a>
+
+{% schema %}
+{
+  "name": "t:names.menu_tab_heading",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:settings.title"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.menu_tab_heading",
+      "settings": {}
+    }
+  ]
+}
+{% endschema %}

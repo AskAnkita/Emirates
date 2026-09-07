@@ -1,0 +1,37 @@
+<div class="target-block relative">
+  <button
+    class="multi-t__button p-0 flex items-center justify-center relative cursor-pointer bor-none rounded-full"
+    data-target="multitasking-social-media"
+    type="button"
+    aria-haspopup="dialog"
+    aria-label="{{ 'content.social_media' | t }}"
+    {{ block.shopify_attributes }}
+  >
+    <span class="svg-wrapper">
+      {{ 'icon-social.svg' | inline_asset_content }}
+    </span>
+  </button>
+
+  <div class="multi-t__wrapper multi-t__social pointer-events-none absolute top-0">
+    {%- render 'social-icons', class: 'multi-t__list' -%}
+  </div>
+  <span class="target-block--tooltip">{{ 'content.social_media' | t }}</span>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.socials",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:info.social_media_info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.socials"
+    }
+  ]
+}
+{% endschema %}

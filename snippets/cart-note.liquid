@@ -1,0 +1,15 @@
+{%- if settings.show_cart_note -%}
+  <span class="cart-note__label block font-bold" style="--mb: var(--size-9)">{{ 'content.note' | t }}</span>
+  <cart-note class="cart__note field" style="--inputs-radius: 0.5rem;">
+    <div class="field">
+      <label class="visually-hidden" for="cart-note">{{ 'content.note' | t }}</label>
+      <textarea
+        class="text-area field__input"
+        name="note"
+        form="cart"
+        id="cart-note"
+        placeholder="{{ 'content.note_placeholder' | t }}"
+      >{{ cart.note }}</textarea>
+    </div>
+  </cart-note>
+{%- endif -%}

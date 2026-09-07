@@ -1,0 +1,163 @@
+{% comment %}
+  Predictive search tab layout using tabs-component.
+  - Each tab: Products, Collections, Pages, Articles (if available)
+  - Use tabs-component for tab switching
+  - Render results in each tab
+{% endcomment %}
+
+{%- assign tabs = '' -%}
+{%- assign tab_labels = '' -%}
+
+{%- if predictive_search.resources.products.size > 0 -%}
+  {%- assign title = 'content.products' | t -%}
+  {%- assign tabs = tabs | append: 'products,' -%}
+  {%- assign tab_labels = tab_labels | append: title | append: ',' -%}
+{%- endif -%}
+{%- if predictive_search.resources.collections.size > 0 -%}
+  {%- assign title = 'content.collections' | t -%}
+  {%- assign tabs = tabs | append: 'collections,' -%}
+  {%- assign tab_labels = tab_labels | append: title | append: ',' -%}
+{%- endif -%}
+{%- if predictive_search.resources.pages.size > 0 -%}
+  {%- assign title = 'content.pages' | t -%}
+  {%- assign tabs = tabs | append: 'pages,' -%}
+  {%- assign tab_labels = tab_labels | append: title | append: ',' -%}
+{%- endif -%}
+{%- if predictive_search.resources.articles.size > 0 -%}
+  {%- assign title = 'content.articles' | t -%}
+  {%- assign tabs = tabs | append: 'articles,' -%}
+  {%- assign tab_labels = tab_labels | append: title | append: ',' -%}
+{%- endif -%}
+
+{%- assign tabs = tabs | split: ',' -%}
+{%- assign tab_labels = tab_labels | split: ',' -%}
+
+{% if predictive_search.resources.queries.size > 0 %}
+  {% assign shared_results_index = shared_results_index | plus: predictive_search.resources.collections.size %}
+  <h6 id="predictive-search-queries" class="predictive-search__heading body-m-font-size">
+    {{- 'content.suggestions' | t -}}
+  </h6>
+  {%- render 'predictive-search-queries',
+    queries: predictive_search.resources.queries
+  -%}
+{% endif %}
+
+{%- if tab_labels.size > 0 -%}
+  <tabs-component class="predictive-search-tabs block">
+    <div class="tabs-product-header flex overflow-x-a mb-4">
+      {%- capture labels -%}
+        {%- for label in tab_labels -%}
+          {{ label }}
+          {%- unless forloop.last -%}
+            ,
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+
+      {%- render 'tab-header-item',
+        id: 'predictive-search-tabs',
+        labels: labels,
+        class: 'predictive-search-tab__trigger',
+        style: ''
+      -%}
+    </div>
+    <div class="tabs-product-grid tabs-component-content">
+      {%- for tab in tabs -%}
+        <div
+          class="predictive-search-tab__panel tabs-component-content{% if forloop.first %} --active{% endif %}"
+          data-tabs-panel
+          data-tab-index="{{ forloop.index0 }}"
+          {% unless forloop.first %}
+            hidden
+          {% endunless %}
+          id="tabs-predictive-search-tabs-{{ forloop.index }}"
+        >
+          {%- unless forloop.first -%}
+            <template class="tabs-component-template">
+          {%- endunless -%}
+            {%- case tab -%}
+              {%- when 'products' -%}
+                {% assign products = predictive_search.resources.products %}
+                {% assign products_test_id = 'products-list-results' %}
+                {% assign title = 'content.products' | t %}
+                {% if products.size > 0 %}
+                  {% render 'predictive-search-products-list',
+                    products_test_id: products_test_id,
+                    title: title,
+                    products: products
+                  %}
+                {% else %}
+                  <div class="predictive-search-results__no-results">
+                    <p>{{ 'content.no_products_found' | t }}</p>
+                  </div>
+                {% endif %}
+              {%- when 'collections' -%}
+                {% assign collections = predictive_search.resources.collections %}
+                {% if collections.size > 0 %}
+                  <ul class="predictive-search__results-list list-unstyled">
+                    {%- for collection in collections -%}
+                      <li class="predictive-search__list-item">
+                        <a href="{{ collection.url }}" class="predictive-search__item link link--text">
+                          <div class="predictive-search__item-content">
+                            <p class="predictive-search__item-heading link--hover-underline">{{ collection.title | escape }}</p>
+                          </div>
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {% else %}
+                  <div class="predictive-search-results__no-results">
+                    <p>{{ 'content.no_collections_found' | t }}</p>
+                  </div>
+                {% endif %}
+              {%- when 'pages' -%}
+                {% assign pages = predictive_search.resources.pages %}
+                {% if pages.size > 0 %}
+                  <ul class="predictive-search__results-list list-unstyled">
+                    {%- for page in pages -%}
+                      <li class="predictive-search__list-item">
+                        <a href="{{ page.url }}" class="predictive-search__item link link--text">
+                          <div class="predictive-search__item-content">
+                            <p class="predictive-search__item-heading link--hover-underline">{{ page.title | escape }}</p>
+                          </div>
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {% else %}
+                  <div class="predictive-search-results__no-results">
+                    <p>{{ 'content.no_pages_found' | t }}</p>
+                  </div>
+                {% endif %}
+              {%- when 'articles' -%}
+                {% assign articles = predictive_search.resources.articles %}
+                {% if articles.size > 0 %}
+                  <ul class="predictive-search__results-list list-unstyled">
+                    {%- for article in articles -%}
+                      <li class="predictive-search__list-item">
+                        <a href="{{ article.url }}" class="predictive-search__item link link--text">
+                          <div class="predictive-search__item-content">
+                            <p class="predictive-search__item-heading link--hover-underline">{{ article.title | escape }}</p>
+                          </div>
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {% else %}
+                  <div class="predictive-search-results__no-results">
+                    <p>{{ 'content.no_articles_found' | t }}</p>
+                  </div>
+                {% endif %}
+            {%- endcase -%}
+          {%- unless forloop.first -%}
+            </template>
+          {%- endunless -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </tabs-component>
+{%- else -%}
+  <div class="predictive-search-results__no-results">
+    <p>{{ 'content.no_results_found' | t }}</p>
+  </div>
+{%- endif -%}

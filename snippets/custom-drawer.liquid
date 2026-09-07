@@ -1,0 +1,97 @@
+{% liquid
+  assign show_language = section.settings.show_language
+  if localization.available_languages.size <= 1
+    assign show_language = false
+  endif
+
+  assign show_country = section.settings.show_country
+  if localization.available_countries.size <= 1
+    assign show_country = false
+  endif
+
+  assign country_style = section.settings.country_selector_style
+%}
+
+{%- if country_style == true -%}
+  <link rel="stylesheet" href="{{ 'icon-flag.css' | asset_url }}" media="print" onload="this.media='all'">
+{%- endif -%}
+
+{%- capture icon_globe -%}
+  <svg
+    class="icon-globe icon"
+    aria-hidden="true"
+    focusable="false"
+    fill="none"
+    viewBox="0 0 50 50"
+  >
+    {%- render 'icon', icon: 'globe' -%}
+  </svg>
+{%- endcapture -%}
+
+<side-drawer
+  id="Custom-Drawer"
+  class="drawer custom-drawer drawer__container selector__dropdown fixed top-0 left-0 w-screen h-full z-9 flex no-js-hidden"
+  data-drawer-direction="right"
+  element-s-up
+>
+  <div id="Drawer-Overlay-Global" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <div
+    class="drawer__inner-wrapper color-{{ section.settings.color_scheme }}"
+    data-drawer-content
+    style="--drawer-max-width: var(--normal-content-width);"
+  >
+    <div
+      class="drawer__inner cus-scrollbar"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Custom Drawer"
+      tabindex="-1"
+    >
+      <div
+        class="drawer__header flex justify-between items-center relative"
+        style="--gap-x: 1rem;--p: var(--padding-xs) 0;"
+      >
+        <h2 class="drawer__heading break m-0 h5">
+          {%- if show_language and show_country -%}
+            {{ 'content.localization_region_and_language' | t }}
+          {%- elsif show_language and show_country == false -%}
+            {{ 'content.language' | t }}
+          {%- elsif show_language == false and show_country -%}
+              {{ 'content.country_label' | t }}
+          {%- endif -%}
+        </h2>
+        <button
+          class="drawer__close block t-button bor-none rounded-full cursor-pointer"
+          type="button"
+          onclick="this.closest('side-drawer').close()"
+          aria-label="Close Custom Drawer"
+        >
+          <span class="svg-wrapper">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+
+      <div class="drawer__wrapper relative h-full cus-scrollbar motion-reduce" style="--p: 1.5rem 0 0;">
+        <div class="drawer__content">
+          <div class="drawer__content-inner">
+            {%- if show_language or show_country -%}
+              <div class="{% if class_animated != blank %} {{ class_animated }}{% endif %}">
+                {%- render 'language-country-localization',
+                  localPosition: 'DrawerHeaderLanguageSidebar',
+                  country_style: country_style,
+                  show_language: show_language,
+                  show_country: show_country,
+                  icon_globe: icon_globe,
+                  show_back_button: true,
+                  element: 'drawer',
+                  section_id: section_id
+                -%}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</side-drawer>

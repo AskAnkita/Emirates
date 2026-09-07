@@ -1,0 +1,73 @@
+{% doc %}
+  Renders the <img> element using provided image object
+
+  @param {object} image - image object
+  @param {number} [height] - custom image height
+  @param {string} [class] - additional classes
+  @param {string} [text_fallback] - text to display if image is blank
+  @param {boolean} [unset_image_tag] - if true, ignores the image focal point
+  @param {string} [style] - additional styles
+  @param {string} [width] - custom image width
+  @param {string} [widths] - custom image widths
+  @param {string} [sizes] - custom image sizes
+  @param {string} [loading] - custom image loading
+  @param {string} [fetch_priority] - custom image fetch priority
+  @param {string} [alt] - custom image alt
+  @param {boolean} [preload] - custom image preload
+
+  @example
+  {% render 'image', image: product.featured_image, height: 300, class: 'product-image', loading: loading, fetch_priority: fetch_priority, sizes: sizes, widths: widths %}
+{% enddoc %}
+{% if image != blank %}
+  {% assign image_height = height | default: image.height %}
+  {% assign image_height_2x = height | default: image_height | times: 2 %}
+  {% assign image_height_3x = height | default: image_height | times: 3 %}
+
+  {%- liquid
+    assign loading_default = 'lazy'
+    assign image_loading = loading | default: loading_default
+
+    assign fetch_priority_default = 'auto'
+    assign image_fetch_priority = fetch_priority | default: fetch_priority_default
+
+    assign alt_default = image.alt | default: 'Image'
+    assign image_alt = alt | default: alt_default
+
+    assign media_width_desktop = '100vw'
+    assign media_width_mobile = '100vw'
+
+    assign sizes_default = 'auto, (min-width: 750px) ' | append: media_width_desktop | append: ', ' | append: media_width_mobile
+    assign image_sizes = sizes | default: sizes_default
+
+    assign widths_default = '300, 450, 600, 750, 900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2000, 2500, 3000, 3500, 4000, 5000'
+    assign image_widths = widths | default: widths_default
+  -%}
+
+  {% capture image_srcset -%}
+    {{ image | image_url: height: image_height, format: 'webp' }} 1x, {{ image | image_url: height: image_height_2x, format: 'webp' }} 2x, {{ image | image_url: height: image_height_3x, format: 'webp' }} 3x
+  {%- endcapture %}
+
+  {% assign style_value = style | default: '' %}
+
+  {% if unset_image_tag %}
+    {% assign style_value = style_value | append: 'object-position: inherit;' %}
+  {% endif %}
+
+  {{
+    image
+    | image_url: height: image_height, format: 'webp'
+    | image_tag:
+      widths: image_widths,
+      loading: image_loading,
+      class: class,
+      srcset: image_srcset,
+      sizes: image_sizes,
+      fetchpriority: image_fetch_priority,
+      style: style_value,
+      alt: image_alt,
+      preload: preload,
+      width: width
+  }}
+{% elsif text_fallback %}
+  {{ text_fallback }}
+{% endif %}

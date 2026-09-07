@@ -1,0 +1,96 @@
+{% doc %}
+  Renders a wrapper section
+
+  @param {section} section - The section object
+  @param {string} children - The children of the section
+{% enddoc %}
+
+{% liquid
+  # {{ attributes }} must be on the immediate HTML parent of the element to preserve
+  # the click-to-edit connection in the theme editor. Any break between the element,
+  # including if-statements, will break the connection.
+
+  assign element = 'div'
+  if is_element != blank
+    assign element = is_element
+  endif
+
+  if is_lookbook == true
+    assign class_name = 'section-lookbook overflow-hidden'
+  endif
+%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }} {{ class_name }}"
+
+  {% if request.visual_preview_mode %}
+    data-shopify-visual-preview
+  {% endif %}
+
+  style="
+    {%- if section.settings.section_width == 'custom' -%}
+      --page-content-width: {{ section.settings.page_width_custom | divided_by: 10 }}rem;
+      --page-width: calc(var(--page-content-width) + var(--page-margin) * 2);
+    {%- endif -%}
+    {%- if section.settings.section_height == 'custom' -%}
+      --section-min-height: {{ section.settings.section_height_custom }}svh;
+    {%- elsif section.settings.section_height == 'full-screen' -%}
+      --section-min-height: 100svh;
+    {%- elsif section.settings.section_height != '' and section.settings.section_height != 'adapt_image' -%}
+      --section-min-height: var(--section-height-{{ section.settings.section_height }});
+    {%- elsif section.settings.section_height == 'adapt_image' -%}
+      --section-min-height: {{ 1 | divided_by: section.settings.background_image.aspect_ratio | times: 100 }}svw;
+    {%- endif -%}
+
+    {%- if section.settings.section_height_mobile == 'custom' -%}
+      --section-min-height-mobile: {{ section.settings.section_height_mobile_custom }}svh;
+    {%- elsif section.settings.section_height_mobile == 'full-screen' -%}
+      --section-min-height-mobile: 100svh;
+    {%- elsif section.settings.section_height_mobile != '' and section.settings.section_height_mobile != 'adapt_image' -%}
+      --section-min-height-mobile: var(--section-height-{{ section.settings.section_height_mobile }});
+    {%- elsif section.settings.section_height_mobile == 'adapt_image' -%}
+      --section-min-height-mobile: {{ 1 | divided_by: section.settings.background_image.aspect_ratio | times: 100 }}svw;
+    {%- endif -%}
+    {%- if section.settings.section_height != '' -%}
+      --section-preview-height: 600px;
+    {%- endif -%}
+  "
+>
+  <div class="custom-section-background">
+    {% render 'background-media',
+      background_media: section.settings.background_media,
+      background_video: section.settings.video,
+      background_video_position: section.settings.video_position,
+      background_image: section.settings.background_image,
+      background_image_position: section.settings.background_image_position,
+      image_behavior: section.settings.image_behavior
+    %}
+  </div>
+
+  <div
+    class="border-style custom-section-content"
+    style="{% render 'border-override', settings: section.settings %}"
+  >
+    {%- if section.settings.toggle_overlay -%}
+      {%- render 'overlay', settings: section.settings, layer: '0' -%}
+    {%- endif -%}
+
+    <{{ element }}
+      class="
+        spacing-style
+        layout-panel-flex
+        layout-panel-flex--{{ section.settings.content_direction }}
+        mobile-{{ section.settings.content_direction_mobile | default: 'column' }}
+        section-content-wrapper
+      "
+      style="
+        {%- render 'layout-panel-style', settings: section.settings -%}
+        {%- render 'spacing-style', settings: section.settings -%}
+      "
+      data-testid="section-content"
+    >
+      {{ children }}
+    </{{ element }}>
+  </div>
+</div>

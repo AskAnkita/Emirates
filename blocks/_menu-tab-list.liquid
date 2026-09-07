@@ -1,0 +1,60 @@
+{%- liquid
+  assign divider = block.settings.divider
+  assign scheme_border = block.settings.scheme_border
+-%}
+{%- capture children -%}
+  {%- content_for 'blocks' -%}
+{%- endcapture -%}
+<ul
+  class="
+    site-nav-mobile--list list-unstyled
+    {% if divider %} site-nav-mobile--list-divider{% endif %}
+  "
+  data-tab-for="{{ block.settings.tab_for }}"
+  style="{% if divider %}--color-border: {{ scheme_border }};{% endif %}"
+>
+  {{- children -}}
+</ul>
+
+{% schema %}
+{
+  "name": "t:names.menu_item",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_menu-tab-item"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "tab_for",
+      "label": "t:settings.tab_for",
+      "info": "t:info.tab_for_info"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "divider",
+      "label": "t:settings.divider",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.divider == true }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.menu_item"
+    }
+  ]
+}
+{% endschema %}

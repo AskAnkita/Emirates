@@ -1,0 +1,413 @@
+{%- liquid
+  assign bl_stts = block.settings
+  assign product_resource = closest.product
+
+  capture text_block_classes
+    if bl_stts.type_preset == 'custom'
+      echo ' custom-typography '
+      if bl_stts.font_size != ''
+        echo ' custom-font-size '
+      endif
+    endif
+    if bl_stts.color != ''
+      echo ' custom-color '
+    endif
+  endcapture
+-%}
+
+<sold-in-last-component class="product-sold-in-last{% unless product_resource.available %} hidden{% endunless %} loading" data-sold-out-product data-item="{{ bl_stts.sold_in_number }}" data-hours="{{ bl_stts.sold_in_hours }}">
+  {% capture icon %}
+    {{- 'icon-hot.svg' | inline_asset_content -}}
+  {% endcapture %}
+
+  {%- capture sold_out_number -%}
+    <span data-sold-out-number>2</span>
+  {% endcapture %}
+
+  {%- capture sold_out_hours -%}
+    <span data-sold-out-hours>8</span>
+  {% endcapture %}
+
+  <span class="sold-in-last-message {{ bl_stts.type_preset }} {{ text_block_classes }}" style="{% render 'typography-style', settings: bl_stts, weight: bl_stts.font_weight %}">
+    {{ bl_stts.text | replace: "[icon]", icon | replace: "[number]", sold_out_number | replace: "[hours]", sold_out_hours }}
+  </span>
+</sold-in-last-component>
+
+{% javascript %}
+  class SoldInLastComponent extends HTMLElement {
+    constructor() {
+      super();
+      this.init();
+    }
+
+    init() {
+      const numberElem = this.querySelector('[data-sold-out-number]');
+      const hoursElem = this.querySelector('[data-sold-out-hours]');
+
+      let numbersListStr = this.dataset.items || this.getAttribute('data-items') || "3,5,6,7,8,10,12,15";
+      let hoursListStr = this.dataset.hours || this.getAttribute('data-hours') || "10,15,16,17,18,20,25,35";
+
+      const numbersList = numbersListStr.split(',').map(item => item.trim()).filter(item => !!item);
+      const hoursList = hoursListStr.split(',').map(item => item.trim()).filter(item => !!item);
+
+      const numberIdx = Math.floor(Math.random() * numbersList.length);
+      const hourIdx = Math.floor(Math.random() * hoursList.length);
+
+      if (numberElem && numbersList.length > 0) {
+        numberElem.textContent = numbersList[numberIdx];
+      }
+      if (hoursElem && hoursList.length > 0) {
+        hoursElem.textContent = hoursList[hourIdx];
+      }
+      this.classList.remove('loading');
+    }
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!customElements.get('sold-in-last-component')) {
+      customElements.define('sold-in-last-component', SoldInLastComponent);
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Sold in last",
+  "tag": null,
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "t:settings.text",
+      "default": "[icon] [number] sold in last [hours] hours",
+      "info": "You can use [icon], [number], [hours] in the text. Example: [icon] [number] sold in last [hours] hours"
+    },
+    {
+      "type" : "text",
+      "id" : "sold_in_number",
+      "label" : "Number",
+      "info": "Example: 3,5,6,7,8,10,12,15. Separate quantities with a comma (,).",
+      "default" : "3,5,6,7,8,10,12,15"
+    },
+    {
+      "type" : "text",
+      "id" : "sold_in_hours",
+      "label" : "Hours",
+      "info": "Example: 10,15,16,17,18,20,25,35. Separate hours with a comma (,).",
+      "default" : "10,15,16,17,18,20,25,35"
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:settings.preset",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:settings.font",
+      "options": [
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:options.heading"
+        }
+      ],
+      "default": "var(--font-body--family)",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        },
+        {
+          "value": "3.4rem",
+          "label": "34px"
+        },
+        {
+          "value": "3.6rem",
+          "label": "36px"
+        },
+        {
+          "value": "4.0rem",
+          "label": "40px"
+        },
+        {
+          "value": "5.0rem",
+          "label": "50px"
+        },
+        {
+          "value": "6.0rem",
+          "label": "60px"
+        },
+        {
+          "value": "7.0rem",
+          "label": "70px"
+        },
+        {
+          "value": "8.0rem",
+          "label": "80px"
+        },
+        {
+          "value": "9.0rem",
+          "label": "90px"
+        },
+        {
+          "value": "10.0rem",
+          "label": "100px"
+        },
+        {
+          "value": "12.0rem",
+          "label": "120px"
+        }
+      ],
+      "default": "1.6rem",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "t:settings.weight",
+      "options": [
+        { "value": "default", "label": "t:options.default" },
+        { "value": "400", "label": "t:options.regular" },
+        { "value": "600", "label": "t:options.semibold" },
+        { "value": "700", "label": "t:options.bold" }
+      ],
+      "default": "default",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "line_height",
+      "label": "t:settings.line_height",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "t:settings.letter_spacing",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "case",
+      "label": "t:settings.case",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:options.uppercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "t:options.capitalize"
+        }
+      ],
+      "default": "none",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "wrap",
+      "label": "t:settings.wrap",
+      "options": [
+        {
+          "value": "pretty",
+          "label": "t:options.pretty"
+        },
+        {
+          "value": "balance",
+          "label": "t:options.balance"
+        },
+        {
+          "value": "nowrap",
+          "label": "t:options.none"
+        }
+      ],
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "color",
+      "label": "t:settings.color",
+      "options": [
+        {
+          "value": "var(--color-foreground)",
+          "label": "t:options.text"
+        },
+        {
+          "value": "var(--color-foreground-heading)",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "var(--color-primary)",
+          "label": "t:options.link"
+        }
+      ],
+      "default": "var(--color-foreground)"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.spacing_top",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.spacing_bottom",
+      "default": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sold in last",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

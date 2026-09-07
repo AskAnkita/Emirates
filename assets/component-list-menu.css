@@ -1,0 +1,65 @@
+.list-menu--right {
+  right: 0;
+}
+
+.list-menu--disclosure {
+  position: absolute;
+  min-width: 100%;
+  width: 20rem;
+  border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+}
+
+.list-menu--disclosure.header__submenu-wrapper-grandchild {
+  opacity: var(--opacity-0);
+  visibility: hidden;
+  overflow: hidden;
+  color: var(--color-foreground);
+  background: var(--color-background);
+}
+
+.list-menu--disclosure:focus {
+  outline: none;
+}
+
+.header-group-section {
+  position: relative;
+  z-index: 3;
+  transition: height var(--animation-speed-slowest);
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .header-group-section:has(.header[data-sticky-type]) {
+    position: sticky;
+    z-index: var(--layer-sticky);
+  }
+
+  .header-group-section:has(> #header-component[data-sticky-type='always']),
+  .header-group-section:has(> #header-component[data-sticky-type='scroll-up'][data-sticky-state='active']) {
+    position: sticky;
+
+    /* Use -1 instead of 0 so intersection observer can track sticky state */
+    top: -1px;
+    z-index: var(--layer-sticky);
+    pointer-events: none;
+  }
+
+  .header-group-section:has(> #header-component[data-sticky-type='always']) .row-group,
+  .header-group-section:has(> #header-component[data-sticky-type='scroll-up'][data-sticky-state='active']) .row-group {
+    pointer-events: auto;
+  }
+
+  .header-group-section:has(.header[data-sticky-type='always'][data-sticky-state='active']) ,
+  .header-group-section:has(.header[data-sticky-type='scroll-up'][data-sticky-state='active']) {
+    view-transition-name: header-component;
+
+    &:has([data-sticky-type="scroll-up"]) {
+      animation: header-sticky-slide-down var(--animation-speed-slowest) forwards;
+    }
+  }
+
+  .header-group-section:has(.header[data-sticky-type='scroll-up'][data-sticky-state='idle']),
+  .header-group-section:has(.header[data-sticky-type='scroll-up'][data-sticky-state='active'][data-animating]) {
+    animation: header-sticky-slide-up var(--animation-speed) forwards;
+  }
+}

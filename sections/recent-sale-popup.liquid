@@ -1,0 +1,287 @@
+<link rel="stylesheet" href="{{ 'component-recent-sale-popup.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript>{{ 'component-recent-sale-popup.css' | asset_url | stylesheet_tag }}</noscript>
+
+{% liquid
+  assign product_list = section.settings.product_list
+  assign time_to_show = section.settings.time_to_show
+  assign time_appear = section.settings.time_appear
+  assign random_hours = section.settings.random_hours
+  assign customer_list = section.settings.customer_list
+  assign location_list = section.settings.location_list
+
+  assign color_scheme = section.settings.color_scheme
+  assign other_text_color = section.settings.other_text_color
+  assign show_on_mobile = section.settings.show_on_mobile
+  assign max_width_desktop = section.settings.max_width_desktop
+
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign padding_left = section.settings.padding_left
+  assign padding_right = section.settings.padding_right
+  assign popup_position = section.settings.popup_position
+
+  assign section_fetch = false
+  if section.index == nil
+    assign section_fetch = true
+  endif
+%}
+
+{%- capture attr -%}
+style="
+{% if padding_left != 0 %}--pl:{{ padding_left }}px;{% endif %}
+{% if padding_top != 0 %}--pt:{{ padding_top }}px;{% endif %}
+{% if padding_bottom != 0 %}--pb:{{ padding_bottom }}px;{% endif %}
+{% if padding_right != 0 %}--pr:{{ padding_right }}px;{% endif %}
+  --duration-slide-in: {{ time_appear }}s;
+  --other-text-color: {{ other_text_color }};
+  --max-width-desktop: {{ max_width_desktop }}px;
+"
+{%- endcapture -%}
+
+<div class="recent-sale-popup-wrapper fixed left-0 bottom-0 w-full z-10 duration-slide-in no-js-hidden" style="--animation-slide-in: 0.3s;">
+  <section-fetcher
+    data-section-id="{{ section.id }}"
+    data-target-id="RecentSalePopup-Content-{{ section.id }}"
+    data-activate="interaction"
+  ></section-fetcher>
+  {%- unless section_fetch -%}
+    <div class="section-resource-list" id="RecentSalePopup-Content-{{ section.id }}">
+    </div>
+  {%- else -%}
+    <div class="section-resource-list" id="RecentSalePopup-Content-{{ section.id }}">
+      <recent-sale-popup
+        class="recent-sale-popup recent-sale-popup--{{ popup_position }} color-{{ color_scheme }}"
+        data-product-list="{{ product_list | json | escape }}"
+        data-time-to-show="{{ time_to_show }}"
+        data-time-appear="{{ time_appear }}"
+        data-random-hours="{{ random_hours }}"
+        data-customer-list="{{ customer_list }}"
+        data-location-list="{{ location_list }}"
+        data-show-on-mobile="{{ show_on_mobile }}"
+        {{ attr }}
+      >
+        <div class="recent-sale-popup__inner">
+          <button
+            type="button"
+            class="recent-sale-popup-close popup__close button-close-circle minimum-touch-target-before"
+            aria-label="{{ 'accessibility.close_dialog' | t }}"
+          >
+            <span class="svg-wrapper">
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </span>
+            <span class="visually-hidden">{{ 'accessibility.close_dialog' | t }}</span>
+          </button>
+          <div class="recent-sale-popup-content flex" style="--gap-x: 12px;">
+            <div class="recent-sale-product-list hidden">
+              {% for product in product_list %}
+                <div class="recent-sale-product-item"
+                  {% if product.featured_image %}
+                    data-product-image="{{ product.featured_image | image_url: width: 75 }}"
+                  {% else %}
+                    data-product-image=""
+                  {% endif %}
+                  data-product-title="{{ product.title | escape }}"
+                  {% if product.url %}
+                    data-product-url="{{ product.url }}"
+                  {% else %}
+                    data-product-url="#"
+                  {% endif %}
+                  data-product-alt="{{ product.title | escape }}">
+                </div>
+              {% endfor %}
+            </div>
+
+            <div class="recent-sale-popup-content-media" style="--w: 75px;">
+              {% if product_list != blank %}
+                <img class="random-product-image"
+                  src=""
+                  alt="Product"
+                  width="75"
+                  height="100">
+              {% else %}
+                {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg random-product-image w-full h-full' }}
+              {% endif %}
+            </div>
+            <div class="recent-sale-popup-content-info flex flex-column justify-between w-full">
+              <span class="flex flex-column" style="--gap-y: 4px; --mb: 20px;">
+                <span><span class="font-bold random-customer">Customer Name</span> <span class="font-light other-text">recently bought</span> </span>
+                <span class="font-bold random-product-name">Product Name</span>
+                <span class="random-location">Location</span>
+              </span>
+
+              <span class="font-light random-time other-text">
+                Time
+              </span>
+            </div>
+            <div class="recent-sale-popup-content-view">
+              <a
+                href="{% if product_list != blank and product_list.first and product_list.first.url %}{{ product_list.first.url }}{% else %}#{% endif %}"
+                class="button minimum-touch-target-before">
+                <span class="svg-wrapper icon-view">
+                  {{- 'icon-eye.svg' | inline_asset_content -}}
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="recent-sale-popup-progress">
+          <div class="recent-sale-popup-progress-bar"></div>
+        </div>
+      </recent-sale-popup>
+    </div>
+  {%- endunless -%}
+</div>
+
+<script src="{{ 'recent-sale-popup.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "t:names.recent_sale_popup",
+  "tag": "section",
+  "class": "section-recent-sale-popup",
+  "limit": 1,
+  "enabled_on": {
+    "groups": ["custom.popup"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "select",
+      "id": "popup_position",
+      "label": "t:settings.popup_position",
+      "options": [
+        { "value": "left", "label": "t:options.left" },
+        { "value": "right", "label": "t:options.right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_on_mobile",
+      "label": "t:settings.show_on_mobile",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "other_text_color",
+      "label": "t:settings.other_text_color",
+      "default": "#8D8D8D"
+    },
+    {
+      "type": "range",
+      "id": "max_width_desktop",
+      "label": "t:settings.max_width_desktop",
+      "default": 420,
+      "min": 400,
+      "max": 800,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "product_list",
+      "id": "product_list",
+      "label": "t:settings.product_list",
+      "limit": 10
+    },
+    {
+      "type": "range",
+      "id": "time_to_show",
+      "label": "t:settings.time_to_show",
+      "default": 10,
+      "min": 1,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "info": "t:info.time_to_show_info"
+    },
+    {
+      "type": "range",
+      "id": "time_appear",
+      "label": "t:settings.time_appear",
+      "default": 10,
+      "min": 1,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "info": "t:info.time_appear_info"
+    },
+    {
+      "type": "text",
+      "id": "random_hours",
+      "label": "t:settings.random_hours",
+      "default": "1 minutes | 15 minutes | 20 minutes | 25 minutes | 30 minutes"
+    },
+    {
+      "type": "text",
+      "id": "customer_list",
+      "label": "t:settings.customer_list",
+      "default": "Customer 1 | Customer 2 | Customer 3"
+    },
+    {
+      "type": "text",
+      "id": "location_list",
+      "label": "t:settings.location_list",
+      "default": "Location 1 | Location 2 | Location 3"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.recent_sale_popup"
+    }
+  ]
+}
+{% endschema %}

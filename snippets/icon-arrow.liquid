@@ -1,0 +1,13 @@
+{%- liquid
+  assign arrows_type = settings.arrows_type
+-%}
+
+{%- if arrows_type == 'chevron' -%}
+  {{- 'icon-caret.svg' | inline_asset_content -}}
+{%- elsif arrows_type == 'arrows_long' -%}
+  {{- 'icon-arrow-long.svg' | inline_asset_content -}}
+{%- elsif arrows_type == 'arrows_long_thin' -%}
+  {{- 'icon-arrow-long-thin.svg' | inline_asset_content -}}
+{%- else -%}
+  {{- 'icon-arrow.svg' | inline_asset_content -}}
+{%- endif -%}

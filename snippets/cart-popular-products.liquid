@@ -1,0 +1,62 @@
+{%- liquid
+  assign bl_stts = block.settings
+  assign popular_collection = bl_stts.popular_products_collection
+  assign max_items = bl_stts.popular_products_show | default: 3 | at_least: 1
+  assign show_arrows = bl_stts.popular_products_arrows
+  assign columns_gap = 12
+  assign bl_id = block.id
+
+  assign pagination_type = nil
+-%}
+
+{%- if popular_collection != blank and popular_collection.products_count > 0 -%}
+  <div class="cart-drawer__recommendations" style="--m: 1.5rem 0 0;">
+    <div class="cart-drawer__recommendations-header flex justify-between items-center" style="--mb: 1rem;">
+      <h3 class="h5 m-0">{{ bl_stts.popular_products_title }}</h3>
+    </div>
+
+    {% capture list_items %}
+      {% for product in popular_collection.products limit: max_items %}
+        <div
+          id="Slide-{{ bl_id }}-{{ product.id }}-{{ forloop.index }}"
+          class="product-grid-item swiper-slide"
+          {% if settings.animations_reveal_on_scroll %}
+            data-cascade style="--animation-order: {{ forloop.index }};"
+          {% endif %}
+        >
+          {%- render 'cart-popular-product-card',
+            card_product: product,
+            media_aspect_ratio: 'square',
+            image_shape: 'square',
+            show_secondary_image: true,
+            show_vendor: true,
+            show_rating: true,
+            section_id: bl_id,
+            quick_add: true 
+          -%}
+        </div>
+      {% endfor %}
+    {% endcapture %}
+
+    <swiper-component
+      {%- render 'swiper-data',
+        loop: false,
+        slides_per_view: 1,
+        space_between: columns_gap,
+        pagination_type: pagination_type
+      -%}
+    >
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          {{ list_items | strip }}
+        </div>
+
+        {% if show_arrows %}
+          <div class="swiper-btns-wrap swiper-btns-wrap--bottom">
+            {% render 'swiper-button' %}
+          </div>
+        {% endif %}
+      </div>
+    </swiper-component>
+  </div>
+{%- endif -%}

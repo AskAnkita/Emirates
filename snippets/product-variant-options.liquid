@@ -1,0 +1,352 @@
+{%- doc -%}
+  Renders a default variant picker, used to display the variant picker in the variants block.
+
+  @param {object} option - The product option object.
+  @param {string} variant_style - The variant style to display.
+  @param {string} swatch_type - The swatch type to display.
+  @param {number} swatch_size - The swatch size to display.
+  @param {object} [block] - The block object
+  @param {boolean} is_color - Whether the option is a color.
+  @param {number} index - The index of the option.
+  @param {string} section_name - The section name.
+  @param {boolean} sbs_variant_picker - Whether the variant picker is a sbs variant picker.
+  @param {boolean} show_variant_media_grouped - Whether the variant media grouped will be shown, defaults to false
+{%- enddoc -%}
+
+{%- liquid
+  assign product_form_id = 'product-form-' | append: block.id
+  if show_variant_media_grouped == null
+    assign show_variant_media_grouped = false
+  endif
+-%}
+
+{%- if is_color -%}
+  {%- capture product_variants -%}
+    {%- for value in option.values -%}
+      {%- liquid
+        assign option_disabled = true
+        if value.available
+          assign option_disabled = false
+        endif
+        
+        assign variant_for_value = null
+        assign variant_image_group = ''
+        
+        if show_variant_media_grouped
+          for color in product.options_with_values[index].values
+            if color == value
+              assign variant_for_value = color.variant
+              if variant_for_value.metafields.custom.variant_image_group != blank
+                assign variant_image_group = variant_for_value.metafields.custom.variant_image_group
+              endif
+              break
+            endif
+          endfor
+        endif
+      -%}
+
+      {%- capture input_id -%}
+        {%- if block.id -%}
+          {{ block.id }}-{{ option.position }}-{{ forloop.index0 -}}
+        {%- else -%}
+          StickyCart-{{ option.name | handle }}-{{ option.position }}-{{ forloop.index0 -}}
+        {%- endif -%}
+      {%- endcapture -%}
+
+      {%- capture input_name -%}
+        {{ option.name | escape | append: section_name }}-{{ product.id }}-{{ option.position }}
+      {%- endcapture -%}
+
+      {%- capture input_dataset -%}
+        data-product-url="{{ value.product_url }}"
+        data-option-value-id="{{ value.id }}"
+        {% if show_variant_media_grouped %}
+          data-filter=".filter-{{ value | handle }}"
+          {% if variant_image_group != blank %}
+            data-variant-image-grouped="{{ variant_image_group }}"
+          {% endif %}
+        {% endif %}
+      {%- endcapture -%}
+
+      {%- capture label_unavailable -%}
+        <span class="visually-hidden label-unavailable">
+          {{- 'products.product.variant_sold_out_or_unavailable' | t -}}
+        </span>
+      {%- endcapture -%}
+
+      {%- capture swatch_item -%}
+        {%- for color in product.options_with_values[index].values -%}
+          {%- liquid
+            assign variant = color.variant
+            assign variant_option_disabled = true
+            if variant.available
+              assign variant_option_disabled = false
+            endif
+          -%}
+
+          {%- if color == value -%}
+            {%- liquid
+              assign enable_variant_image = false
+              assign background_image = ''
+              assign background_color = ''
+              assign has_metaobject = false
+
+              if sbs_variant_picker
+                assign background_image = variant.image.src | image_url: width: '200x'
+                if variant.image
+                  assign enable_variant_image = true
+                endif
+              else
+                case swatch_type
+                when 'variant_image'
+                  assign background_image = variant.image.src | image_url: width: '200x'
+                  if variant.image
+                    assign enable_variant_image = true
+                  endif
+                when 'color'
+                  assign background_image = color | handle | append: '.png'
+                  if images[background_image] != blank
+                    assign background_image = background_image | file_url
+                  else
+                    assign background_image = ''
+                  endif
+                  assign enable_variant_image = true
+                when 'metaobjects'
+                  assign metaobject_color = color.swatch.color
+                  assign metaobject_image = color.swatch.image
+                  assign has_metaobject = false
+                  if metaobject_image != blank
+                    assign background_image = metaobject_image | image_url: width: '200x'
+                    assign enable_variant_image = true
+                    assign has_metaobject = true
+                  elsif metaobject_color != blank
+                    assign background_color = metaobject_color
+                    assign enable_variant_image = true
+                    assign has_metaobject = true
+                    assign background_image = ''
+                  elsif variant.image
+                    assign background_image = variant.image.src | image_url: width: '200x'
+                    assign enable_variant_image = true
+                  else
+                    assign background_color = color | handle
+                    assign has_metaobject = true
+                    assign enable_variant_image = true
+                  endif
+                endcase
+              endif
+            -%}
+
+            {%- capture class_swatch -%}
+              swatch cursor-pointer block max-w-full color-swacth-color--{{ color | handle }}
+            {%- endcapture -%}
+
+            {%- capture class_tooltip -%}
+              {%- if sbs_variant_picker -%}
+                sbs-text block center w-full
+              {%- else -%}
+                tooltip center absolute bottom-full left-50 z-1 whitespace-nowrap capitalize text-sm
+              {%- endif -%}
+            {%- endcapture -%}
+
+            <span
+              {% if enable_variant_image %}
+                class="{{ class_swatch }}"
+                style="{%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                  {%- if has_metaobject and metaobject_color != blank -%}--swatch--background-color: {{ background_color }};{%- endif -%}
+                  {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}
+                  {%- if swatch_size != blank -%}--swatch-input--size: {{ swatch_size }}px;{%- endif -%}
+                  {%- if sbs_variant_picker -%}--swatch-input--size: 100%;{%- endif -%}"
+                data-title="{{ color | handle }}"
+                data-variant-id="{{ variant.id }}"
+                data-variant-img="{{ variant.image.src | image_url: '800x' }}"
+              {% else %}
+                class="{{ class_swatch }} swatch--unavailable"
+                style="{%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                  {%- if has_metaobject and metaobject_color != blank -%}--swatch--background-color: {{ background_color }};{%- endif -%}
+                  {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}
+                  {%- if swatch_size != blank -%}--swatch-input--size: {{ swatch_size }}px;{%- endif -%}
+                  {%- if sbs_variant_picker -%}--swatch-input--size: 100%;{%- endif -%}"
+              {% endif %}
+            >
+              <span class="visually-hidden">{{ color | escape }}</span>
+              {%- if variant_option_disabled -%}
+                {{ label_unavailable }}
+              {%- endif -%}
+            </span>
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+
+      {%- if variant_style == 'pills' or variant_style == 'swatch'-%}
+        <li class="{% if sbs_variant_picker %}sbs-swatch-item{% else %}swatch-item{% endif %} cursor-pointer relative">
+          <div class="swatch-wrapper"{% if show_variant_media_grouped %} is="variant-media-grouped"{% endif %}>
+            <input
+              type="radio"
+              id="{{ input_id }}"
+              name="{{ input_name | escape }}"
+              value="{{ value | escape }}"
+              form="{{ product_form_id }}"
+              {% if value.selected %}
+                checked
+              {% endif %}
+              {% if option_disabled %}
+                class="disabled"
+              {% endif %}
+              {{ input_dataset }}
+            >
+            <label for="{{ input_id }}">
+              {{ swatch_item }}
+              <span class="{{ class_tooltip }}">
+                {% if option_disabled -%}
+                  {{- 'products.product.value_unavailable' | t: option_value: value -}}
+                {%- else -%}
+                  {{- value | escape -}}
+                {%- endif %}
+              </span>
+            </label>
+          </div>
+        </li>
+      {%- elsif variant_style == 'dropdowns' -%}
+        <option
+          id="{{ input_id }}"
+          value="{{ value | escape }}"
+          {% if value.selected %}
+            selected="selected"
+          {% endif %}
+          {{ input_dataset }}
+        >
+          {% if option_disabled -%}
+            {{- 'products.product.value_unavailable' | t: option_value: value -}}
+          {%- else -%}
+            {{- value | escape -}}
+          {%- endif %}
+        </option>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  {%- if variant_style == 'pills' or variant_style == 'swatch'-%}
+    {% if section_name == '-bundle' %}<div>{% else %}<color-swatch>{% endif %}
+      <ul class="swatch-list list-unstyled flex flex-wrap" style="--gap: 1rem;">
+        {{ product_variants }}
+      </ul>
+    {% if section_name == '-bundle' %}</div>{% else %}</color-swatch>{% endif %}
+  {%- elsif variant_style == 'dropdowns' -%}
+    <div class="variant-media-grouped__control" {% if show_variant_media_grouped %}is="variant-media-grouped"{% endif %} style="width: 100%;">
+      <select
+        id="{%- if block.id -%}Option-{{ block.id }}-{{ index }}{%- else -%}StickyCart-Option-{{ option.name | handle }}-{{ index }}{%- endif -%}"
+        class="select__select variant-option__select variant-option__select--has-swatch"
+        name="options[{{ option.name | escape }}]"
+        form="{{ product_form_id }}"
+      >
+        {{ product_variants }}
+      </select>
+      <span class="svg-wrapper">
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          class="icon icon-caret"
+          viewBox="0 0 10 6"
+        >
+          {%- render 'icon', icon: 'caret' -%}
+        </svg>
+      </span>
+    </div>
+  {%- endif -%}
+{%- else -%}
+  {%- capture product_variants -%}
+    {%- for value in option.values -%}
+      {%- liquid
+        assign option_disabled = true
+        if value.available
+          assign option_disabled = false
+        endif
+      -%}
+
+      {%- capture input_id -%}
+        {%- if block.id -%}
+          {{ block.id }}-{{ option.position }}-{{ forloop.index0 -}}
+        {%- else -%}
+          StickyCart-{{ option.name | handle }}-{{ option.position }}-{{ forloop.index0 -}}
+        {%- endif -%}
+      {%- endcapture -%}
+
+      {%- capture input_name -%}
+        {{ option.name | escape | append: section_name }}-{{ product.id }}-{{ option.position }}
+      {%- endcapture -%}
+
+      {%- capture input_dataset -%}
+        data-product-url="{{ value.product_url }}"
+        data-option-value-id="{{ value.id }}"
+      {%- endcapture -%}
+
+      {%- capture label_unavailable -%}
+        <span class="visually-hidden label-unavailable">
+          {{- 'products.product.variant_sold_out_or_unavailable' | t -}}
+        </span>
+      {%- endcapture -%}
+
+      {%- if variant_style == 'pills' or variant_style == 'swatch'-%}
+        <input
+          type="radio"
+          id="{{ input_id }}"
+          name="{{ input_name | escape }}"
+          value="{{ value | escape }}"
+          form="{{ product_form_id }}"
+          {% if value.selected %}
+            checked
+          {% endif %}
+          {% if option_disabled %}
+            class="disabled"
+          {% endif %}
+          {{ input_dataset }}
+        >
+        <label for="{{ input_id }}">
+          {{ value | escape -}}
+          {%- if option_disabled -%}
+            {{ label_unavailable }}
+          {%- endif -%}
+        </label>
+      {%- elsif variant_style == 'dropdowns' -%}
+        <option
+          id="{{ input_id }}"
+          value="{{ value | escape }}"
+          {% if value.selected %}
+            selected="selected"
+          {% endif %}
+          {{ input_dataset }}
+        >
+          {% if option_disabled -%}
+            {{- 'products.product.value_unavailable' | t: option_value: value -}}
+          {%- else -%}
+            {{- value | escape -}}
+          {%- endif %}
+        </option>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  {%- if variant_style == 'pills' or variant_style == 'swatch'-%}
+    {{ product_variants }}
+  {%- elsif variant_style == 'dropdowns' -%}
+    <select
+      id="{%- if block.id -%}Option-{{ block.id }}-{{ index }}{%- else -%}StickyCart-Option-{{ option.name | handle }}-{{ index }}{%- endif -%}"
+      class="select__select variant-option__select"
+      name="options[{{ option.name | escape }}]"
+      form="{{ product_form_id }}"
+    >
+      {{ product_variants }}
+    </select>
+    <span class="svg-wrapper">
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        class="icon icon-caret"
+        viewBox="0 0 10 6"
+      >
+        {%- render 'icon', icon: 'caret' -%}
+      </svg>
+    </span>
+  {%- endif -%}
+{%- endif -%}

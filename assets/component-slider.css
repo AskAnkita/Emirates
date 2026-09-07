@@ -1,0 +1,156 @@
+swiper-component {
+  display: block;
+  width: 100%;
+}
+
+@media screen and (min-width: 750px) {
+  .swiper-component-mobile .swiper-wrapper.md\:block {
+    display: block;
+  }
+  .swiper-component-mobile .swiper-wrapper.md\:grid {
+    display: grid;
+  }
+}
+
+.swiper-initialized .swiper-slide {
+  max-width: 100%;
+}
+
+.swiper:not(.swiper-vertical):not(:has(.swiper-actions--bottom_right)):has(.swiper-pagination:not(.swiper-pagination-pos--inside):not(.swiper-pagination-lock)) {
+  padding-bottom: 4rem;
+}
+
+.product-information__grid .swiper:not(.swiper-vertical):not(:has(.swiper-actions--bottom_right)):has(.swiper-pagination:not(.swiper-pagination-pos--inside):not(.swiper-pagination-lock)),
+.has-variant-image-grouped .swiper:not(.swiper-vertical):not(:has(.swiper-actions--bottom_right)) {
+  padding-bottom: 1rem;
+}
+
+.product-information__grid swiper-component[data-thumbnail-direction="vertical"] .swiper:not(:has(.swiper-actions--bottom_right)):has(.swiper-pagination:not(.swiper-pagination-pos--inside):not(.swiper-pagination-lock)) {
+  padding-bottom: 0;
+}
+
+.swiper:has(.swiper-pagination) .swiper-btns-wrap {
+  top: calc(50% - 2rem);
+}
+
+.swiper-button::after {
+  display: none;
+}
+
+.swiper-button-next .icon {
+  &.icon-caret {
+    transform: rotate(-90deg);
+  }
+}
+
+.swiper-button-prev .icon {
+  &.icon-caret {
+    transform: rotate(90deg);
+  }
+
+  &.icon-arrow {
+    transform: rotate(180deg);
+  }
+}
+
+.swiper-pagination-progressbar {
+  top: unset !important;
+  bottom: 0;
+}
+
+/* Mint start */
+.always_show_swiper_button .swiper-button {
+  opacity: var(--opacity-100);
+}
+
+
+.always_show_swiper_button .swiper-button.swiper-button-disabled {
+  opacity: var(--opacity-0);
+}
+
+.swiper-component-product-grid:has(.swiper-btns-wrap--outside) {
+  .swiper {
+    overflow: visible;
+  }
+  .swiper-wrapper {
+    /* overflow: hidden; */
+  }
+}
+
+.swiper-btns-wrap--outside .swiper-button {
+  position: relative;
+  margin: 0;
+  transform: none;
+
+  &.swiper-button-next {
+    right: 0;
+  }
+  &.swiper-button-prev {
+    left: 0;
+  }
+}
+
+.swiper-btns-wrap.swiper-btns-wrap--outside {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  width: calc(100% + var(--arrow-position-outside) * 2);
+  left: calc(var(--arrow-position-outside) * -1);
+  right: calc(var(--arrow-position-outside) * -1);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+}
+
+.swiper-btns-wrap--bottom_inside {
+  position: absolute;
+  bottom: var(--arrow-height);
+  right: 0;
+}
+
+.swiper-btns-wrap--bottom_inside .swiper-button-prev {
+  left: unset;
+  right: calc(var(--arrow-width) + 30px);
+}
+
+/* fraction on arrows */
+.swiper-button-next .swiper-pagination-fraction {
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: normal;
+  position: absolute;
+  top: 0;
+  left: 4px;
+  text-align: left;
+  transform: translateY(calc(var(--arrow-height) / 5 * -1));
+}
+
+.swiper-btns-wrap:has(.swiper-pagination-fraction) .swiper-button [data-fill-bg],
+.swiper-btns-wrap:has(.swiper-pagination-fraction) .swiper-button::before {
+  display: none;
+}
+
+.swiper-btns-wrap:has(.swiper-pagination-fraction) .swiper-button {
+  overflow: visible;
+  background: rgba(var(--arrow-background));
+}
+
+.swiper-btns-wrap:has(.swiper-pagination-fraction) .swiper-button:hover {
+  background: rgba(var(--arrow-background-hover));
+}
+
+/* css for arrrow on popup */
+
+@media screen and (min-width: 1280px) {
+  .modal--popup .swiper-button .svg-wrapper {
+    max-width: 5rem;
+    max-height: 3rem;
+  }
+
+  .details-content .swiper-button{
+    --button-width: calc(var(--arrow-width) / 2);
+    --button-height: calc(var(--arrow-height) / 2);
+    --button-icon-size: calc(var(--arrow-icon-size) / 2);
+  }
+}

@@ -1,0 +1,100 @@
+{%- liquid
+  assign section_id = section.id
+  assign block_id = block.id
+  assign card_product = block.settings.product
+  assign quick_add = block.settings.quick_add
+
+  assign quick_add_type_icon = false
+  if settings.quick_add_type == 'icon'
+    assign quick_add_type_icon = true
+    assign class_button = 'card-product__group-btn rounded-full bor-none center cursor-pointer flex items-center justify-center relative w-fit leading-none'
+    assign class_text = 'text whitespace-nowrap overflow-hidden pointer-events-none absolute-c-y z--1 opacity-0'
+    assign class_text_inner = 'text-inner text-sm inline-block'
+  else
+    assign padding_block = block.settings.padding_block | times: 0.1 | append: 'rem'
+    assign padding_inline = block.settings.padding_inline | times: 0.1 | append: 'rem'
+  endif
+-%}
+
+{%- if card_product and card_product != empty and block.settings.quick_add != 'none' -%}
+  <div
+    class="card--block-button {{ block.settings.quick_add }} relative z-2 w-full"
+    style="{% if quick_add_type_icon %}--pl: 0; --pr: 0;--md-pl: 1rem; --md-pr: 1rem;--lg-pl: 1.6rem; --lg-pr: 1.6rem;{% else %}--p: {{ padding_block }} {{ padding_inline }};{% if block.settings.background %}--bg-color: {{ block.settings.background_color }}; --corner-radius: {{ block.settings.corner_radius }}px;{% endif %}{% endif %}"
+  >
+    <button class="bundle-product-toggle button button--full-width button-secondary" data-product-id="{{ card_product.id }}">
+      {{ 'products.product.choose_options' | t }}
+    </button>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.product_button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "background",
+      "label": "t:settings.background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:settings.background_color",
+      "alpha": true,
+      "default": "#000"
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "label": "t:settings.corner_radius",
+      "default": 0,
+      "min": 0,
+      "max": 50,
+      "step": 1
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_block",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 0,
+      "label": "t:settings.padding_top_bottom",
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_inline",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 0,
+      "label": "t:settings.padding_left_right",
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_button",
+      "settings": {
+        "product": "{{ closest.product }}"
+      }
+    }
+  ]
+}
+{% endschema %}

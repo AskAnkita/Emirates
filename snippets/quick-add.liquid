@@ -1,0 +1,56 @@
+<quick-add-modal
+  class="quick-add-modal modal--popup fixed top-0 left-0 z-9 w-screen h-full flex justify-center no-js-hidden"
+  element-s-popup
+  id="QuickAddStandard"
+>
+  <div id="Modal-Overlay" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <div
+    class="popup__inner quick-add-modal__content w-auto h-full absolute-c-c flex flex-column global-settings-popup"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ 'products.product.choose_product_options' | t: product_name: product.title | escape }}"
+    tabindex="-1"
+    style="--modal-max-height: 85dvh;"
+  >
+    <button
+      class="quick-add-modal__toggle drawer__close block t-button bor-none rounded-full cursor-pointer"
+      type="button"
+      onclick="this.closest('quick-add-modal').hide()"
+      aria-label="{{ 'accessibility.close_dialog' | t }}"
+      style="--top: 0.3rem; --right: 0.3rem;"
+    >
+      {{- 'icon-close.svg' | inline_asset_content -}}
+    </button>
+    <div id="QuickStandardModal" class="quick-add-modal__content-info cus-scrollbar"></div>
+  </div>
+</quick-add-modal>
+
+<bulk-modal
+  class="quick-add-modal quick-add-modal--bulk modal--popup fixed top-0 left-0 z-9 w-screen h-full flex justify-center no-js-hidden"
+  element-s-popup
+  id="QuickAddBulk"
+>
+  <div id="Modal-Overlay" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <div
+    class="popup__inner quick-add-modal__content quick-add-modal__content--bulk w-auto h-full md:h-auto absolute-c-c flex flex-column global-settings-popup"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ 'products.product.choose_product_options' | t: product_name: product.title | escape }}"
+    tabindex="-1"
+    style="--modal-max-height: 85dvh;--popup-max-width: var(--normal-page-width);"
+  >
+    <button
+      class="quick-add-modal__toggle drawer__close block t-button bor-none rounded-full cursor-pointer"
+      type="button"
+      onclick="this.closest('bulk-modal').hide()"
+      aria-label="{{ 'accessibility.close_dialog' | t }}"
+      style="--top: 0.3rem; --right: 0.3rem;"
+    >
+      {{- 'icon-close.svg' | inline_asset_content -}}
+    </button>
+    <div
+      id="QuickBulkModal"
+      class="quick-add-modal__content-info quick-add-modal__content-info--bulk cus-scrollbar"
+    ></div>
+  </div>
+</bulk-modal>

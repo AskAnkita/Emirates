@@ -1,0 +1,75 @@
+{%- doc -%}
+  Renders a background image
+
+  @param {object} background_image - The background image
+  @param {string} background_image_position - The background image position
+  @param {number} [height] - The height of the background image
+  @param {string} [image_behavior] - The image behavior
+  @param {string} [ratio] - The ratio of the background image
+  @param {object} [section] - The section object
+  @param {string} [placeholder] - The placeholder of the background image
+{%- enddoc -%}
+
+{%- liquid
+  assign element = 'div'
+  assign class = 'background-image-img'
+  if image_behavior == 'parallax'
+    assign element = 'parallax-background'
+    assign class = 'parallax-image'
+  elsif image_behavior == 'reveal_on_scroll'
+    assign is_animated_image = true
+    assign element = 'animate-image'
+    assign class = 'animate-image__image'
+  endif
+
+  assign style_value = 'object-position: center;'
+-%}
+
+<{{ element }}
+  class="background-image-container{% if background_image_position == 'fit' %} background-image-fit{% endif %}{% if image_behavior != 'none' %} animate--{{ image_behavior }}{% endif %}"
+  style="{% if ratio %}--ratio: {{ ratio }};{% endif %}"
+  data-speed="0.6"
+  data-axis="y"
+  data-range="25%"
+  data-offset="start end, end start"
+  {% if is_animated_image %}
+    data-animate-type="{{ image_behavior }}"
+  {% endif %}
+>
+  {% liquid
+    assign media_width_desktop = '100vw'
+    assign media_width_mobile = '100vw'
+    assign sizes = '(min-width: 750px) ' | append: media_width_desktop | append: ', ' | append: media_width_mobile
+    assign widths = '300, 450, 600, 750, 900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2000, 2500, 3000, 3500, 4000, 5000'
+  %}
+
+  {%- if background_image != blank -%}
+    {% liquid
+      assign fetch_priority = 'auto'
+      assign loading = 'lazy'
+      if section and section.index == 1
+        assign fetch_priority = 'high'
+        assign loading = 'eager'
+      endif
+    %}
+    {{
+      background_image
+      | image_url: width: background_image.width
+      | image_tag:
+        height: height,
+        sizes: sizes,
+        widths: widths,
+        loading: loading,
+        fetchpriority: fetch_priority,
+        style: style_value,
+        class: class
+    }}
+  {%- else -%}
+    {%- assign placeholder_name = placeholder | default: 'hero-apparel-3' -%}
+
+    {%- if placeholder_name == blank -%}
+      {%- assign placeholder_name = 'hero-apparel-3' -%}
+    {%- endif -%}
+    {{ placeholder_name | placeholder_svg_tag }}
+  {%- endif -%}
+</{{ element }}>

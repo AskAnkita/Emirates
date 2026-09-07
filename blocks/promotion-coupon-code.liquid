@@ -1,0 +1,139 @@
+{% liquid
+  assign coupon_code = block.settings.coupon_code
+  assign input_bg = block.settings.input_bg
+  assign input_text_color = block.settings.input_text_color
+  assign input_border_color = block.settings.input_border_color
+  assign icon_color = block.settings.icon_color
+  assign icon_bg = block.settings.icon_bg
+
+  assign pl = block.settings.padding_left
+  assign pr = block.settings.padding_right
+  assign pt = block.settings.padding_top
+  assign pb = block.settings.padding_bottom
+%}
+
+{% capture attr %}
+  style="
+  --input-bg: {{ input_bg }}; --input-text-color: {{ input_text_color }}; --input-border-color: {{ input_border_color }}; --icon-color: {{ icon_color }}; --icon-bg: {{ icon_bg }};
+  {% if pl != 0 %}--pl:{{ pl }}px;{% endif %}
+  {% if pt != 0 %}--pt:{{ pt }}px;{% endif %}
+  {% if pb != 0 %}--pb:{{ pb }}px;{% endif %}
+  {% if pr != 0 %}--pr:{{ pr }}px;{% endif %}
+  "
+{% endcapture %}
+
+<div class="coupon-code-block relative" data-text="{{ coupon_code }}" {{ attr }}>
+  <span class="coupon-code-text relative">
+    <span class="coupon-code-default">{{ coupon_code }}</span>
+    <span class="coupon-code-copied">Copied!</span>
+  </span>
+  <button class="coupon-code-icon promotion-code">
+    <span class="svg-wrapper">
+        {{- 'icon-copy.svg' | inline_asset_content -}}
+    </span>
+    <span class="tooltip" data-success_message="{{ 'content.copied' | t }}">
+        {{ 'content.copy' | t }}
+    </span>
+    </button>
+</div>
+
+<script src="{{ 'copy-coupon-code.js' | asset_url }}" defer="defer"></script>  
+
+{% schema %}
+{
+  "name": "t:names.promotion_coupon_code",
+  "blocks": [],
+  "settings": [
+    {
+      "type": "text",
+      "id": "coupon_code",
+      "label": "t:settings.coupon_code",
+      "default": "CODEWHERE"
+    },
+    {
+      "type": "header",
+      "content": "t:content.input"
+    },
+    {
+      "type": "color",
+      "id": "input_bg",
+      "label": "t:settings.background",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "t:settings.color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "t:settings.border_color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "t:settings.icon_color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "icon_bg",
+      "label": "t:settings.icon_background",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.promotion_coupon_code",
+      "category": "t:categories.custom"
+    }
+  ]
+}
+{% endschema %}

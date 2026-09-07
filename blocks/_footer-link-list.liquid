@@ -1,0 +1,64 @@
+<details
+  id="Footer-details-{{ block.id }}"
+  class="footer-block block {{ block.type }} footer-block--menu{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+  is="collapsible-details"
+  collapsible-mobile
+  style="{% if settings.animations_reveal_on_scroll %}--animation-order: {{ forloop.index }};{% endif %}"
+  {{ block.shopify_attributes }}
+>
+  <summary id="Footer-summary-{{ block.id }}-{{ section.id }}" class="sm\:flex items-center justify-between cursor-pointer">
+    <h2 class="footer-block__heading inline-richtext{% if block.settings.underline %} underline{% endif %}">{{- block.settings.heading -}}</h2>
+    {{- 'icon-caret.svg' | inline_asset_content -}}
+  </summary>
+
+  {%- if block.settings.menu != blank -%}
+    <ul class="footer-block__details-content details-content list-unstyled flex flex-column">
+      {%- for link in block.settings.menu.links -%}
+        <li>
+          <a
+            href="{{ link.url }}"
+            class="link link--text list-menu__item list-menu__item--link"
+          >
+            {{ link.title | escape }}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</details>
+
+{% schema %}
+{
+  "name": "t:names.footer_link_list",
+  "tag": null,
+  "blocks": [],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.menu"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Quick links",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "underline",
+      "label": "t:settings.show_underline_for_heading",
+      "default": false
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:settings.menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.footer_link_list"
+    }
+  ]
+}
+{% endschema %}

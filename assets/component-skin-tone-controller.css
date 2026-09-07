@@ -1,0 +1,106 @@
+/* The control is rendered inside ONE media container, so it anchors to that
+   image alone rather than floating over the whole gallery. */
+.media-gallery__grid-item:has(> .skin-tone-controller) {
+  position: relative;
+}
+
+.skin-tone-controller {
+  --skin-tone-track: linear-gradient(
+    to top,
+    #4d2b20 0%,
+    #8f5c43 22%,
+    #c58b6d 45%,
+    #e3b295 68%,
+    #f6d4bf 100%
+  );
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 1.6rem;
+  transform: translateY(-50%);
+  display: flex;
+  width: 3.8rem;
+  min-height: 15rem;
+  padding: 1rem 0.7rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  border: 1px solid rgb(var(--color-foreground-rgb) / 0.14);
+  border-radius: 2rem;
+  background: rgb(var(--color-background-rgb) / 0.88);
+  box-shadow: 0 0.5rem 1.8rem rgb(0 0 0 / 0.12);
+  backdrop-filter: blur(0.8rem);
+}
+
+.skin-tone-controller__label,
+.skin-tone-controller__value {
+  color: rgb(var(--color-foreground-rgb));
+  font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.skin-tone-controller__label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.skin-tone-controller__value {
+  min-height: 0.9rem;
+  color: rgb(var(--color-foreground-rgb) / 0.7);
+  font-size: 0.75rem;
+}
+
+.skin-tone-controller__input {
+  width: 13rem;
+  height: 1.2rem;
+  margin: 5.8rem -5.8rem;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  transform: rotate(-90deg);
+}
+
+.skin-tone-controller__input::-webkit-slider-runnable-track {
+  height: 0.45rem;
+  border-radius: 1rem;
+  background: var(--skin-tone-track);
+}
+
+.skin-tone-controller__input::-moz-range-track {
+  height: 0.45rem;
+  border-radius: 1rem;
+  background: var(--skin-tone-track);
+}
+
+.skin-tone-controller__input::-webkit-slider-thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: -0.52rem;
+  appearance: none;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #9f684c;
+  box-shadow: 0 0.1rem 0.5rem rgb(0 0 0 / 0.28);
+}
+
+.skin-tone-controller__input::-moz-range-thumb {
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #9f684c;
+  box-shadow: 0 0.1rem 0.5rem rgb(0 0 0 / 0.28);
+}
+
+.skin-tone-controller__input:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+@media screen and (max-width: 749px) {
+  .skin-tone-controller {
+    right: 1rem;
+    min-height: 13rem;
+  }
+}

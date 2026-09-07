@@ -1,0 +1,79 @@
+{% comment %} INSERT_YOUR_REWRITE_HERE {% endcomment %}
+{% liquid
+  assign product_resource = product
+  if request.visual_preview_mode and product_resource == blank
+    assign product_resource = collections.all.products.first
+  endif
+
+  assign color_scheme = section.settings.color_scheme
+
+  assign type_preset = block.settings.type_preset
+
+  assign pl = block.settings.padding_left
+  assign pr = block.settings.padding_right
+  assign pt = block.settings.padding_top
+  assign pb = block.settings.padding_bottom
+
+  assign sticky_width = block.settings.sticky_width
+  assign sticky_pos_bottom = section.settings.sticky_pos_bottom
+  assign shadow_horizontal_offset = block.settings.shadow_horizontal_offset
+  assign shadow_vertical_offset = block.settings.shadow_vertical_offset
+  assign shadow_blur = block.settings.shadow_blur
+  assign shadow_spread_radius = block.settings.shadow_spread_radius
+  assign shadow_color = block.settings.shadow_color
+
+-%}
+
+{%- capture sticky_attr -%}
+style="
+  --sticky-width: {{ sticky_width }}%;
+  --sticky-pos-bottom: {{ sticky_pos_bottom }}px;
+  --shadow-horizontal-offset: {{ shadow_horizontal_offset }}px;
+  --shadow-vertical-offset: {{ shadow_vertical_offset }}px;
+  --shadow-blur: {{ shadow_blur }}px;
+  --shadow-spread-radius: {{ shadow_spread_radius }}px;
+  --shadow-color: {{ shadow_color }};
+  {% if block.settings.inherit_color_scheme == false %}
+    {% render 'color-scheme-style', settings: block.settings %}
+  {% endif %}
+"
+{%- endcapture -%}
+
+{%- capture attr -%}
+style="
+  {% if pl != 0 %}--pl:{{ pl }}px;{% endif %}
+  {% if pt != 0 %}--pt:{{ pt }}px;{% endif %}
+  {% if pb != 0 %}--pb:{{ pb }}px;{% endif %}
+  {% if pr != 0 %}--pr:{{ pr }}px;{% endif %}
+"
+{%- endcapture -%}
+
+<sticky-atc
+  class="sticky-atc sticky bottom-0 left-0 right-0 z-10 flex justify-between items-center shadow-style style-jump_to_product"
+  {{ sticky_attr }}
+  data-jump-to-product="true" role="button" tabindex="0" aria-label="{{ 'accessibility.jump_to_product' | t }}"
+>
+  <div class="section section--page-width color-{{ color_scheme }}">
+    <div class="sticky-atc__wrapper flex justify-between items-center w-full" {{ attr }}>
+      <div class="sticky-atc__content flex items-center small-hide" style="--gap: 2.4rem;">
+        <div class="sticky-atc__media">
+          {%- assign current_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
+          {{- current_media | image_url: width: 64 | image_tag: height: '64', sizes: '64px', widths: '64', loading: 'lazy', class: 'w-full h-auto object-cover' -}}
+        </div>
+        <div class="sticky-atc__info">
+          <div class="sticky-atc__title">
+            <span class="block font-bold {{ type_preset }}">{{ product.title | escape }}</span>
+          </div>
+          <div class="sticky-atc__price">
+            <product-price>
+              {%- render 'price-product', product_resource: product, show_unit_price: true, show_sale_price_first: true -%}
+            </product-price>
+          </div>
+        </div>
+      </div>
+      <span class="svg-wrapper icon-arrow-down">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+    </div>
+  </div>
+</sticky-atc>

@@ -1,0 +1,127 @@
+{%- liquid
+  assign bl_stts = block.settings
+  assign text = bl_stts.text
+  assign number = bl_stts.number
+  assign scroll_reveal = settings.animations_reveal_on_scroll
+
+  assign collapse = bl_stts.collapse
+  assign collapse_default = bl_stts.collapse_default
+  assign collapse_icon = bl_stts.collapse_icon
+  if collapse == true
+    assign element = 'accordion-custom'
+    if collapse_default == 'open'
+      assign is_open = true
+    else
+      assign is_open = false
+    endif
+  else
+    assign element = 'div'
+  endif
+-%}
+
+<{{element}} class="blog-post__recent-posts blog-posts__sidebar-item" {% if is_open %}
+  open-by-default-on-desktop
+  open-by-default-on-mobile
+{% endif %}>
+  {% if collapse %}
+    <details
+      {% if is_open %}
+        open
+      {% endif %}
+    >
+      <summary>
+  {% endif %}
+
+  {% if text != blank %}
+    <h3 class="blog-posts__sidebar-heading{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}{% if collapse %} blog-posts__sidebar-collapse-button cursor-pointer{% endif %}">
+      {{ text }}
+    </h3>
+  {%- elsif text == blank and collapse == true -%}
+    <h3 class="blog-posts__sidebar-heading blog-posts__sidebar-collapse-button cursor-pointer">
+      {{ 'content.collapse_row' | t }}
+    </h3>
+  {% endif %}
+
+  {% if collapse %}
+    {% if collapse_icon != 'none' %}
+      <span class="svg-wrapper icon-caret-wrapper">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+    {% endif %}
+    </summary>
+  {% endif %}
+
+  {% if collapse %}
+    <div class="details-content">
+  {% endif %}
+
+  <ul class="blog-post__recent-posts-list list-unstyled" role="menu">
+    {%- for article in blog.articles limit: number -%}
+      <li class="blog-post__recent-posts-item{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}" style="{% if scroll_reveal %}--animation-order: {{ forloop.index }};{% endif %}">
+        <h6 class="blog-title">
+          <a href="{{ article.url }}" class="link link-underline" aria-label="link">
+            <span class="text">{{ article.title }}</span>
+          </a>
+        </h6>
+        <em class="date m-0">{{ article.published_at | date: '%d %B %Y' }}</em>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  {% if collapse %}
+    </div>
+    </details>
+  {% endif %}
+</{{element}}>
+
+{% schema %}
+{
+  "name": "t:names.recent_posts",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "collapse",
+      "label": "t:settings.collapse",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collapse_default",
+      "label": "t:settings.collapse_style",
+      "visible_if": "{{ block.settings.collapse == true }}",
+      "options": [
+        {
+          "value": "open",
+          "label": "t:settings.collapse_open"
+        },
+        {
+          "value": "close",
+          "label": "t:settings.collapse_close"
+        }
+      ],
+      "default": "close"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:options.text",
+      "default": "<p>Recent posts</p>"
+    },
+    {
+      "type": "range",
+      "id": "number",
+      "label": "t:settings.number_of_posts",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.recent_posts"
+    }
+  ]
+}
+{% endschema %}

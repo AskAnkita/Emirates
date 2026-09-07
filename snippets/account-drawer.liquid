@@ -1,0 +1,167 @@
+<side-drawer
+  id="Drawer-Account"
+  class="drawer drawer__container fixed top-0 left-0 w-screen h-full z-9 flex no-js-hidden"
+  data-drawer-direction="right"
+>
+  <div id="Drawer-Overlay-Account" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <div
+    class="drawer__inner-wrapper color-{{ section.settings.color_scheme }}"
+    data-drawer-content
+    style="--drawer-max-width: var(--normal-content-width);"
+  >
+    <div
+      class="drawer__inner cus-scrollbar"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Account Drawer"
+      tabindex="-1"
+    >
+      <div
+        class="drawer__header flex justify-between items-center relative"
+        style="--gap-x: 1rem;--p: var(--padding-xs) 0;"
+      >
+        <h2 class="drawer__heading break m-0 h5">
+          {%- liquid
+            if customer
+              echo 'Hi, ' | append: customer.name | default: 'Guest'
+            else
+              echo 'Login'
+            endif
+          -%}
+        </h2>
+        <button
+          class="drawer__close block t-button bor-none rounded-full cursor-pointer"
+          type="button"
+          onclick="this.closest('side-drawer').close()"
+          aria-label="Close Account Drawer"
+        >
+          <span class="svg-wrapper">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+
+      <div class="drawer__wrapper relative h-full cus-scrollbar motion-reduce" style="--p: 1.5rem 0 0;">
+        <div class="drawer__content">
+          <div class="drawer__content-inner">
+            {% if customer %}
+              <ul class="drawer__list list-unstyled m-0 p-0 flex flex-column" style="--gap-y: 2rem;" role="list">
+                <li class="drawer__list-item flex justify-between items-center relative cursor-pointer" role="listItem">
+                  <a
+                    href="{{ routes.account_url }}"
+                    class="link flex justify-between items-center flex-1 underline link--hover-underline paragraph"
+                  >
+                    <span class="text">{{ 'customer.account.details' | t }}</span>
+                  </a>
+                </li>
+
+                <li class="drawer__list-item flex justify-between items-center relative cursor-pointer" role="listItem">
+                  <a
+                    href="{{ routes.account_addresses_url }}"
+                    class="link flex justify-between items-center flex-1 underline link--hover-underline paragraph"
+                  >
+                    <span class="text">{{ 'customer.addresses.title' | t }}</span>
+                  </a>
+                </li>
+
+                <li class="drawer__list-item flex justify-between items-center relative cursor-pointer" role="listItem">
+                  <a
+                    href="{{ routes.account_login_url }}#recover"
+                    class="link flex justify-between items-center flex-1 underline link--hover-underline paragraph"
+                  >
+                    <span class="text">{{ 'customer.recover_password.title' | t }}</span>
+                  </a>
+                </li>
+
+                <li class="drawer__list-item flex justify-between items-center relative cursor-pointer" role="listItem">
+                  <a
+                    href="{{ routes.account_logout_url }}"
+                    class="link flex justify-between items-center flex-1 underline link--hover-underline paragraph"
+                  >
+                    <span class="text">{{ 'customer.log_out' | t }}</span>
+                  </a>
+                </li>
+              </ul>
+            {% else %}
+              {%- form 'customer_login', id: 'CustomerLoginForm', class: 'customer-drawer__form' -%}
+                <div class="drawer__form-field flex flex-column" style="--gap-y: 0.8rem;">
+                  <label for="CustomerEmail">
+                    {{ 'customer.login_page.email' | t }}
+                  </label>
+                  <input
+                    class="field__input"
+                    type="email"
+                    name="customer[email]"
+                    id="CustomerEmail"
+                    autocomplete="email"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    required
+                    {% if form.errors contains 'form' %}
+                      aria-invalid="true"
+                    {% endif %}
+                    placeholder="{{ 'customer.login_page.email' | t }}"
+                  >
+                </div>
+
+                {%- if form.password_needed -%}
+                  <div class="drawer__form-field flex flex-column" style="--gap-y: 0.8rem; --mt: 1.2rem;">
+                    <label for="CustomerPassword">
+                      {{ 'customer.login_page.password' | t }}
+                    </label>
+                    <input
+                      class="field__input"
+                      type="password"
+                      value=""
+                      name="customer[password]"
+                      id="CustomerPassword"
+                      autocomplete="current-password"
+                      required
+                      {% if form.errors contains 'password' %}
+                        aria-invalid="true"
+                      {% endif %}
+                      placeholder="{{ 'customer.login_page.password' | t }}"
+                    >
+                  </div>
+                {%- endif -%}
+                <div class="flex flex-column items-center gap-2xl" style="--mt: var(--margin-2xl)">
+                  <button class="button w-full" type="submit">
+                    <span
+                      class="button-overflow relative overflow-hidden"
+                      data-button-text="{{ 'customer.login_page.title' | t }}"
+                    >
+                      <span class="button-text-main inline-block relative z-1">
+                        {{ 'customer.login_page.title' | t }}
+                      </span>
+                    </span>
+                  </button>
+                  <a class="link link--hover-underline paragraph" href="{{ routes.account_login_url }}#recover">
+                    <span class="text">
+                      {{ 'customer.login_page.forgot_password' | t }}
+                    </span>
+                  </a>
+                </div>
+                <div style="--mt: var(--margin-2xl);">
+                  <a
+                    href="{{ routes.account_register_url }}"
+                    class="size-style button-secondary w-full"
+                    style="--button-text-case: uppercase;"
+                  >
+                    <span
+                      class="button-overflow relative overflow-hidden"
+                      data-button-text="{{ 'customer.login_page.create_account' | t }}"
+                    >
+                      <span class="button-text-main inline-block relative z-1">
+                        {{ 'customer.login_page.create_account' | t }}
+                      </span>
+                    </span>
+                  </a>
+                </div>
+              {%- endform -%}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</side-drawer>

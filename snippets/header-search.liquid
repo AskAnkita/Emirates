@@ -1,0 +1,168 @@
+{%- liquid
+  assign search_type = search_type | default: settings.search_type
+
+  if variant == 'mobile'
+    assign search_type = 'drawer'
+  endif
+
+  if search_type == 'full'
+    assign details_wrapper = 'details-modal'
+    assign details_element = 'details'
+    assign details_summary = 'summary'
+  elsif search_type == 'drawer'
+    assign details_wrapper = 'div'
+    assign details_element = 'div'
+    assign details_summary = 'button'
+  else
+    assign details_wrapper = 'div'
+    assign details_element = 'details'
+    assign details_summary = 'summary'
+  endif
+
+  assign search_color_scheme = section.settings.color_scheme_search_inline
+  assign display_type = display_type | default: 'icon'
+  assign display_layout = sec_stts.search_display
+%}
+
+{%- capture header_utility_custom_style -%}
+  {% if custom_header_utility %}
+    {%- render 'typography-style', settings: sec_stts, preset: 'custom', font_size: header_utility_size, font: header_utility_font, weight: header_utility_weight, line_height: header_utility_line_height, letter_spacing: header_utility_letter_spacing, case: header_utility_case, wrap: header_utility_wrap %}
+  {% endif %}
+{%- endcapture -%}
+
+{%- capture account_custom_class -%}
+  {% if custom_header_utility %} custom-typography custom-font-size{% endif %}
+{%- endcapture -%}
+
+{% unless style == 'none' %}
+  <div
+    class="
+      header__column-action {% unless search_type == 'inline' %}header__column-action--{{ display_type }}{% endunless %} header-block grid__itemblock search-action
+      {% if class != blank %} {{ class }}{% endif %}
+    "
+  >
+    {% unless search_type == 'inline' %}
+      <{{ details_wrapper }} class="header__search">
+        <{{ details_element }}>
+          {% if search_type == 'drawer' %}
+            <side-drawer-opener data-side-drawer="#Drawer-Search">
+          {% endif %}
+          <{{ details_summary }}
+            class="header__icon header__icon--search header__icon--summary button focus-inset modal__toggle"
+            aria-haspopup="dialog"
+            aria-label="{{ 'content.search' | t }}"
+          >
+            <span class="header__icon header__icon--{{ display_type }}{% if display_type == 'both' %} header__icon--layout-{{ display_layout }}{% endif %}">
+              <span class="svg-wrapper{% if display_type == 'text' %} lg:none{% endif %}">
+                {{- 'icon-search.svg' | inline_asset_content -}}
+              </span>
+              {%- if display_type == 'text' or display_type == 'both' -%}
+                <span class="text max-md:hidden{% if display_type == 'icon' %} visually-hidden{% endif %} {{ account_custom_class }}" style="{{ header_utility_custom_style }}">
+                  {{ 'content.search' | t }}
+                </span>
+              {%- endif -%}
+            </span>
+          </{{ details_summary }}>
+          {% if search_type == 'drawer' %}
+            </side-drawer-opener>
+          {% endif %}
+          {%- if search_type == 'full' -%}
+            <div
+              class="search-modal search-modal--{{ search_type }} modal__content color-{{ search_color_scheme }}"
+              role="dialog"
+              aria-modal="true"
+              aria-label="{{ 'content.search' | t }}"
+            >
+              <div id="Details-Modal-Overlay" class="modal-overlay"></div>
+              <div
+                class="details-modal__content search-modal__content{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} search-modal__content-top{% else %} search-modal__content-bottom{% endif %}"
+                tabindex="-1"
+              >
+                {%- if settings.predictive_search_enabled -%}
+                  <predictive-search class="search-modal__form" data-loading-text="{{ 'accessibility.loading' | t }}">
+                {%- else -%}
+                  <search-form class="search-modal__form">
+                {%- endif -%}
+                <form action="{{ routes.search_url }}" method="get" role="search" class="search search-modal__form">
+                  <div class="predictive-search--center">
+                    <div class="field">
+                      <button class="search__button field__button" aria-label="{{ 'content.search' | t }}">
+                        <span class="svg-wrapper">
+                          {{- 'icon-search.svg' | inline_asset_content -}}
+                        </span>
+                      </button>
+                      <input
+                        class="search__input field__input"
+                        id="{{ input_id }}"
+                        type="search"
+                        name="q"
+                        value="{{ search.terms | escape }}"
+                        placeholder=" "
+                        {%- if settings.predictive_search_enabled -%}
+                          role="combobox"
+                          aria-expanded="false"
+                          aria-owns="predictive-search-results"
+                          aria-controls="predictive-search-results"
+                          aria-haspopup="listbox"
+                          aria-autocomplete="list"
+                          autocorrect="off"
+                          autocomplete="off"
+                          autocapitalize="off"
+                          spellcheck="false"
+                        {%- endif -%}
+                      >
+                      <label class="field__label" for="{{ input_id }}">{{ 'content.search' | t }}</label>
+                      <input type="hidden" name="options[prefix]" value="last">
+                      <button
+                        type="reset"
+                        class="reset__button reset__button--text field__button{% if search.terms == blank %} hidden{% endif %}"
+                        aria-label="{{ 'content.clear_search_term' | t }}"
+                      >
+                        {{ 'actions.clear' | t }}
+                      </button>
+                      <button
+                        type="button"
+                        class="search-modal__close-button modal__close-button link link--text focus-inset"
+                        aria-label="{{ 'accessibility.close' | t }}"
+                      >
+                        <span class="svg-wrapper">
+                          {{- 'icon-close.svg' | inline_asset_content -}}
+                        </span>
+                      </button>
+                    </div>
+
+                  </div>
+
+                  {%- if settings.predictive_search_enabled -%}
+                    <div
+                      class="predictive-search predictive-search--header predictive-search--center cus-scrollbar"
+                      tabindex="-1"
+                      data-predictive-search
+                    >
+                      {% render 'predictive-search-empty-state',
+                        shadow_opacity: 0.1,
+                        products_test_id: products_test_id
+                      %}
+                    </div>
+
+                    <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span>
+                  {%- endif -%}
+                </form>
+                {%- if settings.predictive_search_enabled -%}
+                  </predictive-search>
+                {%- else -%}
+                  </search-form>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- elsif search_type == 'drawer' -%}
+            {%- render 'predictive-search-drawer', variant: variant, input_id: input_id, color_scheme: search_color_scheme -%}
+          {%- endif -%}
+        </{{ details_element }}>
+      </{{ details_wrapper }}>
+
+    {% else %}
+      {%- render 'predictive-search-inline', color_scheme: search_color_scheme, search_type: section.settings.search_type -%}
+    {% endunless %}
+  </div>
+{% endunless %}

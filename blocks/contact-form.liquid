@@ -1,0 +1,328 @@
+{% liquid
+  assign form_id = block.id | default: section.id | prepend: 'ContactForm-'
+
+  assign button_style = block.settings.button_style
+  assign button_label = block.settings.button_label
+
+  assign pl = block.settings.padding_left
+  assign pr = block.settings.padding_right
+  assign pt = block.settings.padding_top
+  assign pb = block.settings.padding_bottom
+
+  assign gap = block.settings.gap
+
+%}
+
+{%- capture attr -%}
+  style="
+    --gap:{{ gap }}px;
+    {% if pl != 0 %}--pl:{{ pl }}px;{% endif %}
+    {% if pt != 0 %}--pt:{{ pt }}px;{% endif %}
+    {% if pb != 0 %}--pb:{{ pb }}px;{% endif %}
+    {% if pr != 0 %}--pr:{{ pr }}px;{% endif %}
+    {% if block.settings.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: block.settings %}
+    {% endif %}
+"
+{%- endcapture -%}
+
+<div class="w-full block{% if block.settings.inherit_color_scheme == false %} color-scheme-custom{% endif %}" {{ attr }}>
+  <contact-form class="block-contact-form" id="{{ form_id }}--block">
+    {%- form 'contact', id: form_id -%}
+      {%- if form.posted_successfully? -%}
+        <div class="form-success">
+          <div class="alertBox alertBox--success">
+            <p class="alertBox-message">
+              {{ 'content.form.post_success' | t }}
+            </p>
+          </div>
+        </div>
+      {%- else -%}
+        <div class="contact-form-stack">
+          {% content_for 'block', type: '_input-mail', id: 'email-input' %}
+          {% content_for 'blocks' %}
+        </div>
+        <button class="button{% if button_style == 'outline' %}-secondary{% endif %} whitespace-nowrap" type="submit">
+          <span class="button-overflow relative overflow-hidden" data-button-text="{{ button_label }}">
+            <span class="button-text-main inline-block relative z-1">
+              {{ button_label }}
+            </span>
+          </span>
+        </button>
+        <script>
+          (() => {
+            const stack = document.querySelector('#{{ form_id }}--block .contact-form-stack');
+            if (!stack) return;
+            const email = stack.querySelector('[data-order-index]');
+            if (!email) return;
+            const order = parseInt(email.dataset.orderIndex || '1', 10);
+            const children = Array.from(stack.children).filter((el) => el !== email);
+            const target = children[Math.max(0, order - 1)];
+            if (target) {
+              stack.insertBefore(email, target);
+            } else {
+              stack.appendChild(email);
+            }
+          })();
+        </script>
+      {%- endif -%}
+    {%- endform -%}
+  </contact-form>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.contact_form",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_input"
+    },
+    {
+      "type": "_textarea"
+    },
+    {
+      "type": "_radio"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "t:content.submit_button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:settings.button_label",
+      "default": "SUBMIT CONTACT"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "outline",
+          "label": "t:options.outline"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_background",
+      "label": "t:settings.background",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color_background",
+      "id": "scheme_background_gradient",
+      "label": "t:settings.background_gradient",
+      "info": "t:info.background_gradient_info",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground_heading",
+      "label": "t:settings.headings",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground",
+      "label": "t:settings.text",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary",
+      "label": "t:settings.primary_color",
+      "default": "#000F9F",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary_hover",
+      "label": "t:settings.primary_hover_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_shadow",
+      "label": "t:settings.shadow_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.contact_form",
+      "category": "t:categories.forms",
+      "blocks": {
+        "input_zFxPcw": {
+          "type": "_input",
+          "name": "t:names.input",
+          "settings": {
+            "label": "Name",
+            "show_label": true,
+            "label_type_preset": "paragraph",
+            "label_mb": 8,
+            "input_type_preset": "paragraph",
+            "is_required": false,
+            "placeholder": "Please fill in this field",
+            "padding_left": 15,
+            "padding_right": 15,
+            "padding_top": 12,
+            "padding_bottom": 12,
+            "border_style": "all",
+            "input_border_width": 1,
+            "input_border_radius": 0,
+            "input_alignment": "left"
+          },
+          "blocks": {}
+        },
+        "input_36kKKB": {
+          "type": "_input",
+          "name": "t:names.input",
+          "settings": {
+            "label": "Phone",
+            "show_label": true,
+            "label_type_preset": "paragraph",
+            "label_mb": 8,
+            "input_type_preset": "paragraph",
+            "is_required": false,
+            "placeholder": "Please fill in this field",
+            "padding_left": 15,
+            "padding_right": 15,
+            "padding_top": 12,
+            "padding_bottom": 12,
+            "border_style": "all",
+            "input_border_width": 1,
+            "input_border_radius": 0,
+            "input_alignment": "left"
+          },
+          "blocks": {}
+        },
+        "textarea_eVV6pX": {
+          "type": "_textarea",
+          "name": "Textarea",
+          "settings": {
+            "label": "Comment",
+            "show_label": true,
+            "label_type_preset": "paragraph",
+            "label_mb": 8,
+            "text_area_height": 220,
+            "input_type_preset": "paragraph",
+            "is_required": false,
+            "placeholder": "Please fill in this field",
+            "padding_left": 15,
+            "padding_right": 15,
+            "padding_top": 12,
+            "padding_bottom": 12,
+            "border_style": "all",
+            "input_border_width": 1,
+            "input_border_radius": 0,
+            "input_alignment": "left"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "input_zFxPcw",
+        "input_36kKKB",
+        "textarea_eVV6pX"
+      ]
+    }
+  ]
+}
+{% endschema %}

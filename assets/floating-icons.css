@@ -1,0 +1,41 @@
+@-webkit-keyframes floating-icons-fall {
+  0% {top:-10%;}
+  100% {top:110%;}
+}
+@-webkit-keyframes floating-icons-shake {
+  0% {-webkit-transform:translateX(0px);transform:translateX(0px);}
+  25% {-webkit-transform:translateX(30px);transform:translateX(30px);}
+  50% {-webkit-transform:translateX(-10px);transform:translateX(-10px);}
+  75% {-webkit-transform:translateX(40px);transform:translateX(40px);}
+  100% {-webkit-transform:translateX(0px);transform:translateX(0px);}
+}
+@keyframes floating-icons-fall {
+  0% {top:-10%;}
+  75% {top:95%; filter: blur(1px);}
+  100% {top:110%; filter: blur(4px);}
+}
+@keyframes floating-icons-shake {
+  0% {transform:translateX(0px);}
+  25% {transform:translateX(30px);}
+  50% {transform:translateX(-10px);}
+  75% {transform:translateX(40px);}
+  100% {transform:translateX(0px);}
+}
+.floating-icon {
+  position: absolute;
+  color: var(--floating-icons-color, var(--color-white));
+  font-size: 2em;
+  top: -10%;
+  pointer-events: none;
+  opacity: 0.85;
+  -webkit-user-select: none;
+  user-select: none;
+  animation-name: floating-icons-fall, floating-icons-shake;
+  --floating-icons-fall-duration: 8s;
+  --floating-icons-shake-duration: 4s;
+  animation-duration: var(--floating-icons-fall-duration), var(--floating-icons-shake-duration);
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+  animation-play-state: running, running;
+  will-change: transform, top;
+}

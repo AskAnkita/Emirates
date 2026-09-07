@@ -1,0 +1,126 @@
+{% liquid
+  assign pl = block.settings.padding_left
+  assign pr = block.settings.padding_right
+  assign pt = block.settings.padding_top
+  assign pb = block.settings.padding_bottom
+
+  assign border = block.settings.border
+%}
+
+{%- capture attr -%}
+class="{% if border != 'none' %} border-style-{{ border }}{% endif %}" {{ block.shopify_attributes }}
+style="
+{% if pl != 0 %}--pl:{{ pl }}px;{% endif %}
+{% if pt != 0 %}--pt:{{ pt }}px;{% endif %}
+{% if pb != 0 %}--pb:{{ pb }}px;{% endif %}
+{% if pr != 0 %}--pr:{{ pr }}px;{% endif %}
+"
+{%- endcapture -%}
+
+<div class="product-tab-item" {{ attr }}>
+  <a class="tab-title" href="#">
+    {% content_for 'block', type: 'text', id: 'static-text' %}
+  </a>
+
+  <div class="tab-content">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% javascript %}
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabTitles = document.querySelectorAll('.tab-title');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    if (tabTitles.length === 0 || tabContents.length === 0) return;
+
+    tabContents[0].classList.add('is-active');
+
+    tabTitles.forEach(title => {
+      title.addEventListener('click', function(e) {
+        e.preventDefault();
+        tabContents.forEach(content => {
+          content.classList.remove('is-active');
+        });
+        const tabContent = this.nextElementSibling;
+        if (tabContent) {
+          tabContent.classList.add('is-active');
+        }
+      });
+    });
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:names.product_tab_item",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:settings.title"
+    },
+    {
+      "type":  "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_tab_item"
+    }
+  ]
+}
+{% endschema %}

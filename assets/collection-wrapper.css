@@ -1,0 +1,190 @@
+.collection-wrapper {
+  @media screen and (min-width: 750px) {
+    --facets-vertical-col-width: 6;
+  }
+
+  @media screen and (min-width: 990px) {
+    --facets-vertical-col-width: 2;
+  }
+
+  @media screen and (min-width: 1025px) {
+    --facets-vertical-col-width: 3;
+  }
+
+  &:has(.facets-block-wrapper--right) {
+    @media screen and (min-width: 990px) {
+      --facets-vertical-col-start: 12;
+    }
+  }
+}
+
+.collection-wrapper:has(.collection-wrapper--full-width) .facets--vertical:not(.facets--drawer) {
+  @media screen and (min-width: 750px) {
+    padding-inline-start: max(var(--padding-sm), var(--padding-md));
+  }
+}
+
+.collection-wrapper:has(.product-grid-mobile--large) .facets-mobile-wrapper.facets-controls-wrapper {
+  @media screen and (max-width: 749px) {
+    display: none;
+  }
+}
+
+.collection-wrapper:has(> .facets--horizontal) .facets__panel[open] {
+  @media screen and (min-width: 750px) {
+    z-index: var(--facets-open-z-index);
+  }
+}
+
+.main-collection-grid {
+  grid-column:1/14;
+
+  @media screen and (min-width: 750px) {
+    grid-column: var(--grid-column--desktop);
+  }
+}
+
+.collection-wrapper {
+  @media screen and (min-width: 750px) {
+    grid-template-columns:
+      1fr repeat(
+        var(--centered-column-number),
+        minmax(0, calc((var(--page-width) - var(--page-margin) * 2) / var(--centered-column-number)))
+      )
+      1fr;
+  }
+}
+
+.collection-wrapper:has(.collection-wrapper--full-width),
+.collection-wrapper:has(.facets-block-wrapper--vertical) {
+  @media screen and (min-width: 750px) {
+    grid-column: 1 / -1;
+    grid-template-columns:
+      minmax(var(--page-margin), 1fr)
+      24rem
+      repeat(
+        calc(var(--centered-column-number) - 1),
+        minmax(0, calc((var(--page-width) - var(--page-margin) * 2 - 24rem) / (var(--centered-column-number) - 1)))
+      )
+      minmax(var(--page-margin), 1fr);
+  }
+}
+
+.collection-wrapper:has(.facets-block-wrapper--vertical.facets-block-wrapper--right) {
+  @media screen and (min-width: 750px) {
+    grid-template-columns:
+      minmax(var(--page-margin), 1fr)
+      repeat(
+        calc(var(--centered-column-number) - 1),
+        minmax(0, calc((var(--page-width) - var(--page-margin) * 2 - 24rem) / (var(--centered-column-number) - 1)))
+      )
+      24rem
+      minmax(var(--page-margin), 1fr);
+  }
+}
+
+.collection-wrapper:has(.facets--horizontal) {
+  .collection-header {
+    grid-column: 1 / -1;
+  }
+}
+
+.collection-wrapper:has(.facets-block-wrapper--full-width.facets-block-wrapper--vertical) {
+  @media screen and (max-width: 749px) {
+    display: grid;
+    grid-template-columns: repeat(var(--centered-column-number), 1fr);
+
+    .main-collection-grid {
+      grid-column: 1 / 13;
+    }
+  }
+}
+
+.collection-wrapper:has(.facets--vertical) .facets-block-wrapper--vertical:not(.hidden) ~ .facets-vertical-sort,
+.collection-wrapper:has(.facets--vertical) .facets-block-wrapper--vertical:not(.hidden) ~ .collection-header,
+.collection-wrapper:has(.facets--vertical) .facets-block-wrapper--vertical:not(.hidden) ~ .main-collection-grid {
+  @media screen and (min-width: 1025px) {
+    grid-column: var(--facets-vertical-col-width) / var(--full-width-column-number);
+  }
+}
+
+.collection-wrapper:has(.facets-block-wrapper--right .facets--vertical) .facets-block-wrapper--vertical:not(.hidden) ~ .facets-vertical-sort,
+.collection-wrapper:has(.facets-block-wrapper--right .facets--vertical) .facets-block-wrapper--vertical:not(.hidden) ~ .collection-header,
+.collection-wrapper:has(.facets-block-wrapper--right .facets--vertical) .facets-block-wrapper--vertical:not(.hidden) ~ .main-collection-grid {
+  @media screen and (min-width: 1025px) {
+    grid-column: 2 / var(--facets-vertical-col-start);
+  }
+}
+
+.collection-wrapper:has(.facets--vertical, .facets--vertical .collection-header) {
+  display: grid;
+  grid-template-rows: max-content max-content 1fr;
+  .collection-header {
+    grid-column: 1 / -1;
+
+    @media screen and (min-width: 750px) {
+      grid-column: 2/14;
+    }
+
+    @media screen and (min-width: 1025px) {
+      grid-row: 1 / 2;
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .facets-block-wrapper--vertical {
+      grid-row: 2 / 3;
+    }
+
+    &:has(.facets-vertical-sort--vertical-divider) .collection-header {
+      border-bottom: var(--style-border-width) solid var(--color-border);
+    }
+  }
+
+
+  .facets-block-wrapper--vertical:not(.hidden) ~ .facets-vertical-sort {
+    grid-row: 2 / 3;
+  }
+
+  .facets-block-wrapper--vertical:not(.hidden) ~ .main-collection-grid {
+    grid-row: 3 / 4;
+  }
+}
+
+.template-collection--full-width.grid-base:has(.facets-block-wrapper--vertical.facets-block-wrapper--full-width.facets-block-wrapper--left) {
+  --centered-column-number: 6;
+}
+
+.collection-wrapper:has(.facets-block-wrapper--vertical:not(#filters-drawer)):has(.collection-wrapper--full-width) {
+  @media screen and (min-width: 750px) {
+    grid-column: 1 / -1;
+    grid-template-columns: 0fr repeat(var(--centered-column-number), minmax(0, 1fr)) 0fr;
+  }
+}
+
+:is(.collection-wrapper--full-width, .collection-wrapper--full-width-on-mobile)
+  [product-grid-view='default']
+  .product-grid__card {
+  @media screen and (max-width: 749px) {
+    padding-inline-start: max(var(--padding-xs), var(--padding-inline-start));
+    padding-inline-end: max(var(--padding-xs), var(--padding-inline-end));
+  }
+}
+
+:is(.collection-wrapper--full-width, .collection-wrapper--full-width-on-mobile)
+  [product-grid-view='mobile-single']
+  .product-grid__card {
+  @media screen and (max-width: 749px) {
+    padding-inline-start: max(var(--padding-xs), var(--padding-inline-start));
+    padding-inline-end: max(var(--padding-xs), var(--padding-inline-end));
+  }
+}
+
+/* Make product media go edge-to-edge by using negative margins */
+:is(.collection-wrapper--full-width) .card-gallery,
+:is(.collection-wrapper--full-width-on-mobile) .card-gallery {
+  @media screen and (max-width: 749px) {
+    margin-inline-start: calc(-1 * max(var(--padding-xs), var(--padding-inline-start)));
+    margin-inline-end: calc(-1 * max(var(--padding-xs), var(--padding-inline-end)));
+  }
+}

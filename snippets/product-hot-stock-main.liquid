@@ -1,0 +1,25 @@
+{% liquid
+  if current_variant.inventory_management and current_variant.inventory_quantity > 0 and current_variant.inventory_quantity <= productMaxStock
+    assign checkShowHotStock = true
+  else
+    assign checkShowHotStock = false
+  endif
+
+  assign progressBarWidth = current_variant.inventory_quantity | times: 100 | divided_by: productMaxStock
+
+  assign type_preset = type_preset
+  assign progress_bar_height = progress_bar_height
+%}
+
+{% capture attr %}
+  style="--progress-bar-width: {{ progressBarWidth }}%; --progress-bar-height: {{ progress_bar_height }}; --progress-bar-color: {{ progress_bar_color }}; --progress-bar-color_2: {{ progress_bar_color_2 }}; --hot-stock-text-color: {{ text_color }};"
+{% endcapture %}
+
+<div class="productView-hotStock{% if checkShowHotStock == false %} hidden{% endif %}" data-hot-stock="{{ productMaxStock }}" {% if variantCount < 2 %} data-current-inventory="{{ current_variant.inventory_quantity }}"{% endif %} {{ attr }}>
+  <span class="hotStock-text {{ type_preset }}" style="{% render 'typography-style', settings: block.settings, weight: block.settings.font_weight %}">
+    {{ 'products.product.hot_stock' | t : inventory: current_variant.inventory_quantity }}
+  </span>
+  <div class="hotStock-progress">
+    <span class="hotStock-progress-item"></span>
+  </div>
+</div>

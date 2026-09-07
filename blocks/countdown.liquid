@@ -1,0 +1,561 @@
+{{ 'container-block.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  .countdown-container {
+    padding: {{ block.settings.padding }}px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .countdown-heading {
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+    margin:0 0 {{ block.settings.spacing }}px 0;font-weight: 600;
+  }
+
+  .countdown-subheading {
+    font-size: {{ block.settings.subheading_size }}px;
+    color: {{ block.settings.subheading_color }};
+    margin: 0 0 {{ block.settings.spacing }}px 0;
+  }
+
+  .countdown-unit {
+    position: relative;
+    min-width: {{ block.settings.unit_width }}px;
+    padding: {{ block.settings.unit_padding }}px;
+    background-color: {{ block.settings.unit_background }};
+    border-radius: {{ block.settings.unit_border_radius }}px;
+    border: none;
+    aspect-ratio: 1;
+  }
+
+  .countdown-unit.countdown-unit--outline {
+    border: {{ block.settings.unit_border_width }}px solid {{ block.settings.unit_border_color }};
+  }
+
+  .countdown-timer .countdown-unit--inline + .countdown-unit--inline:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: calc(((var(--gap, 0px) + {{ block.settings.unit_border_width }}px) / 2) * -1);
+    transform: translateY(-50%);
+    width: {{ block.settings.unit_border_width }}px;
+    height: var(--separator-height, calc(100% - 5.2rem));
+    background-color: {{ block.settings.unit_border_color }};
+  }
+
+  .countdown-number {
+    font-size: {{ block.settings.number_size }}px;
+    color: {{ block.settings.number_color }};
+    margin-bottom: 4px;
+    font-family: {{ block.settings.number_font }};
+  }
+
+  .countdown-label {
+    font-size: {{ block.settings.label_size }}px;
+    color: {{ block.settings.label_color }};
+    letter-spacing: 0.5px;
+    font-weight: {{ block.settings.label_weight }};
+  }
+
+  .countdown-expired {
+    font-size: {{ block.settings.expired_size }}px;
+    color: {{ block.settings.expired_color }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .countdown-timer {
+      gap: {{ block.settings.timer_gap | times: 0.7 }}px;
+    }
+
+    .countdown-unit {
+      min-width: {{ block.settings.unit_width | times: 0.8 }}px;
+      padding: {{ block.settings.unit_padding | times: 0.8 }}px;
+    }
+
+    .countdown-number {
+      font-size: {{ block.settings.number_size | times: 0.8 }}px;
+    }
+
+    .countdown-label {
+      font-size: {{ block.settings.label_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}
+
+{%- liquid
+  assign direction = block.settings.direction
+  assign align_item = block.settings.align_item
+  assign layout_gap = block.settings.layout_gap
+-%}
+
+{%- capture flex_class -%}
+  flex flex-{{ direction }} items-{{ align_item }}
+{%- endcapture -%}
+
+{% if direction == 'row' %}
+  <div class="container-max-700">
+{% endif %}
+  <countdown-timer
+    class="countdown-container {{ flex_class }}"
+    data-end-date="{{ block.settings.end_date }}"
+    style="--corner-radius: {{ block.settings.border_radius }}px; --gap: {{ layout_gap }}px;"
+    {{ block.shopify_attributes }}
+  >
+    {%- capture class_unit -%}
+      countdown-unit flex-center flex-column countdown-unit--{{ block.settings.border_style }}
+    {%- endcapture -%}
+
+    {%- capture class_number -%}
+      countdown-number leading-none
+    {%- endcapture -%}
+
+    {%- capture class_label -%}
+      countdown-label uppercase
+    {%- endcapture -%}
+
+    {% if block.settings.heading != blank %}
+      <div class="countdown-heading w-full">{{ block.settings.heading }}</div>
+    {% endif %}
+
+    {% if block.settings.subheading != blank %}
+      <div class="countdown-subheading">{{ block.settings.subheading }}</div>
+    {% endif %}
+  {% if direction == 'row' %}
+    <div class="container-max-450">
+  {% endif %}
+      <div class="countdown-timer flex justify-center flex-wrap" style="--gap: {{ block.settings.timer_gap }}px;{% if block.settings.custom_separator_height %} --separator-height: {{ block.settings.separator_height }}px; {% endif %}">
+        {% if block.settings.show_days %}
+          <div class="{{ class_unit }}">
+            <span class="{{ class_number }}" data-days>00</span>
+            <span class="{{ class_label }}">{{ 'content.days' | t }}</span>
+          </div>
+        {% endif %}
+
+        {% if block.settings.show_hours %}
+          <div class="{{ class_unit }}">
+            <span class="{{ class_number }}" data-hours>00</span>
+            <span class="{{ class_label }}">{{ 'content.hours' | t }} </span>
+          </div>
+        {% endif %}
+
+        {% if block.settings.show_minutes %}
+          <div class="{{ class_unit }}">
+            <span class="{{ class_number }}" data-minutes>00</span>
+            <span class="{{ class_label }}">{{ 'content.mins' | t }} </span>
+          </div>
+        {% endif %}
+
+        {% if block.settings.show_seconds %}
+          <div class="{{ class_unit }}">
+            <span class="{{ class_number }}" data-seconds>00</span>
+            <span class="{{ class_label }}">{{ 'content.secs' | t }} </span>
+          </div>
+        {% endif %}
+      </div>
+  {% if direction == 'row' %}
+    </div>
+  {% endif %}
+    <div class="countdown-expired center" style="display: none;">
+      {{ block.settings.expired_message }}
+    </div>
+  </countdown-timer>
+
+{% if direction == 'row' %}
+  </div>
+{% endif %}
+
+<script src="{{ 'countdown-timer.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "t:names.countdown",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.content"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "t:settings.heading",
+      "default": "<p>Limited Time Offer</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "t:settings.subheading",
+      "default": "<p>Don't miss out on this amazing deal!</p>"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "t:settings.end_date_and_time",
+      "default": "2026-12-31 23:59:59",
+      "info": "Format: YYYY-MM-DD HH:MM:SS"
+    },
+    {
+      "type": "text",
+      "id": "expired_message",
+      "label": "t:settings.expired_message",
+      "default": "This offer has expired"
+    },
+    {
+      "type": "header",
+      "content": "t:content.display_options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_days",
+      "label": "t:settings.show_days",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_hours",
+      "label": "t:settings.show_hours",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_minutes",
+      "label": "t:settings.show_minutes",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_seconds",
+      "label": "t:settings.show_seconds",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Layout direction",
+      "options": [
+        {
+          "value": "row",
+          "label": "Horizontal"
+        },
+        {
+          "value": "column",
+          "label": "Vertical"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "select",
+      "id": "align_item",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "layout_gap",
+      "label": "Layout gap",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "t:content.colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:settings.background_color",
+      "default": "#f8f8f8",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "t:settings.heading_color",
+      "default": "#000000",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "t:settings.subheading_color",
+      "default": "#666666",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "unit_background",
+      "label": "t:settings.timer_background",
+      "default": "#ffffff",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "unit_border_color",
+      "label": "t:settings.timer_border_color",
+      "default": "#e0e0e0",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "number_color",
+      "label": "t:settings.number_color",
+      "default": "#000000",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "t:settings.label_color",
+      "default": "#666666",
+      "alpha": true
+    },
+    {
+      "type": "select",
+      "id": "label_weight",
+      "label": "t:settings.button_text_weight",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "400",
+          "label": "t:options.regular"
+        },
+        {
+          "value": "600",
+          "label": "t:options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:options.bold"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "color",
+      "id": "expired_color",
+      "label": "t:settings.expired_message_color",
+      "default": "#cc0000",
+      "alpha": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "t:settings.heading_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "t:settings.subheading_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "number_size",
+      "label": "t:settings.number_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "number_font",
+      "label": "Number font",
+      "options": [
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:options.heading"
+        }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "label": "t:settings.label_size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "expired_size",
+      "label": "t:settings.expired_message_size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "t:settings.container_padding",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "t:settings.element_spacing",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "timer_gap",
+      "label": "t:settings.timer_gap",
+      "min": 8,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "label": "Custom separator height",
+      "id": "custom_separator_height",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "separator_height",
+      "label": "Separator height",
+      "min": 2,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 36,
+      "visible_if": "{{ block.settings.custom_separator_height }}"
+    },
+    {
+      "type": "range",
+      "id": "unit_width",
+      "label": "t:settings.timer_width",
+      "min": 60,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "unit_padding",
+      "label": "t:settings.timer_padding",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:settings.container_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "border_style",
+      "label": "t:settings.border",
+      "options": [
+        {
+          "value": "outline",
+          "label": "t:options.outline"
+        },
+        {
+          "value": "inline",
+          "label": "t:options.inline"
+        }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "range",
+      "id": "unit_border_radius",
+      "label": "t:settings.timer_border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 6,
+      "visible_if": "{{ block.settings.border_style != 'none' and block.settings.border_style == 'outline' }}"
+    },
+    {
+      "type": "range",
+      "id": "unit_border_width",
+      "label": "t:settings.timer_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1,
+      "visible_if": "{{ block.settings.border_style != 'none' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.countdown",
+      "category": "t:categories.decorative"
+    }
+  ]
+}
+{% endschema %}

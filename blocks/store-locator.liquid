@@ -1,0 +1,215 @@
+{% liquid
+  assign map_list_height = block.settings.map_list_height
+  assign map_list_width = block.settings.map_list_width
+  assign map_gap_desktop = block.settings.map_gap_desktop
+  assign map_gap_mobile = block.settings.map_gap_mobile
+
+  assign pl = block.settings.padding_left
+  assign pr = block.settings.padding_right
+  assign pt = block.settings.padding_top
+  assign pb = block.settings.padding_bottom
+
+  assign border_color = block.settings.border_color
+  assign border_width = block.settings.border_width
+
+  assign item_background = block.settings.item_background
+%}
+
+{%- capture attr -%}
+style="
+{% if pl != 0 %}--pl:{{ pl }}px;{% endif %}
+{% if pt != 0 %}--pt:{{ pt }}px;{% endif %}
+{% if pb != 0 %}--pb:{{ pb }}px;{% endif %}
+{% if pr != 0 %}--pr:{{ pr }}px;{% endif %}
+{% if map_list_height != 0 %}--map-list-height:{{ map_list_height }}px;{% endif %}
+{% if map_list_width != 0 %}--map-list-width:{{ map_list_width }}px;{% endif %}
+{% if map_gap_desktop != 0 %}--map-gap-desktop:{{ map_gap_desktop }}px;{% endif %}
+{% if map_gap_mobile != 0 %}--map-gap-mobile:{{ map_gap_mobile }}px;{% endif %}
+{% if border_color != 'none' %}--border-color:{{ border_color }};{% endif %}
+{% if border_width != 0 %}--border-width:{{ border_width }}px;{% endif %}
+{% if item_background != 'none' %}--item-background:{{ item_background }};{% endif %}
+"
+{%- endcapture -%}
+
+<div class="storeLocator" {{ attr }}>
+  <div class="storeLocator__left">
+    <div class="storeLocator__list" style="--pr: {{ map_gap_desktop }}px;">
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+  <div class="storeLocator__right">
+    <div class="map" id="map"></div>
+  </div>
+</div>
+
+{% javascript %}
+  (function() {
+    var root = document.querySelector('.storeLocator');
+    if (!root) return;
+
+    var items = root.querySelectorAll('.storeLocator__item');
+    var mapEl = root.querySelector('#map');
+    if (!mapEl || !items.length) return;
+
+    function setActive(item) {
+      items.forEach(function(i) { i.classList.remove('active'); });
+      item.classList.add('active');
+    }
+
+    function renderMapFrom(item) {
+      var html = item.getAttribute('data-map') || '';
+      mapEl.classList.add('is-loading');
+      mapEl.innerHTML = html;
+
+      setTimeout(function() {
+        mapEl.classList.remove('is-loading');
+      }, 500);
+    }
+
+    items.forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        setActive(item);
+        renderMapFrom(item);
+      });
+    });
+
+    // Initialize with first item
+    var first = items[0];
+    if (first) {
+      setActive(first);
+      renderMapFrom(first);
+    }
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:names.store_locator",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "range",
+      "id": "map_list_height",
+      "label": "t:settings.map_list_height",
+      "min": 400,
+      "max": 1000,
+      "step": 100,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "map_list_width",
+      "label": "t:settings.map_list_width",
+      "min": 200,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "default": 350
+    },
+    {
+      "type": "range",
+      "id": "map_gap_desktop",
+      "label": "t:settings.map_gap_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "map_gap_mobile",
+      "label": "t:settings.map_gap_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "t:content.style"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "t:settings.border_color",
+      "default": "#eeeeee"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "t:settings.border_width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "item_background",
+      "label": "t:settings.background",
+      "default": "#f8f8f8"
+    },
+    {
+      "type":  "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    }
+  ],
+  "blocks": [
+    { "type": "_store-locator-item" }
+  ],
+  "presets": [
+    {
+      "name": "t:names.store_locator",
+      "category": "t:categories.custom"
+    }
+  ]
+}
+{% endschema %}

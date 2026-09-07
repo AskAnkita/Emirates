@@ -1,0 +1,148 @@
+{%- liquid
+  assign bl_stts = block.settings
+  assign text = bl_stts.text
+  assign image = bl_stts.image
+  assign collapse = bl_stts.collapse
+  assign scroll_reveal = settings.animations_reveal_on_scroll
+
+  assign link = bl_stts.link
+  if link != blank
+    assign link_attributes = 'href="' | append: link | append: '"'
+    assign link_wrapper = '<a ' | append: link_attributes | append: 'title="' | append: image.alt | append: '"' | append: '>'
+    assign link_wrapper_end = '</a>'
+  endif
+
+  assign collapse = bl_stts.collapse
+  assign collapse_default = bl_stts.collapse_default
+  assign collapse_icon = bl_stts.collapse_icon
+  if collapse == true
+    assign element = 'accordion-custom'
+    if collapse_default == 'open'
+      assign is_open = true
+    else
+      assign is_open = false
+    endif
+  else
+    assign element = 'div'
+  endif
+
+  assign ratio = image.aspect_ratio
+-%}
+
+<{{ element }}
+  class="blog-post__sidebar-image blog-posts__sidebar-item"
+  {% if is_open %}
+    open-by-default-on-desktop
+    open-by-default-on-mobile
+  {% endif %}
+>
+  {% if collapse %}
+    <details
+      {% if is_open %}
+        open
+      {% endif %}
+    >
+      <summary>
+  {% endif %}
+
+  {% if text != blank %}
+    <h3 class="blog-posts__sidebar-heading{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}{% if collapse %} blog-posts__sidebar-collapse-button cursor-pointer{% endif %}">
+      {{ text }}
+    </h3>
+  {%- elsif text == blank and collapse == true -%}
+    <h3 class="blog-posts__sidebar-heading blog-posts__sidebar-collapse-button cursor-pointer">
+      {{ 'content.collapse_row' | t }}
+    </h3>
+  {% endif %}
+
+  {% if collapse %}
+    {% if collapse_icon != 'none' %}
+      <span class="svg-wrapper icon-caret-wrapper">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+    {% endif %}
+    </summary>
+  {% endif %}
+
+  {% if collapse %}
+    <div class="details-content">
+  {% endif %}
+
+  <div
+    class="blog-post__sidebar-image-content image-block"
+    style="{% if image != blank %}--ratio: {{ ratio }};{% endif %}"
+  >
+    {%- if image != blank -%}
+      {%- if link != blank -%}
+        {{ link_wrapper }}
+      {%- endif -%}
+      {%- render 'image', image: image, class: 'blog-post__sidebar-image-img image-block__image' -%}
+      {%- if link != blank -%}
+        {{ link_wrapper_end }}
+      {%- endif -%}
+
+    {%- else -%}
+      <div class="placeholder">
+        {{ 'collection-apparel-3' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {% if collapse %}
+    </div>
+    </details>
+  {% endif %}
+</{{ element }}>
+
+{% schema %}
+{
+  "name": "t:names.image",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "collapse",
+      "label": "t:settings.collapse",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collapse_default",
+      "label": "t:settings.collapse_style",
+      "visible_if": "{{ block.settings.collapse == true }}",
+      "options": [
+        {
+          "value": "open",
+          "label": "t:settings.collapse_open"
+        },
+        {
+          "value": "close",
+          "label": "t:settings.collapse_close"
+        }
+      ],
+      "default": "close"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:settings.heading",
+      "default": "<p>Image</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:settings.link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.image"
+    }
+  ]
+}
+{% endschema %}

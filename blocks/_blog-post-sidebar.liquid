@@ -1,0 +1,75 @@
+{%- capture children -%}
+  {% content_for 'blocks' %}
+{%- endcapture -%}
+
+<side-drawer
+  class="blog-posts__sidebar-drawer drawer__container"
+  id="Drawer-Blog-Sidebar"
+  data-drawer-direction="left"
+  data-moved="false"
+>
+  <div id="Drawer-Overlay-Blog-Sidebar" class="drawer__overlay fixed inset-0 cursor-pointer lg:none"></div>
+  <div class="blog-posts__sidebar-container" data-drawer-content>
+    <div class="blog-posts__sidebar flex flex-column hide-scrollbar">
+      <div class="drawer__header flex justify-between items-center relative lg:none">
+        <h2 class="drawer__heading break m-0 h5">{{ 'content.sidebar' | t }}</h2>
+        <button
+          class="drawer__close block t-button bor-none rounded-full cursor-pointer"
+          type="button"
+          onclick="this.closest('side-drawer').close()"
+          aria-label="{{ 'accessibility.close_dialog' | t }}"
+        >
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </button>
+      </div>
+      {{ children }}
+    </div>
+  </div>
+</side-drawer>
+
+{% schema %}
+{
+  "name": "t:names.sidebar",
+  "tag": null,
+  "blocks": [
+    { "type": "_blog-post-sidebar-category" },
+    { "type": "_blog-post-sidebar-recent-posts" },
+    { "type": "_blog-post-sidebar-products" },
+    { "type": "_blog-post-sidebar-image" },
+    { "type": "_blog-post-sidebar-text" },
+    { "type": "_blog-post-sidebar-tags" }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.sidebar",
+      "blocks": {
+        "category": {
+          "type": "_blog-post-sidebar-category",
+          "name": "Category"
+        },
+        "recent_posts": {
+          "type": "_blog-post-sidebar-recent-posts",
+          "name": "Recent posts"
+        },
+        "products": {
+          "type": "_blog-post-sidebar-products",
+          "name": "Products"
+        },
+        "image": {
+          "type": "_blog-post-sidebar-image",
+          "name": "Image"
+        },
+        "text": {
+          "type": "_blog-post-sidebar-text",
+          "name": "Custom text"
+        },
+        "tags": {
+          "type": "_blog-post-sidebar-tags",
+          "name": "Tags"
+        }
+      }
+    }
+  ]
+}
+{% endschema %}

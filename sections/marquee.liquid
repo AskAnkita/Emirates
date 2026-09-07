@@ -1,0 +1,318 @@
+{% liquid
+  assign sec_stts = section.settings
+  assign movement_direction = sec_stts.movement_direction
+  assign gap_between_elements = sec_stts.gap_between_elements
+
+  assign is_rtl = false
+  if settings.enable_rtl_layout
+    assign rtl_locales = "ar,ae,arc,fa,he,ur,ps,sd,dv,yi,ug,ha,ckb,ku,ks,pnb,bcc,bqi,azb,mzn,glk,nqo,kwh" | split: ","
+    if rtl_locales contains request.locale.iso_code
+      assign is_rtl = true
+    endif
+  endif
+
+  assign movement_direction_effective = movement_direction
+  if is_rtl
+    if movement_direction == 'normal'
+      assign movement_direction_effective = 'reverse'
+    else
+      assign movement_direction_effective = 'normal'
+    endif
+  endif
+
+  assign marquee_type = sec_stts.marquee_type
+  if marquee_type == 'auto'
+    assign element_scroll = 'div'
+  else
+    assign element_scroll = 'marquee-scroll'
+  endif
+%}
+
+{%- capture attr_scroll -%}
+  data-speed="1" data-direction="{{ movement_direction_effective | replace: 'normal', 'left' | replace: 'reverse', 'right' }}" data-parallax="1.5"
+{%- endcapture -%}
+
+<marquee-component
+  class="
+    block w-full overflow-hidden relative
+    spacing-style
+    gap-style
+    color-{{ sec_stts.color_scheme }}
+  "
+  style="
+    --marquee-direction: {{ movement_direction_effective }};
+    {%- render 'spacing-style', settings: sec_stts %};
+    {% render 'gap-style', value: gap_between_elements, name: 'marquee-gap' %}
+  "
+  data-speed-factor="{{ sec_stts.speed }}"
+  data-movement-direction="{{ movement_direction_effective }}"
+>
+  {% if sec_stts.background_media != 'none' %}
+    <div class="custom-section-background">
+      {% render 'background-media',
+        background_media: sec_stts.background_media,
+        background_video: sec_stts.video,
+        background_video_position: sec_stts.video_position,
+        background_image: sec_stts.background_image,
+        background_image_position: sec_stts.background_image_position,
+        image_behavior: sec_stts.image_behavior
+      %}
+    </div>
+  {% endif %}
+  {% if sec_stts.toggle_overlay %}
+    {% render 'overlay', settings: sec_stts, layer: '0' %}
+  {% endif %}
+
+  <{{ element_scroll }}
+    class="marquee__wrapper flex w-fit whitespace-nowrap"
+    {% if marquee_type == 'scroll' %}
+      {{- attr_scroll -}}
+    {% endif %}
+  >
+    <div class="marquee__content flex">
+      <div class="marquee__repeated-items flex-center">
+        {% content_for 'blocks' %}
+      </div>
+    </div>
+  </{{ element_scroll }}>
+  {% if sec_stts.center_image != blank %}
+    <div class="marquee__center-image absolute-c-c z-1 pointer-events-none w-fit h-full">
+      {%- render 'image', image: sec_stts.center_image, class: 'w-auto h-full' -%}
+    </div>
+  {% endif %}
+</marquee-component>
+
+{% schema %}
+{
+  "name": "t:names.marquee",
+  "disabled_on": {
+    "groups": ["custom.popup", "aside"]
+  },
+  "blocks": [
+    {
+      "type": "text"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "_large-icon"
+    },
+    {
+      "type": "logo"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "movement_direction",
+      "label": "t:settings.motion_direction",
+      "options": [
+        {
+          "value": "reverse",
+          "label": "t:options.forward"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.reverse"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "gap_between_elements",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "t:content.center_image"
+    },
+    {
+      "type": "image_picker",
+      "id": "center_image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "background_media",
+      "label": "t:settings.background_media",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "image",
+          "label": "t:options.image"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "t:settings.image",
+      "visible_if": "{{ section.settings.background_media == 'image' }}"
+    },
+    {
+      "type": "select",
+      "id": "background_image_position",
+      "label": "t:settings.image_position",
+      "options": [
+        {
+          "value": "cover",
+          "label": "t:options.cover"
+        },
+        {
+          "value": "fit",
+          "label": "t:options.fit"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ section.settings.background_media == 'image' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "toggle_overlay",
+      "label": "t:settings.background_overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "t:settings.overlay_color",
+      "alpha": true,
+      "default": "#00000026",
+      "visible_if": "{{ section.settings.toggle_overlay }}"
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "t:settings.overlay_style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "t:options.solid"
+        },
+        {
+          "value": "gradient",
+          "label": "t:options.gradient"
+        }
+      ],
+      "default": "solid",
+      "visible_if": "{{ section.settings.toggle_overlay }}"
+    },
+    {
+      "type": "select",
+      "id": "gradient_direction",
+      "label": "t:settings.gradient_direction",
+      "options": [
+        {
+          "value": "to top",
+          "label": "t:options.up"
+        },
+        {
+          "value": "to bottom",
+          "label": "t:options.down"
+        }
+      ],
+      "default": "to top",
+      "visible_if": "{{ section.settings.toggle_overlay and section.settings.overlay_style == 'gradient' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.animations"
+    },
+    {
+      "type": "select",
+      "id": "marquee_type",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "auto",
+          "label": "t:options.auto"
+        },
+        {
+          "value": "scroll",
+          "label": "t:options.scroll"
+        }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "label": "t:settings.speed",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.marquee",
+      "category": "t:categories.banners",
+      "blocks": {
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Timeless design, built for everyday use.</p>",
+            "type_preset": "custom",
+            "font": "var(--font-body--family)",
+            "font_size": "3.2rem",
+            "line_height": "tight",
+            "letter_spacing": "tight",
+            "case": "none",
+            "wrap": "nowrap",
+            "width": "fit-content"
+          }
+        }
+      },
+      "block_order": ["text"]
+    }
+  ]
+}
+{% endschema %}

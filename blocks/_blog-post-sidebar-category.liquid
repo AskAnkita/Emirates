@@ -1,0 +1,272 @@
+{%- doc -%}
+  Renders a category list for a blog post sidebar in filters.
+
+  @param {boolean} in_facets - whether the category list is in a facets panel
+  @param {string} heading_label_case - the case of the heading label
+  @param {string} text_label_case - the case of the text label
+{%- enddoc -%}
+
+{{ 'blog-post-sidebar-category.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign bl_stts = block.settings
+  assign text = bl_stts.text
+  assign type = bl_stts.type
+
+  assign collapse = bl_stts.collapse
+  assign collapse_default = bl_stts.collapse_default
+  assign collapse_icon = bl_stts.collapse_icon
+  if collapse == true
+    assign element = 'accordion-custom'
+    if collapse_default == 'open'
+      assign is_open = true
+    else
+      assign is_open = false
+    endif
+  else
+    assign element = 'div'
+  endif
+
+  assign limit = bl_stts.collections_to_show
+-%}
+
+{%- capture class_item -%}
+  blog-post__category-list-item
+{%- endcapture -%}
+
+{%- capture class_link -%}
+  blog-post__category-list-link link link--hover-underline
+{%- endcapture -%}
+
+{%- capture class_item_current -%}
+  current-cate is-clicked
+{%- endcapture -%}
+
+<{{ element }}
+  class="blog-post__category blog-posts__sidebar-item"
+  style="
+  {% if in_facets %}
+  --font-h3--case: {{ heading_label_case }};
+  --font-size: {{ heading_label_font_size }};
+  --text-transform: {{ text_label_case }};
+  --button-font-size-link: var(--font-size, var(--body-xs-font-size));
+  {% endif %}"
+  {% if is_open %}
+    open-by-default-on-desktop
+    open-by-default-on-mobile
+  {% endif %}
+>
+  {% if collapse %}
+    <details
+      {% if is_open %}
+        open
+      {% endif %}
+    >
+      <summary>
+  {% endif %}
+
+  {% if text != blank %}
+    <h3 class="blog-posts__sidebar-heading{% if collapse %} blog-posts__sidebar-collapse-button cursor-pointer{% endif %}">
+      {{ text }}
+    </h3>
+  {%- elsif text == blank and collapse == true -%}
+    <h3 class="blog-posts__sidebar-heading blog-posts__sidebar-collapse-button cursor-pointer">
+      {{ 'content.collapse_row' | t }}
+    </h3>
+  {% endif %}
+
+  {% if collapse %}
+    {% if collapse_icon != 'none' %}
+      <span class="svg-wrapper icon-caret-wrapper">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+    {% endif %}
+    </summary>
+  {% endif %}
+
+  {% if collapse %}
+    <div class="details-content">
+  {% endif %}
+
+  <ul
+    class="blog-post__category-list list-unstyled cus-scrollbar"
+    role="menu"
+  >
+    {% assign collection_list = block.settings.link_list | handleize %}
+    {%- if type == 'show_all' -%}
+      {%- for collection_list in collections limit: limit -%}
+        <li
+          class="{{ class_item }}{% if collection.handle == collection_list.handle %} {{ class_item_current }}{% endif %}"
+          role="menuitem"
+        >
+          <a class="{{ class_link }}" href="{{ collection_list.url }}" aria-label="link" style="{% if in_facets %}--font-size: {{ text_label_font_size }};{% endif %}">
+            <span class="text">{{ collection_list.title | escape }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    {%- elsif type == '1_level' -%}
+      {%- for link in linklists[collection_list].links limit: 9 -%}
+        <li
+          class="{{ class_item }}{% if link.active or link.child_active %} {{ class_item_current }}{% endif %}"
+          role="menuitem"
+        >
+          <a class="{{ class_link }}" href="{{ link.url }}" aria-label="link" style="{% if in_facets %}--font-size: {{ text_label_font_size }};{% endif %}">
+            <span class="text">{{ link.title | escape }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for link in linklists[collection_list].links -%}
+        <li class="{{ class_item }}{% if link.active %} {{ class_item_current }}{% endif %}" role="menuitem">
+          {%- if linklists[link.handle] == empty -%}
+            <a class="{{ class_link }}" href="{{ link.url }}" aria-label="link" style="{% if in_facets %}--font-size: {{ text_label_font_size }};{% endif %}">
+              <span class="text">{{ link.title | escape }}</span>
+            </a>
+          {%- else -%}
+            <a class="{{ class_link }} has-subMenu" href="{{ link.url }}" aria-label="link" style="{% if in_facets %}--font-size: {{ text_label_font_size }};{% endif %}">
+              <span class="text">{{ link.title }}</span>
+            </a>
+            <span class="icon-dropdown" role="button" aria-label="{{ 'accessibility.dropdown' | t }}" tabindex="0">
+              <span class="icon-plus"></span>
+            </span>
+            <ul class="dropdown-category-list navPages-level-2 list-unstyled" role="list">
+              {%- for link_child_item in linklists[link.handle].links -%}
+                <li class="navPage-subMenu-item{% if link_child_item.active or link_child_item.child_active %} {{ class_item_current }}{% endif %}">
+                  {%- if linklists[link_child_item.handle] == empty -%}
+                    <a
+                      class="{{ class_link }} navPage-subMenu-action"
+                      href="{{ link_child_item.url }}"
+                      aria-label="link"
+                      style="{% if in_facets %}--font-size: {{ text_label_font_size }};{% endif %}"
+                    >
+                      {{ link_child_item.title }}
+                    </a>
+                  {%- else -%}
+                    <a
+                      class="{{ class_link }} navPage-subMenu-action has-subMenu"
+                      href="{{ link_child_item.url }}"
+                      aria-label="link"
+                      style="{% if in_facets %}--font-size: {{ text_label_font_size }};{% endif %}"
+                    >
+                      <span class="text">{{ link_child_item.title }}</span>
+                    </a>
+                    <span
+                      class="icon-dropdown"
+                      role="button"
+                      aria-label="{{ 'accessibility.dropdown' | t }}"
+                      tabindex="0"
+                    >
+                      <span class="icon-plus"></span>
+                    </span>
+                    <ul class="dropdown-category-list navPages-level-3 list-unstyled" role="list">
+                      {%- for n in linklists[link_child_item.handle].links -%}
+                        <li class="navPage-subMenu-item{% if n.active %} {{ class_item_current }}{% endif %}">
+                          <a
+                            class="{{ class_link }} navPage-subMenu-action"
+                            href="{{ n.url }}"
+                            aria-label="link"
+                            style="{% if in_facets %}--font-size: {{ text_label_font_size }};{% endif %}"
+                          >
+                            {{- n.title -}}
+                          </a>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    {%- endif -%}
+  </ul>
+  {% if collapse %}
+    </div>
+    </details>
+  {% endif %}
+</{{ element }}>
+
+{% schema %}
+{
+  "name": "t:names.category",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "collapse",
+      "label": "t:settings.collapse",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collapse_default",
+      "label": "t:settings.collapse_style",
+      "visible_if": "{{ block.settings.collapse == true }}",
+      "options": [
+        {
+          "value": "open",
+          "label": "t:settings.collapse_open"
+        },
+        {
+          "value": "close",
+          "label": "t:settings.collapse_close"
+        }
+      ],
+      "default": "close"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:settings.heading",
+      "default": "<p>Categories</p>"
+    },
+    {
+      "type": "select",
+      "id": "type",
+      "label": "t:settings.menu_depth",
+      "default": "1_level",
+      "options": [
+        {
+          "value": "1_level",
+          "label": "t:options.one_level"
+        },
+        {
+          "value": "3_level",
+          "label": "t:options.all_levels"
+        },
+        {
+          "value": "show_all",
+          "label": "t:options.all_collections"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "collections_to_show",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "label": "t:settings.limit",
+      "default": 20
+    },
+    {
+      "type": "paragraph",
+      "content": "This setting will render all collections in your store.",
+      "visible_if": "{{ block.settings.type == 'show_all' }}"
+    },
+    {
+      "type": "link_list",
+      "id": "link_list",
+      "label": "t:settings.menu",
+      "default": "main-menu",
+      "visible_if": "{{ block.settings.type != 'show_all' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.category"
+    }
+  ]
+}
+{% endschema %}

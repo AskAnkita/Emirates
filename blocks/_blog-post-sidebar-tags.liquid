@@ -1,0 +1,143 @@
+{%- liquid
+  assign bl_stts = block.settings
+  assign text = bl_stts.text
+  assign scroll_reveal = settings.animations_reveal_on_scroll
+  assign number = bl_stts.number
+  assign show_tag_count = bl_stts.show_tag_count
+
+  assign collapse = bl_stts.collapse
+  assign collapse_default = bl_stts.collapse_default
+  assign collapse_icon = bl_stts.collapse_icon
+  if collapse == true
+    assign element = 'accordion-custom'
+    if collapse_default == 'open'
+      assign is_open = true
+    else
+      assign is_open = false
+    endif
+  else
+    assign element = 'div'
+  endif
+-%}
+
+<{{element}} class="blog-post__sidebar-tags blog-posts__sidebar-item"
+  {% if is_open %}
+    open-by-default-on-desktop
+    open-by-default-on-mobile
+  {% endif %}
+>
+  {% if collapse %}
+    <details
+      {% if is_open %}
+        open
+      {% endif %}
+    >
+      <summary>
+  {% endif %}
+  {% if text != blank %}
+    <h3 class="blog-posts__sidebar-heading{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}{% if collapse %} blog-posts__sidebar-collapse-button cursor-pointer{% endif %}">
+      {{ text }}
+    </h3>
+  {%- elsif text == blank and collapse == true -%}
+    <h3 class="blog-posts__sidebar-heading blog-posts__sidebar-collapse-button cursor-pointer">
+      {{ 'content.collapse_row' | t }}
+    </h3>
+  {% endif %}
+
+  {% if collapse %}
+    {% if collapse_icon != 'none' %}
+      <span class="svg-wrapper icon-caret-wrapper">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+    {% endif %}
+    </summary>
+  {% endif %}
+
+  {% if collapse %}
+    <div class="details-content">
+  {% endif %}
+
+  <div class="blog-post__sidebar-tags-content">
+    <ul class="blog-post__sidebar-tags-list list-unstyled flex flex-wrap gap-sm{% if scroll_reveal and collapse == false %} scroll-trigger animate--slide-in{% endif %}">
+      {%- for tag in blog.all_tags limit: number -%}
+        {%- liquid
+          assign tagCount = 0
+          for article in blog.articles
+            if article.tags contains tag
+              assign tagCount = tagCount | plus: 1
+            endif
+          endfor
+        -%}
+        <li class="blog-post__sidebar-tags-item inline-block center tag-item">
+          <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="blog-post__sidebar-tag link">
+            {{ tag -}}
+            {%- if show_tag_count %} ({{ tagCount }}){% endif %}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  {% if collapse %}
+      </div>
+    </details>
+  {% endif %}
+</{{element}}>
+
+{% schema %}
+{
+  "name": "t:names.tags",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "collapse",
+      "label": "t:settings.collapse",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collapse_default",
+      "label": "t:settings.collapse_style",
+      "visible_if": "{{ block.settings.collapse == true }}",
+      "options": [
+        {
+          "value": "open",
+          "label": "t:settings.collapse_open"
+        },
+        {
+          "value": "close",
+          "label": "t:settings.collapse_close"
+        }
+      ],
+      "default": "close"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:settings.heading",
+      "default": "<p>Tags</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tag_count",
+      "label": "t:settings.show_tag_count",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "number",
+      "label": "t:settings.limit",
+      "default": 10,
+      "min": 1,
+      "step": 1,
+      "max": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.tags"
+    }
+  ]
+}
+{% endschema %}

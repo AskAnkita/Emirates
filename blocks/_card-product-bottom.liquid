@@ -1,0 +1,53 @@
+{%- liquid
+  assign section_id = section.id
+  assign card_product = block.settings.product
+-%}
+{%- if card_product and card_product != empty -%}
+  <div class="card--block-media__bottom absolute left-0 right-0 bottom-0">
+    {% content_for "blocks" %}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.product_bottom",
+  "tag": null,
+  "blocks": [
+    { "type": "_card-product-marquee-flex" },
+    { "type": "_card-product-countdown-flex" },
+    { "type": "spacer" }
+  ],
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_bottom",
+      "settings": {
+        "product": "{{ closest.product }}"
+      },
+      "blocks": [
+        {
+          "type": "_card-product-countdown-flex",
+          "settings": {
+            "product": "{{ closest.product }}"
+          }
+        },
+        {
+          "type": "spacer"
+        },
+        {
+          "type": "_card-product-marquee-flex",
+          "settings": {
+            "product": "{{ closest.product }}"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

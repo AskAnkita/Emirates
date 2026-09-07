@@ -1,0 +1,23 @@
+<ul
+  class="predictive-search-results__list predictive-search-results__wrapper predictive-search-results__wrapper-queries list-unstyled flex flex-wrap"
+  role="listbox"
+  aria-labelledby="predictive-search-queries"
+>
+  {%- for query in queries -%}
+    <li class="predictive-search-results__card--query">
+      <a
+        class="pills__pill predictive-search-results__pill link"
+        href="{{ query.url }}"
+      >
+        <span class="svg-wrapper">
+          {{ 'icon-search-pill.svg' | inline_asset_content }}
+        </span>
+        <span
+          aria-label="{{ query.text }}"
+        >
+          {{ query.styled_text }}
+        </span>
+      </a>
+    </li>
+  {% endfor %}
+</ul>

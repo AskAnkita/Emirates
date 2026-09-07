@@ -1,0 +1,469 @@
+{% liquid
+  assign mobile_columns = block.settings.mobile_columns_grid
+  if block.settings.layout_type == 'grid' and block.settings.carousel_on_mobile
+    assign mobile_columns = block.settings.mobile_columns_carousel
+  endif
+  assign mobile_columns_int = mobile_columns | plus: 0
+  assign show_mobile_slider = false
+  if block.settings.carousel_on_mobile and block.blocks.size > mobile_columns_int
+    assign show_mobile_slider = true
+  endif
+
+  assign columns_desktop = block.settings.columns_grid
+  assign columns_tablet = 2
+  if columns_desktop == 1
+    assign columns_tablet = 1
+  elsif columns_desktop <= 2
+    assign columns_tablet = mobile_columns
+  elsif columns_desktop >= 4
+    assign columns_tablet = 3
+  endif
+%}
+
+{% capture list_items %}
+  {% for child_block in block.blocks %}
+    <li
+      id="Slide-{{ child_block.id }}-{{ forloop.index }}"
+      class="
+        grid__item{% if show_mobile_slider %} swiper-slide{% endif %}
+        layout-panel-flex layout-panel-flex--{{ block.settings.content_direction }}
+        {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}
+      "
+      style="
+        {% if settings.animations_reveal_on_scroll %}--animation-order: {{ forloop.index }};{% endif %}
+        {% render 'layout-panel-style', settings: block.settings, scale_min: 8 %}
+      "
+    >
+      {% render child_block %}
+    </li>
+
+    {% unless forloop.last %}
+      <!--@list/split-->
+    {% endunless %}
+  {% endfor %}
+{% endcapture %}
+
+<div
+  class="
+    lookbook-row
+    group-block relative
+    group-block--height-{{ block.settings.height }}
+    group-block--width-{{ block.settings.width }}
+    spacing-style
+    size-style
+  "
+  style="
+    {% render 'spacing-style', settings: block.settings %}
+    {% render 'size-style', settings: block.settings %}
+
+    {% if block.settings.width == 'custom' %}
+      --custom-gap: {{ block.settings.gap }}px;
+    {% endif %}
+  "
+  {{ block.shopify_attributes }}
+>
+  <div
+    class="
+      group-block-content relative
+      layout-panel-flex
+      layout-panel-flex--{{ block.settings.content_direction }}
+    "
+    style="{% render 'layout-panel-style', settings: block.settings, scale_min: 8 %}"
+  >
+    {% case block.settings.layout_type %}
+      {% when 'grid' %}
+        <div class="lookbook--grid-layout product-grid--block w-full">
+          {%- if show_mobile_slider -%}
+            <swiper-component
+              class="swiper-component-mobile swiper-component-product-grid{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+              data-swiper-mobile
+              {%- render 'swiper-data',
+                settings: block.settings,
+                loop: false,
+                slides_per_view: mobile_columns,
+                space_between: block.settings.gap
+              -%}
+              style="
+                {% render 'swiper-style',
+                  columns_mobile: mobile_columns,
+                  columns_tablet: columns_tablet,
+                  columns_desktop: columns_desktop,
+                  columns_gap: block.settings.gap,
+                %}
+              "
+            >
+              <div class="swiper">
+          {%- endif -%}
+          <ul
+            id="Grid-{{ block.id }}"
+            data-id="{{ block.id }}"
+            class="grid grid-layout list-unstyled{% if show_mobile_slider %} swiper-wrapper md:grid{% endif %} lg:grid-layout--{{ columns_desktop }} md:grid-layout--{{ columns_tablet }} max-sm:grid-layout--{{ mobile_columns }}"
+            role="list"
+            aria-label="{{ 'content.grid.name' | t }}"
+            style="--grid-desktop-horizontal-spacing: {{ block.settings.gap }}px; --grid-desktop-vertical-spacing: {{ block.settings.gap }}px;"
+          >
+            {{- list_items -}}
+          </ul>
+          {%- if show_mobile_slider -%}
+            </div>
+            </swiper-component>
+          {%- endif -%}
+        </div>
+      {% when 'editorial' %}
+        {%- liquid
+          if block.settings.image_layout contains 'right'
+            assign layout_class = ' grid__item--right'
+          else
+            assign layout_class = ' grid__item--left'
+          endif
+        -%}
+        <div
+          class="
+            lookbook--editorial-layout
+            w-full grid
+            md:items-{{ block.settings.vertical_alignment | replace: 'flex-start', 'start' | replace: 'flex-end', 'end' }}
+            md:justify-{{ block.settings.horizontal_alignment |  replace: 'flex-start', 'start' |  replace: 'flex-end', 'end' | replace: 'space-between', 'between' }}
+            {{ layout_class }}
+          "
+          style="
+            --gap: {{ block.settings.gap }}px;
+          "
+        >
+          {%- content_for 'blocks' -%}
+        </div>
+    {% endcase %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.lookbook_row",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_lookbook-group"
+    },
+    {
+      "type": "_lookbook-item-all"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "spacer"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:options.grid" 
+        },
+        {
+          "value": "editorial",
+          "label": "t:options.editorial"
+        }
+      ],
+      "default": "editorial"
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_on_mobile",
+      "label": "t:settings.carousel_on_mobile",  
+      "default": false,
+      "visible_if": "{{ block.settings.layout_type == 'grid' }}"
+    },
+    {
+      "type": "range",
+      "id": "columns_grid",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 5,
+      "label": "t:settings.columns",
+      "visible_if": "{{ block.settings.layout_type == 'grid' }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns_grid",
+      "label": "t:settings.mobile_columns",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2",
+      "visible_if": "{{ block.settings.layout_type == 'grid' and block.settings.carousel_on_mobile == false }}"
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns_carousel",
+      "label": "t:settings.mobile_columns",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 2,
+      "visible_if": "{{ block.settings.layout_type == 'grid' and block.settings.carousel_on_mobile == true }}"
+    },
+    {
+      "type": "select",
+      "id": "content_direction",
+      "label": "t:settings.direction",
+      "options": [
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "row",
+      "visible_if": "{{ block.settings.content_direction == 'fake-value' }}"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.right"
+        },
+        {
+          "value": "space-between",
+          "label": "t:options.space_between"
+        }
+      ],
+      "default": "flex-start",
+      "visible_if": "{{ block.settings.content_direction == 'row' }}"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "t:settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.bottom"
+        },
+        {
+          "value": "stretch",
+          "label": "t:options.stretch"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ block.settings.content_direction == 'row' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "align_baseline",
+      "label": "t:settings.align_baseline",
+      "default": false,
+      "visible_if": "{{ block.settings.vertical_alignment == 'flex-end' }}"
+    },
+    {
+      "type": "select",
+      "id": "image_layout",
+      "label": "t:settings.image_layout",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:settings.width_mobile",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "t:settings.height",
+      "options": [
+        {
+          "value": "auto",
+          "label": "t:options.auto"
+        },
+        {
+          "value": "fit",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fit"
+    },
+    {
+      "type": "range",
+      "id": "custom_height",
+      "label": "t:settings.custom_height",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.height == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.lookbook_row"
+    }
+  ]
+}
+{% endschema %}

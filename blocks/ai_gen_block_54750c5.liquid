@@ -1,0 +1,868 @@
+{% doc %}
+  @prompt
+    Section Name:
+    
+    "Shop Diamonds by Shape (Interactive Grid + Preview)"
+    
+    🎯 Goal:
+    
+    Create a fully responsive Shopify section that matches the provided design exactly.
+    
+    🖥️ Desktop Layout (Important)
+    Use a 2-column layout
+    Left side: 30% width
+    Right side: 70% width
+    🔹 Left Side (30%)
+    Add a Heading text field
+    Below heading, show a large preview image
+    By default: show first collection's hover image
+    When user hovers any item on right → update this image dynamically
+    🔹 Right Side (70%)
+    
+    Create a Grid of 10 items (collections)
+    
+    Layout:
+    5 columns
+    2 rows
+    Total: 10 items
+    📦 Each Grid Item Must Have:
+    Default Image
+    Hover Image
+    Text label (below image)
+    Collection link (clickable)
+    🖱️ Hover Interaction (VERY IMPORTANT)
+    
+    When hovering on any item:
+    
+    Right Side:
+    Image switches to hover image
+    Show underline below text
+    Smooth transition (200–300ms)
+    Left Side:
+    Update preview image to that item's hover image
+    🔗 Click Behavior
+    Clicking image OR text → open selected collection link
+    📱 Tablet Layout
+    Remove 30% / 70% layout
+    Hide left preview section
+    Show only carousel slider
+    Carousel Behavior:
+    Show image + text
+    Smooth scroll
+    Autoplay (optional)
+    📱 Mobile Layout
+    Same as tablet (carousel)
+    Show:
+    3 items per view
+    Swipe enabled
+    ⚙️ Section Settings (Customizer)
+    General Settings:
+    Heading (rich text supported)
+    Padding:
+    Top
+    Bottom
+    Left
+    Right
+    Layout Settings:
+    Tablet columns (default: 7)
+    Mobile columns (default: 3)
+    Grid Spacing:
+    Column gap
+    Row gap
+    Left Section Settings:
+    Vertical gap (heading ↔ image spacing)
+    📋 Blocks (Repeatable up to 10)
+    
+    Each block = 1 collection item
+    
+    Fields:
+    
+    Collection (link target)
+    Default Image
+    Hover Image
+    Text label
+    🎨 Design Requirements
+    Match provided UI exactly:
+    Clean luxury style
+    Center aligned images
+    Text below image
+    Thin underline on hover
+    Soft transitions
+    Image ratio: 1:1
+    Maintain consistent spacing
+    ✨ Animation & Effects
+    Hover image fade transition
+    Underline animation on text
+    Left preview image fade update
+    📐 Responsiveness
+    Desktop → Grid layout (5x2)
+    Tablet → Carousel (7 items visible)
+    Mobile → Carousel (3 items visible)
+    ⚠️ Important Notes
+    Limit blocks to maximum 10
+    First item should be active by default
+    Fully editable via Shopify customizer
+    Use clean Liquid + minimal JS (no heavy libraries)
+    Ensure performance optimized
+    ✅ Expected Result
+    Interactive diamond shape selector
+    Hover updates preview (left side)
+    Fully responsive slider on mobile/tablet
+    Pixel-perfect design based on screenshots
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-diamond-shape-section-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.padding_top }}px {{ block.settings.padding_right }}px {{ block.settings.padding_bottom }}px {{ block.settings.padding_left }}px;
+  }
+
+  .ai-diamond-shape-container-{{ ai_gen_id }} {
+    display: flex;
+    gap: 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .ai-diamond-shape-preview-{{ ai_gen_id }} {
+    flex: 0 0 30%;
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.preview_vertical_gap }}px;
+  }
+
+  .ai-diamond-shape-preview-heading-{{ ai_gen_id }} {
+    font-size: 2.4rem;
+    margin: 0;
+    color: #000000;
+  }
+
+  .ai-diamond-shape-preview-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .ai-diamond-shape-preview-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-diamond-shape-preview-image-{{ ai_gen_id }}.ai-fade-out {
+    opacity: 0;
+  }
+
+  .ai-diamond-shape-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-diamond-shape-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 300px;
+  }
+
+  .ai-diamond-shape-grid-wrapper-{{ ai_gen_id }} {
+    flex: 0 0 70%;
+  }
+
+  .ai-diamond-shape-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: {{ block.settings.row_gap }}px {{ block.settings.column_gap }}px;
+  }
+
+  .ai-diamond-shape-item-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .ai-diamond-shape-item-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .ai-diamond-shape-item-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-diamond-shape-item-default-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .ai-diamond-shape-item-hover-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+  }
+
+  .ai-diamond-shape-item-{{ ai_gen_id }}:hover .ai-diamond-shape-item-default-{{ ai_gen_id }} {
+    opacity: 0;
+  }
+
+  .ai-diamond-shape-item-{{ ai_gen_id }}:hover .ai-diamond-shape-item-hover-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .ai-diamond-shape-item-text-{{ ai_gen_id }} {
+    font-size: 1.4rem;
+    color: #000000;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .ai-diamond-shape-item-text-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 1px;
+    background-color: #000000;
+    transition: width 0.3s ease;
+  }
+
+  .ai-diamond-shape-item-{{ ai_gen_id }}:hover .ai-diamond-shape-item-text-{{ ai_gen_id }}::after {
+    width: 100%;
+  }
+
+  .ai-diamond-shape-carousel-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-diamond-shape-container-{{ ai_gen_id }} {
+      flex-direction: column;
+    }
+
+    .ai-diamond-shape-preview-{{ ai_gen_id }} {
+      display: none;
+    }
+
+    .ai-diamond-shape-grid-wrapper-{{ ai_gen_id }} {
+      display: none;
+    }
+
+    .ai-diamond-shape-carousel-{{ ai_gen_id }} {
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-diamond-shape-carousel-track-{{ ai_gen_id }} {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 0 20px;
+    }
+
+    .ai-diamond-shape-carousel-track-{{ ai_gen_id }}::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ai-diamond-shape-carousel-item-{{ ai_gen_id }} {
+      flex: 0 0 calc((100% - ({{ block.settings.tablet_columns | minus: 1 }} * 16px)) / {{ block.settings.tablet_columns }});
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .ai-diamond-shape-carousel-item-image-wrapper-{{ ai_gen_id }} {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .ai-diamond-shape-carousel-item-image-{{ ai_gen_id }} {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ai-diamond-shape-carousel-item-text-{{ ai_gen_id }} {
+      font-size: 1.2rem;
+      color: #000000;
+      text-align: center;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-diamond-shape-carousel-item-{{ ai_gen_id }} {
+      flex: 0 0 calc((100% - ({{ block.settings.mobile_columns | minus: 1 }} * 16px)) / {{ block.settings.mobile_columns }});
+    }
+  }
+{% endstyle %}
+
+<diamond-shape-section-{{ ai_gen_id }}
+  class="ai-diamond-shape-section-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-diamond-shape-container-{{ ai_gen_id }}">
+    <div class="ai-diamond-shape-preview-{{ ai_gen_id }}">
+      {% if block.settings.heading != blank %}
+        <div class="ai-diamond-shape-preview-heading-{{ ai_gen_id }}">
+          {{ block.settings.heading }}
+        </div>
+      {% endif %}
+      <div class="ai-diamond-shape-preview-image-wrapper-{{ ai_gen_id }}">
+        {% if block.settings.item_1_hover_image %}
+          <img
+            src="{{ block.settings.item_1_hover_image | image_url: width: 800 }}"
+            alt="{{ block.settings.item_1_text | escape }}"
+            class="ai-diamond-shape-preview-image-{{ ai_gen_id }}"
+            data-preview-image
+            loading="lazy"
+            width="800"
+            height="800"
+          >
+        {% else %}
+          <div class="ai-diamond-shape-image-placeholder-{{ ai_gen_id }}">
+            {{ 'image' | placeholder_svg_tag }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="ai-diamond-shape-grid-wrapper-{{ ai_gen_id }}">
+      <div class="ai-diamond-shape-grid-{{ ai_gen_id }}">
+        {% for i in (1..10) %}
+          {% assign collection_key = 'item_' | append: i | append: '_collection' %}
+          {% assign default_image_key = 'item_' | append: i | append: '_default_image' %}
+          {% assign hover_image_key = 'item_' | append: i | append: '_hover_image' %}
+          {% assign text_key = 'item_' | append: i | append: '_text' %}
+          
+          {% assign collection = block.settings[collection_key] %}
+          {% assign default_image = block.settings[default_image_key] %}
+          {% assign hover_image = block.settings[hover_image_key] %}
+          {% assign text = block.settings[text_key] %}
+          
+          {% if default_image or hover_image or text != blank %}
+            <a
+              href="{{ collection.url | default: '#' }}"
+              class="ai-diamond-shape-item-{{ ai_gen_id }}"
+              data-hover-image="{{ hover_image | image_url: width: 800 }}"
+            >
+              <div class="ai-diamond-shape-item-image-wrapper-{{ ai_gen_id }}">
+                {% if default_image %}
+                  <img
+                    src="{{ default_image | image_url: width: 400 }}"
+                    alt="{{ text | escape }}"
+                    class="ai-diamond-shape-item-image-{{ ai_gen_id }} ai-diamond-shape-item-default-{{ ai_gen_id }}"
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                  >
+                {% endif %}
+                {% if hover_image %}
+                  <img
+                    src="{{ hover_image | image_url: width: 400 }}"
+                    alt="{{ text | escape }}"
+                    class="ai-diamond-shape-item-image-{{ ai_gen_id }} ai-diamond-shape-item-hover-{{ ai_gen_id }}"
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                  >
+                {% endif %}
+              </div>
+              <div class="ai-diamond-shape-item-text-{{ ai_gen_id }}">
+                {{ text }}
+              </div>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="ai-diamond-shape-carousel-{{ ai_gen_id }}">
+      <div class="ai-diamond-shape-carousel-track-{{ ai_gen_id }}">
+        {% for i in (1..10) %}
+          {% assign collection_key = 'item_' | append: i | append: '_collection' %}
+          {% assign default_image_key = 'item_' | append: i | append: '_default_image' %}
+          {% assign hover_image_key = 'item_' | append: i | append: '_hover_image' %}
+          {% assign text_key = 'item_' | append: i | append: '_text' %}
+          
+          {% assign collection = block.settings[collection_key] %}
+          {% assign default_image = block.settings[default_image_key] %}
+          {% assign hover_image = block.settings[hover_image_key] %}
+          {% assign text = block.settings[text_key] %}
+          
+          {% if default_image or hover_image or text != blank %}
+            <a
+              href="{{ collection.url | default: '#' }}"
+              class="ai-diamond-shape-carousel-item-{{ ai_gen_id }}"
+            >
+              <div class="ai-diamond-shape-carousel-item-image-wrapper-{{ ai_gen_id }}">
+                {% if hover_image %}
+                  <img
+                    src="{{ hover_image | image_url: width: 400 }}"
+                    alt="{{ text | escape }}"
+                    class="ai-diamond-shape-carousel-item-image-{{ ai_gen_id }}"
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                  >
+                {% elsif default_image %}
+                  <img
+                    src="{{ default_image | image_url: width: 400 }}"
+                    alt="{{ text | escape }}"
+                    class="ai-diamond-shape-carousel-item-image-{{ ai_gen_id }}"
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                  >
+                {% endif %}
+              </div>
+              <div class="ai-diamond-shape-carousel-item-text-{{ ai_gen_id }}">
+                {{ text }}
+              </div>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</diamond-shape-section-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class DiamondShapeSection{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.previewImage = this.querySelector('[data-preview-image]');
+        this.gridItems = this.querySelectorAll('.ai-diamond-shape-item-{{ ai_gen_id }}');
+        
+        this.setupHoverEffects();
+      }
+
+      setupHoverEffects() {
+        if (!this.previewImage) return;
+
+        var self = this;
+        this.gridItems.forEach(function(item) {
+          item.addEventListener('mouseenter', function() {
+            var hoverImageUrl = item.getAttribute('data-hover-image');
+            if (hoverImageUrl && hoverImageUrl !== 'null') {
+              self.previewImage.classList.add('ai-fade-out');
+              
+              setTimeout(function() {
+                self.previewImage.src = hoverImageUrl;
+                self.previewImage.classList.remove('ai-fade-out');
+              }, 150);
+            }
+          });
+        });
+      }
+    }
+
+    customElements.define('diamond-shape-section-{{ ai_gen_id }}', DiamondShapeSection{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Shop diamonds by shape",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "General"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>Shop Diamonds by Shape</p>"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Left",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Right",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "tablet_columns",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "label": "Tablet columns",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Mobile columns",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Grid spacing"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Column gap",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Row gap",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Left section"
+    },
+    {
+      "type": "range",
+      "id": "preview_vertical_gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Vertical gap",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Item 1"
+    },
+    {
+      "type": "collection",
+      "id": "item_1_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_1_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_1_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_1_text",
+      "label": "Text",
+      "default": "Round"
+    },
+    {
+      "type": "header",
+      "content": "Item 2"
+    },
+    {
+      "type": "collection",
+      "id": "item_2_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_2_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_2_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_2_text",
+      "label": "Text",
+      "default": "Princess"
+    },
+    {
+      "type": "header",
+      "content": "Item 3"
+    },
+    {
+      "type": "collection",
+      "id": "item_3_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_3_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_3_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_3_text",
+      "label": "Text",
+      "default": "Cushion"
+    },
+    {
+      "type": "header",
+      "content": "Item 4"
+    },
+    {
+      "type": "collection",
+      "id": "item_4_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_4_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_4_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_4_text",
+      "label": "Text",
+      "default": "Emerald"
+    },
+    {
+      "type": "header",
+      "content": "Item 5"
+    },
+    {
+      "type": "collection",
+      "id": "item_5_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_5_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_5_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_5_text",
+      "label": "Text",
+      "default": "Oval"
+    },
+    {
+      "type": "header",
+      "content": "Item 6"
+    },
+    {
+      "type": "collection",
+      "id": "item_6_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_6_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_6_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_6_text",
+      "label": "Text",
+      "default": "Radiant"
+    },
+    {
+      "type": "header",
+      "content": "Item 7"
+    },
+    {
+      "type": "collection",
+      "id": "item_7_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_7_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_7_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_7_text",
+      "label": "Text",
+      "default": "Asscher"
+    },
+    {
+      "type": "header",
+      "content": "Item 8"
+    },
+    {
+      "type": "collection",
+      "id": "item_8_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_8_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_8_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_8_text",
+      "label": "Text",
+      "default": "Marquise"
+    },
+    {
+      "type": "header",
+      "content": "Item 9"
+    },
+    {
+      "type": "collection",
+      "id": "item_9_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_9_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_9_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_9_text",
+      "label": "Text",
+      "default": "Heart"
+    },
+    {
+      "type": "header",
+      "content": "Item 10"
+    },
+    {
+      "type": "collection",
+      "id": "item_10_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_10_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_10_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_10_text",
+      "label": "Text",
+      "default": "Pear"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop diamonds by shape"
+    }
+  ]
+}
+{% endschema %}

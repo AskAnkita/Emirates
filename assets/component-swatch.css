@@ -1,0 +1,97 @@
+.swatch-item {
+  --swatch--border-radius: var(--variant-pills-radius, 50%);
+
+  border: var(--variant-pills-border-width) solid
+    rgb(var(--color-black-rgb) / var(--opacity-15));
+  border-radius: var(--swatch--border-radius);
+  padding: 0.2rem;
+  box-shadow: var(--variant-pills-shadow-horizontal-offset)
+    var(--variant-pills-shadow-vertical-offset)
+    var(--variant-pills-shadow-blur-radius) var(--color-shadow);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: calc(var(--variant-pills-border-width) * -1);
+    border: var(--variant-pills-border-width) solid
+      rgb(var(--color-black-rgb) / var(--opacity-100));
+    border-radius: var(--swatch--border-radius);
+    pointer-events: none;
+    transform: scale(0.8);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: var(--opacity-0);
+  }
+
+  &.active::after {
+    transform: scale(1);
+    opacity: var(--opacity-100);
+  }
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.swatch {
+  --swatch--size: var(--swatch-input--size, 4.4rem);
+
+  width: var(--swatch--size);
+  aspect-ratio: 1 / 1;
+  background-color: var(--swatch--background-color);
+  background-image: var(--swatch--background);
+  background-position: var(--swatch-focal-point, initial);
+  background-size: cover;
+  background-origin: border-box;
+  border-radius: var(--swatch--border-radius);
+}
+
+.swatch-item:has(.swatch--unavailable) {
+  border-style: dashed;
+  border-color: rgb(var(--color-black-rgb) / var(--opacity-50));
+}
+
+.swatch-item:has(.swatch.active) {
+  border-style: solid;
+  border-color: #000;
+}
+
+.swatch-item .tooltip {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .swatch-item .tooltip {
+    display: block;
+    opacity: var(--opacity-0);
+    visibility: hidden;
+    pointer-events: none;
+    color: #fff;
+    background: #232323;
+    padding: var(--padding-2xs);
+    min-width: var(--size-40);
+    margin: 0 0 var(--margin-sm);
+    border-radius: 0.2rem;
+    transition: opacity ease 0.3s, transform ease 0.3s;
+    font-size: var(--font-size--2xs);
+    transform: translateY(0.5rem);
+  }
+
+  .swatch-item .tooltip:before {
+    content: "";
+    position: absolute;
+    bottom: -0.4rem;
+    left: 1rem;
+    height: 0;
+    width: 0;
+    border-top: 0.7rem solid #232323;
+    border-left: 0.7rem solid transparent;
+    border-right: 0.7rem solid transparent;
+    transform: translate(-50%);
+  }
+
+  .swatch-item:hover .tooltip {
+    opacity: var(--opacity-100);
+    visibility: visible;
+    transform: translateY(0);
+  }
+}

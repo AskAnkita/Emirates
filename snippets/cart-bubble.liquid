@@ -1,0 +1,38 @@
+{%- doc -%}
+  @param [limit] - {number}
+  @param [live_region] - {boolean}
+
+  The maximum number of items in the cart to display. If the number of items in the cart is greater than this limit, the
+  count will be displayed as "99+".
+{%- enddoc -%}
+
+{% assign item_count = cart.item_count %}
+<div
+  class="cart-bubble h6{% if cart.empty? %} visually-hidden{% endif %}"
+  {% if item_count <= 99 %}
+    data-maintain-ratio
+  {% endif %}
+>
+  <span class="cart-bubble__background"></span>
+  <span
+    class="cart-bubble__text"
+    {% if live_region %}
+      role="status"
+    {% endif %}
+  >
+    <span class="visually-hidden">
+      {{- 'accessibility.cart_count' | t -}}
+      : {{ item_count }}
+    </span>
+    <span class="cart-bubble__text-count{% if cart.empty? %} hidden{% endif %}">
+      <span aria-hidden="true">
+        {%- if item_count < 100 -%}
+          {{ item_count }}
+        {%- else -%}
+          {{ 'content.cart_count_max.more' | t }}
+        {%- endif -%}
+      </span>
+      <span class="visually-hidden">{{ 'content.cart_count' | t: count: item_count }}</span>
+    </span>
+  </span>
+</div>

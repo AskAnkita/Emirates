@@ -1,0 +1,19 @@
+{%- doc -%}
+  Skin tone control for a single product image.
+
+  Rendered INSIDE one media container so the filter can only ever reach that
+  container's own image - never the rest of the gallery.
+{%- enddoc -%}
+
+<skin-tone-controller class="skin-tone-controller" aria-label="Skin tone controller">
+  <span class="skin-tone-controller__label">Skin tone</span>
+  <input
+    class="skin-tone-controller__input"
+    type="range"
+    min="0"
+    max="100"
+    value="50"
+    aria-label="Adjust skin tone"
+  >
+  <span class="skin-tone-controller__value" aria-live="polite">Natural</span>
+</skin-tone-controller>

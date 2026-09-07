@@ -1,0 +1,445 @@
+{% liquid
+  assign ratio = 1
+
+  case block.settings.image_ratio
+    when 'landscape'
+      assign ratio = '16 / 9'
+    when 'portrait'
+      assign ratio = '4 / 5'
+    when 'adapt'
+      assign ratio = block.settings.image.aspect_ratio
+  endcase
+
+  if ratio == 0 or ratio == null
+    assign ratio = 1
+  endif
+
+  assign image = block.settings.image
+  assign image_height = block.settings.image.height
+  assign image_height_2x = image_height | times: 2
+  assign image_width = block.settings.image.width
+  assign image_width_2x = image_width | times: 2
+  assign image_aspect_ratio = block.settings.image.aspect_ratio
+%}
+
+
+{% capture class %}
+image-block relative image-block--{{ block.id }} image-block--height-{{ block.settings.height }} spacing-style size-style border-style{% if block.settings.hide_on_mobile %} max-sm:hidden{% endif %}{% if block.settings.animation_type == 'zoom' %} image-zoomin{% endif %}
+{% endcapture %}
+
+{% capture style %}
+--ratio: {{ ratio }};
+{% render 'size-style', settings: block.settings %}
+{% render 'spacing-style', settings: block.settings %}
+{% render 'border-override', settings: block.settings %}
+{% endcapture %}
+
+{% liquid
+  assign media_width_desktop = '100vw'
+  assign media_width_mobile = '100vw'
+  assign sizes = 'auto, (min-width: 750px) ' | append: media_width_desktop | append: ', ' | append: media_width_mobile
+  assign widths = '300, 450, 600, 750, 900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2000, 2500, 3000, 3500, 4000, 5000'
+
+  assign element = 'div'
+  if block.settings.animation_type != 'none'
+    assign element = 'animate-image'
+  endif
+%}
+
+{% capture class_img %}
+image-block__image
+{% endcapture %}
+
+{% capture attributes %}
+{{ block.shopify_attributes }}
+data-animate-type="{{ block.settings.animation_type }}"
+{% endcapture %}
+
+<{{ element }}
+class="{{ class }}"
+style="{{ style }}"
+{{ attributes }}
+>
+{%- if block.settings.link != blank -%}
+  <a
+    href="{{ block.settings.link }}"
+    class="image-block__link"
+    aria-label="Image Block Link"
+  ></a>
+{%- endif -%}
+{%- if image != blank -%}
+  {% liquid
+    assign fetch_priority = 'high'
+    assign loading = 'eager'
+    assign preload = true
+  %}
+  {%- render 'image',
+    image: image,
+    class: class_img,
+    width: image.width,
+    height: image.height,
+    widths: widths,
+    sizes: sizes,
+    fetch_priority: fetch_priority,
+    loading: loading,
+    preload: preload
+
+  -%}
+{%- else -%}
+  {{ 'hero-apparel-1' | placeholder_svg_tag: 'image-block__image placeholder-svg' }}
+{%- endif -%}
+</{{ element }}>
+
+{% schema %}
+  {
+    "name": "t:names.image",
+    "tag": null,
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "t:settings.image"
+      },
+      {
+        "type": "url",
+        "id": "link",
+        "label": "t:settings.link"
+      },
+      {
+        "type": "checkbox",
+        "id": "hide_on_mobile",
+        "label": "t:settings.hide_on_mobile",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "t:content.size"
+      },
+      {
+        "type": "select",
+        "id": "image_ratio",
+        "options": [
+          {
+            "value": "adapt",
+            "label": "t:options.adapt_to_image"
+          },
+          {
+            "value": "portrait",
+            "label": "t:options.portrait"
+          },
+          {
+            "value": "square",
+            "label": "t:options.square"
+          }
+        ],
+        "default": "adapt",
+        "label": "t:settings.image_ratio"
+      },
+      {
+        "type": "select",
+        "id": "width",
+        "label": "t:settings.width_desktop",
+        "options": [
+          {
+            "value": "fit-content",
+            "label": "t:options.fit"
+          },
+          {
+            "value": "custom",
+            "label": "t:options.custom"
+          }
+        ],
+        "default": "fit-content"
+      },
+      {
+        "type": "select",
+        "id": "unit",
+        "label": "t:settings.unit",
+        "visible_if": "{{ block.settings.width == 'custom' }}",
+        "options": [
+          {
+            "value": "pixel",
+            "label": "t:options.pixel"
+          },
+          {
+            "value": "percent",
+            "label": "t:options.percent"
+          }
+        ],
+        "default": "percent"
+      },
+      {
+        "type": "range",
+        "id": "custom_width",
+        "label": "t:settings.custom_width",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "default": 100,
+        "visible_if": "{{ block.settings.width == 'custom' and block.settings.unit == 'percent' }}"
+      },
+      {
+        "type": "range",
+        "id": "custom_width_pixel",
+        "label": "t:settings.custom_width",
+        "min": 100,
+        "max": 1000,
+        "step": 10,
+        "unit": "px",
+        "default": 100,
+        "visible_if": "{{ block.settings.width == 'custom' and block.settings.unit == 'pixel' }}"
+      },
+      {
+        "type": "select",
+        "id": "width_tablet",
+        "label": "t:settings.width_tablet",
+        "options": [
+          {
+            "value": "fit-content",
+            "label": "t:options.fit"
+          },
+          {
+            "value": "custom",
+            "label": "t:options.custom"
+          }
+        ],
+        "default": "fit-content"
+      },
+      {
+        "type": "select",
+        "id": "unit_tablet",
+        "label": "t:settings.unit",
+        "visible_if": "{{ block.settings.width_tablet == 'custom' }}",
+        "options": [
+          {
+            "value": "pixel",
+            "label": "t:options.pixel"
+          },
+          {
+            "value": "percent",
+            "label": "t:options.percent"
+          }
+        ],
+        "default": "percent"
+      },
+      {
+        "type": "range",
+        "id": "custom_width_tablet",
+        "label": "t:settings.custom_width",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "default": 100,
+        "visible_if": "{{ block.settings.width_tablet == 'custom' and block.settings.unit_tablet == 'percent' }}"
+      },
+      {
+        "type": "range",
+        "id": "custom_width_tablet_pixel",
+        "label": "t:settings.custom_width",
+        "min": 100,
+        "max": 1000,
+        "step": 10,
+        "unit": "px",
+        "default": 100,
+        "visible_if": "{{ block.settings.width_tablet == 'custom' and block.settings.unit_tablet == 'pixel' }}"
+      },
+      {
+        "type": "select",
+        "id": "width_mobile",
+        "label": "t:settings.width_mobile",
+        "options": [
+          {
+            "value": "fit-content",
+            "label": "t:options.fit"
+          },
+          {
+            "value": "custom",
+            "label": "t:options.custom"
+          }
+        ],
+        "default": "fit-content"
+      },
+      {
+        "type": "select",
+        "id": "unit_mobile",
+        "label": "t:settings.unit",
+        "visible_if": "{{ block.settings.width_mobile == 'custom' }}",
+        "options": [
+          {
+            "value": "pixel",
+            "label": "t:options.pixel"
+          },
+          {
+            "value": "percent",
+            "label": "t:options.percent"
+          }
+        ],
+        "default": "percent"
+      },
+      {
+        "type": "range",
+        "id": "custom_width_mobile",
+        "label": "t:settings.custom_width",
+        "min": 1,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "default": 100,
+        "visible_if": "{{ block.settings.width_mobile == 'custom' and block.settings.unit_mobile == 'percent' }}"
+      },
+      {
+        "type": "range",
+        "id": "custom_width_mobile_pixel",
+        "label": "t:settings.custom_width",
+        "min": 100,
+        "max": 500,
+        "step": 10,
+        "unit": "px",
+        "default": 100,
+        "visible_if": "{{ block.settings.width_mobile == 'custom' and block.settings.unit_mobile == 'pixel' }}"
+      },
+      {
+        "type": "select",
+        "id": "height",
+        "label": "t:settings.height",
+        "options": [
+          {
+            "value": "fit",
+            "label": "t:options.fit_content"
+          },
+          {
+            "value": "fill",
+            "label": "t:options.fill"
+          }
+        ],
+        "default": "fit",
+        "visible_if": "{{ block.settings.image_ratio == 'adapt' }}"
+      },
+      {
+        "type": "header",
+        "content": "t:content.border"
+      },
+      {
+        "type": "select",
+        "id": "border",
+        "label": "t:settings.style",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:options.none"
+          },
+          {
+            "value": "solid",
+            "label": "t:options.solid"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "range",
+        "id": "border_width",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "t:settings.thickness",
+        "default": 1,
+        "visible_if": "{{ block.settings.border != 'none' }}"
+      },
+      {
+        "type": "range",
+        "id": "border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "t:settings.opacity",
+        "default": 100,
+        "visible_if": "{{ block.settings.border != 'none' }}"
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "label": "t:settings.corner_radius",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.border != 'none' }}"
+      },
+      {
+        "type": "header",
+        "content": "t:content.animations"
+      },
+      {
+        "type": "select",
+        "id": "animation_type",
+        "label": "t:settings.type",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:options.none"
+          },
+          {
+            "value": "zoom-out",
+            "label": "Zoom out"
+          },
+          {
+            "value": "fade-in",
+            "label": "Fade in"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "header",
+        "content": "t:content.padding"
+      },
+      {
+        "type": "range",
+        "id": "padding-block-start",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "default": 0,
+        "label": "t:settings.top"
+      },
+      {
+        "type": "range",
+        "id": "padding-inline-end",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "default": 0,
+        "label": "t:settings.right"
+      },
+      {
+        "type": "range",
+        "id": "padding-block-end",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "default": 0,
+        "label": "t:settings.bottom"
+      },
+      {
+        "type": "range",
+        "id": "padding-inline-start",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "default": 0,
+        "label": "t:settings.left"
+      }
+    ],
+    "presets": [
+      {
+        "name": "t:names.image",
+        "category": "Basic"
+      }
+    ]
+  }
+  {% endschema %}

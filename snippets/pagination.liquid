@@ -1,0 +1,155 @@
+{% doc %}
+  Display pagination for a list of products or articles.
+
+  @param {object} paginate - Shopify paginate object
+  @param {object} section - section object with settings
+{% enddoc %}
+
+{% liquid
+  assign sec_stts = section.settings
+  assign pagination_type = sec_stts.pagination_type
+%}
+
+{% capture list_class %}
+  pagination__list list-unstyled flex flex-wrap
+{% endcapture %}
+
+{% capture item_class %}
+  pagination__item inline-flex items-center justify-center relative w-full p-0 decoration-none color-foreground border-style
+{% endcapture %}
+
+{% capture icons_style %}
+  {% if sec_stts.pagination_icons_type == 'chevron' %}
+    {{- 'icon-caret.svg' | inline_asset_content -}}
+  {% else %}
+    {{- 'icon-arrow.svg' | inline_asset_content -}}
+  {% endif %}
+{% endcapture %}
+
+{%- if paginate.parts.size > 0 -%}
+  <div
+    class="
+      pagination-wrapper
+      spacing-style
+      {{ pagination_type }}
+    "
+    style="
+      {% render 'spacing-style', settings: sec_stts, suffix: suffix %}
+      {% render 'border-override', settings: sec_stts %}
+      --pagination-alignment: {{ sec_stts.pagination_alignment | default: 'center' }};
+    "
+  >
+    <nav
+      class="pagination{% if pagination_type == 'infinite' %} hidden{% endif %}"
+      role="navigation"
+      aria-label="{{ 'content.pagination.label' | t }}"
+    >
+      <ul class="{{ list_class }}" role="list">
+        {%- if paginate.previous -%}
+          <li>
+            <a
+              href="{{ paginate.previous.url }}{{ anchor }}"
+              class="{{ item_class }} pagination__item--prev pagination__item-arrow link motion-reduce"
+              aria-label="{{ 'content.pagination.previous' | t }}"
+            >
+              <span class="visually-hidden">{{ 'content.pagination.button_previous' | t }}</span>
+              <span class="svg-wrapper">
+                {{ icons_style }}
+              </span>
+            </a>
+          </li>
+        {%- endif -%}
+
+        {%- for part in paginate.parts -%}
+          <li>
+            {%- if part.is_link -%}
+              <a
+                href="{{ part.url }}{{ anchor }}"
+                class="{{ item_class }} link"
+                aria-label="{{ 'content.pagination.page' | t: number: part.title }}"
+              >
+                {{- part.title -}}
+              </a>
+            {%- else -%}
+              {%- if part.title == paginate.current_page -%}
+                <a
+                  role="link"
+                  aria-disabled="true"
+                  class="{{ item_class }} pagination__item--current light"
+                  aria-current="page"
+                  aria-label="{{ 'content.pagination.page' | t: number: part.title }}"
+                >
+                  {{- part.title -}}
+                </a>
+              {%- else -%}
+                <span class="pagination__item">{{ part.title }}</span>
+              {%- endif -%}
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+
+        {%- if paginate.next -%}
+          <li>
+            <a
+              href="{{ paginate.next.url }}{{ anchor }}"
+              class="{{ item_class }} pagination__item--next pagination__item-arrow link motion-reduce"
+              aria-label="{{ 'content.pagination.next' | t }}"
+            >
+              <span class="visually-hidden">{{ 'content.pagination.button_next' | t }}</span>
+              <span class="svg-wrapper">
+                {{ icons_style }}
+              </span>
+            </a>
+          </li>
+        {%- endif -%}
+      </ul>
+    </nav>
+
+    {% if sec_stts.pagination_type == 'infinite' %}
+      <!-- Infinite Scrolling Button -->
+      <infinite-scrolling class="infinite-scrolling-wrapper block center">
+        <div class="pagination-page-item pagination-page-total flex-center flex-wrap gap-2xs">
+          <span>{{ 'content.start_count' | t }}</span>
+          <span data-total-start>{{ paginate.current_offset | plus: 1 }}</span>
+          <span>-</span>
+          {%- if paginate.next -%}
+            <span data-total-end>{{ paginate.current_offset | plus: paginate.page_size }}</span>
+          {%- else -%}
+            <span data-total-end>{{ paginate.items }}</span>
+          {%- endif -%}
+          <span>{{ 'content.end_count' | t: count: paginate.items }}</span>
+          {%- if paginate.next -%}
+            {% liquid
+              assign pg_current = paginate.current_offset | plus: paginate.page_size
+              assign pg_total = paginate.items
+              assign total_progress = pg_current | times: 100 | divided_by: pg_total | append: '%'
+            %}
+          {%- else -%}
+            {%- assign total_progress = '100%' -%}
+          {%- endif -%}
+          <div class="progress-wrapper flex-center w-full">
+            <div class="pagination-total-progress w-full overflow-hidden">
+              <span style="width: {{ total_progress }}" class="pagination-total-item h-full block"></span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="button button--primary infinite-scrolling-btn"
+          data-infinite-scrolling
+          aria-label="{{ 'content.show_more' | t }}"
+        >
+          <span class="text">
+            {%- if paginate.next -%}
+              {{ 'content.show_more' | t }}
+            {%- else -%}
+              {{ 'content.no_more' | t }}
+            {%- endif -%}
+          </span>
+          {% render 'loading-spinner' %}
+        </button>
+      </infinite-scrolling>
+    {%- endif -%}
+  </div>
+{%- endif -%}

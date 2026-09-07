@@ -1,0 +1,31 @@
+<div class="drawer__header flex justify-between items-center color-{{ block.settings.color_scheme }}">
+  <div class="tabs-product-header flex overflow-x-a ">
+    {%- content_for 'blocks' -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.menu_tab_heading",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_menu_tab_heading"
+    }
+  ],
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-3"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.menu_tab_heading",
+      "settings": {}
+    }
+  ]
+}
+{% endschema %}

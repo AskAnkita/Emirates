@@ -1,0 +1,62 @@
+<div class="footer__content-bottom-wrapper flex items-center">
+  <div class="footer__column footer__localization relative z-0">
+    {%- if block.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+      <localization-form>
+        {%- form 'localization', id: 'FooterCountryForm', class: 'localization-form' -%}
+          <div>
+            <h2 class="caption-large text-body" id="FooterCountryLabel">{{ 'content.country_label' | t }}</h2>
+            {%- render 'country-localization', localPosition: 'FooterCountry' -%}
+          </div>
+        {%- endform -%}
+      </localization-form>
+    {%- endif -%}
+
+    {%- if block.settings.enable_language_selector and localization.available_languages.size > 1 -%}
+      <localization-form>
+        {%- form 'localization', id: 'FooterLanguageForm', class: 'localization-form' -%}
+          <div>
+            <h2 class="caption-large text-body" id="FooterLanguageLabel">{{ 'content.language_label' | t }}</h2>
+            {%- render 'language-localization', localPosition: 'FooterLanguage' -%}
+          </div>
+        {%- endform -%}
+      </localization-form>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.country_selector",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.country_region_selector",
+      "info": "t:info.country_selector_info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": true,
+      "label": "t:settings.enable_country_selector"
+    },
+    {
+      "type": "header",
+      "content": "t:content.language_selector",
+      "info": "t:info.language_selector_info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": true,
+      "label": "t:settings.enable_language_selector"
+    }
+  ],
+  "blocks": [],
+  "presets": [
+    {
+      "name": "t:names.country_selector"
+    }
+  ]
+}
+{% endschema %}

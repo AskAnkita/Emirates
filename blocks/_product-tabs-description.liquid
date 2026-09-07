@@ -1,0 +1,133 @@
+{% liquid
+  assign product = closest.product
+  assign title = block.settings.title
+  assign view_content = block.settings.view_content
+  assign accordion_icon = block.settings.accordion_icon
+  assign accordion_border_style = block.settings.accordion_border_style
+  assign accordion_border_color = block.settings.accordion_border_color
+%}
+
+{%- capture icon -%}
+  {% if accordion_icon == 'plus' %}
+    {{- 'icon-plus.svg' | inline_asset_content -}}
+  {% elsif accordion_icon == 'right-arrow' %}
+    {{- 'icon-right-arrow.svg' | inline_asset_content -}}
+  {% elsif accordion_icon == 'caret' %}
+    {{- 'icon-caret.svg' | inline_asset_content -}}
+  {% endif %}
+{%- endcapture -%}
+
+{%- capture tab_title -%}
+  {% liquid
+    assign element = 'side-drawer-opener'
+    if view_content == 'default'
+      assign element = 'div'
+    endif
+  %}
+
+  <{{ element }} {% if view_content == 'popup' %}data-side-drawer="#PopupModal-{{ section.id }}"{% else %}data-side-drawer="#Global-Drawer"{% endif %} class="toggle-title{% if view_content == 'default' %} isCheckingOpenDefault {% endif %}" data-view-content="{{ view_content }}">
+    <button class="toggle-link cursor-pointer">
+      <span class="text">Tab Title</span>
+      <span class="svg-wrapper icon-caret-wrapper">{{- icon -}}</span>
+    </button>
+  </{{ element }}>
+{%- endcapture -%}
+
+<div class="tab-content{% if accordion_border_style != 'none' %} border-{{ accordion_border_style }}{% endif %}" style="--accordion-border-color: {{ accordion_border_color }};">
+  {{ tab_title | replace: 'Tab Title', title }}
+  <div class="toggle-content">
+    {{ product.description }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.description",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:settings.title",
+      "default": "Description"
+    },
+    {
+      "type": "select",
+      "id": "view_content",
+      "label": "t:settings.view_content",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "sidebar",
+          "label": "t:options.sidebar"
+        },
+        {
+          "value": "popup",
+          "label": "t:options.popup"
+        }
+      ],
+      "default": "sidebar"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "select",
+      "id": "accordion_icon",
+      "label": "t:settings.icon",
+      "options": [
+        { "value": "none", "label": "t:options.none" },
+        { "value": "caret", "label": "t:options.caret" },
+        { "value": "plus", "label": "t:options.plus" },
+        { "value": "right-arrow", "label": "t:options.right_arrow" }
+      ],
+      "default": "caret"
+    },
+    {
+      "type": "select",
+      "id": "accordion_border_style",
+      "label": "t:settings.border_style",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "top",
+          "label": "t:options.top"
+        },
+        {
+          "value": "bottom",
+          "label": "t:options.bottom"
+        },
+        {
+          "value": "top-bottom",
+          "label": "t:options.top_bottom"
+        },
+        {
+          "value": "full",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "color",
+      "id": "accordion_border_color",
+      "label": "t:settings.border_color",
+      "default": "#d3d3d3",
+      "visible_if": "{{ block.settings.accordion_border_style != 'none' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.description",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

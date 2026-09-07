@@ -1,0 +1,69 @@
+.container-max-450 {
+  container-type: inline-size;
+  container-name: containerBlockMax450;
+  width: 100%;
+}
+
+.container-max-500 {
+  container-type: inline-size;
+  container-name: containerBlockMax500;
+  width: 100%;
+}
+
+.container-max-700 {
+  container-type: inline-size;
+  container-name: containerBlockMax700;
+  width: 100%;
+}
+
+.container-max-900 {
+  container-type: inline-size;
+  container-name: containerBlockMax900;
+  width: 100%;
+}
+
+@container containerBlockMax450 (width <= 450px) {
+  .countdown-timer {
+    flex-wrap: nowrap !important;
+  }
+
+  .email-signup__input-groups.email-signup__auto-responsive {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .email-signup__input-groups.email-signup__auto-responsive .button {
+    width: 100%;
+  }
+}
+
+@container containerBlockMax500 (width <= 500px) {
+  .flex.flex-row,
+  .layout-panel-flex.layout-panel-flex--row {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+@container containerBlockMax700 (width <= 700px) {
+  .flex.flex-row,
+  .layout-panel-flex.layout-panel-flex--row {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@container containerBlockMax900 (width <= 900px) {
+  .flex.flex-row,
+  .layout-panel-flex.layout-panel-flex--row {
+    flex-direction: column !important;
+  }
+}
+
+
+
+.email-signup__form:has(.email-signup__auto-responsive) {
+  container-type: inline-size;
+  container-name: containerBlockMax450;
+  width: 100%;
+}

@@ -1,0 +1,128 @@
+{%- comment -%}
+  Intended for blocks and sections that provide values for all the referenced settings.
+  Accepts:
+     settings: {block.settings || section.settings}
+{%- endcomment -%}
+
+{%- if settings.scheme_background_gradient != empty and settings.scheme_background_gradient -%}
+  --color-background: {{ settings.scheme_background_gradient }};
+{%- elsif settings.scheme_background -%}
+  --color-background: rgb({{ settings.scheme_background.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_background -%}
+--color-background-rgb: {{ settings.scheme_background.rgb }};
+{%- endif -%}
+
+{%- if settings.scheme_foreground -%}
+--color-foreground: rgb({{ settings.scheme_foreground.rgba }});
+--color-foreground-rgb: {{ settings.scheme_foreground.rgb }};
+{%- endif -%}
+
+{%- if settings.scheme_foreground_heading -%}
+--color-foreground-heading: rgb({{ settings.scheme_foreground_heading.rgba }});
+--color-foreground-heading-rgb: {{ settings.scheme_foreground_heading.rgb }};
+{%- endif -%}
+
+{%- if settings.scheme_primary -%}
+--color-primary: rgb({{ settings.scheme_primary.rgba }});
+--color-primary-rgb: {{ settings.scheme_primary.rgb }};
+{%- endif -%}
+{%- if settings.scheme_primary_hover -%}
+--color-primary-hover: rgb({{ settings.scheme_primary_hover.rgba }});
+--color-primary-hover-rgb: {{ settings.scheme_primary_hover.rgb }};
+{%- endif -%}
+
+{%- if settings.scheme_border -%}
+--color-border: rgb({{ settings.scheme_border.rgba }});
+--color-border-rgb: {{ settings.scheme_border.rgb }};
+{%- endif -%}
+
+{%- if settings.scheme_shadow -%}
+--color-shadow: rgb({{ settings.scheme_shadow.rgba }});
+--color-shadow-rgb: {{ settings.scheme_shadow.rgb }};
+{%- endif -%}
+
+{%- if settings.scheme_primary_button_text -%}
+--color-primary-button-text: rgb({{ settings.scheme_primary_button_text.rgba }});
+--color-primary-button-text-rgb: {{ settings.scheme_primary_button_text.rgb }};
+{%- endif -%}
+{%- if settings.scheme_primary_button_background_gradient != empty and settings.scheme_primary_button_background_gradient -%}
+  --color-primary-button-background: {{ settings.scheme_primary_button_background_gradient }};
+{%- elsif settings.scheme_primary_button_background -%}
+  --color-primary-button-background: rgb({{ settings.scheme_primary_button_background.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_primary_button_border -%}
+--color-primary-button-border: rgb({{ settings.scheme_primary_button_border.rgba }});
+{%- endif -%}
+{%- if settings.scheme_primary_button_hover_text -%}
+--color-primary-button-hover-text: rgb({{ settings.scheme_primary_button_hover_text.rgba }});
+{%- endif -%}
+{%- if settings.scheme_primary_button_hover_background_gradient != empty and settings.scheme_primary_button_hover_background_gradient -%}
+  --color-primary-button-hover-background: {{ settings.scheme_primary_button_hover_background_gradient }};
+{%- elsif settings.scheme_primary_button_hover_background -%}
+  --color-primary-button-hover-background: rgb({{ settings.scheme_primary_button_hover_background.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_primary_button_hover_border -%}
+--color-primary-button-hover-border: rgb({{ settings.scheme_primary_button_hover_border.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_secondary_button_text -%}
+--color-secondary-button-text: rgb({{ settings.scheme_secondary_button_text.rgba }});
+--color-secondary-button-text-rgb: {{ settings.scheme_secondary_button_text.rgb }};
+{%- endif -%}
+{%- if settings.scheme_secondary_button_background_gradient != empty and settings.scheme_secondary_button_background_gradient -%}
+  --color-secondary-button-background: {{ settings.scheme_secondary_button_background_gradient }};
+{%- elsif settings.scheme_secondary_button_background -%}
+  --color-secondary-button-background: rgb({{ settings.scheme_secondary_button_background.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_secondary_button_border -%}
+--color-secondary-button-border: rgb({{ settings.scheme_secondary_button_border.rgba }});
+{%- endif -%}
+{%- if settings.scheme_secondary_button_hover_text -%}
+--color-secondary-button-hover-text: rgb({{ settings.scheme_secondary_button_hover_text.rgba }});
+{%- endif -%}
+{%- if settings.scheme_secondary_button_hover_background_gradient != empty and settings.scheme_secondary_button_hover_background_gradient -%}
+  --color-secondary-button-hover-background: {{ settings.scheme_secondary_button_hover_background_gradient }};
+{%- elsif settings.scheme_secondary_button_hover_background -%}
+  --color-secondary-button-hover-background: rgb({{ settings.scheme_secondary_button_hover_background.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_secondary_button_hover_border -%}
+--color-secondary-button-hover-border: rgb({{ settings.scheme_secondary_button_hover_border.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_input_background -%}
+--color-input-background: rgb({{ settings.scheme_input_background.rgba }});
+{%- endif -%}
+{%- if settings.scheme_input_text_color -%}
+--color-input-text: rgb({{ settings.scheme_input_text_color.rgba }});
+--color-input-text-rgb: {{ settings.scheme_input_text_color.rgb }};
+{%- endif -%}
+{%- if settings.scheme_input_border_color -%}
+--color-input-border: rgb({{ settings.scheme_input_border_color.rgba }});
+{%- endif -%}
+{%- if settings.scheme_input_hover_background -%}
+--color-input-hover-background: rgb({{ settings.scheme_input_hover_background.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_arrow_color -%}
+--arrow-color: rgb({{ settings.scheme_arrow_color.rgba }});
+{%- endif -%}
+{%- if settings.scheme_arrow_background -%}
+--arrow-background: rgb({{ settings.scheme_arrow_background.rgba }});
+{%- endif -%}
+{%- if settings.scheme_arrow_border -%}
+--arrow-border: rgb({{ settings.scheme_arrow_border.rgba }});
+{%- endif -%}
+
+{%- if settings.scheme_pagination_color -%}
+--pagination-color: rgb({{ settings.scheme_pagination_color.rgba }});
+{%- endif -%}
+{%- if settings.scheme_pagination_active_color -%}
+--pagination-active-color: rgb({{ settings.scheme_pagination_active_color.rgba }});
+--pagination-active-color-rgb: {{ settings.scheme_pagination_active_color.rgb }};
+{%- endif -%}

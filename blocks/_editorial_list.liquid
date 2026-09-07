@@ -1,0 +1,170 @@
+{%- liquid
+  assign columns_desktop = block.settings.columns_grid
+  assign mobile_columns = block.settings.mobile_columns_grid
+  if block.settings.carousel_on_mobile
+    assign mobile_columns = block.settings.mobile_columns_carousel
+  endif
+
+  assign mobile_columns_int = mobile_columns | plus: 0
+
+  assign show_mobile_slider = false
+  if block.settings.carousel_on_mobile and block.blocks.size > mobile_columns_int
+    assign show_mobile_slider = true
+  endif
+
+  assign columns_tablet = 2
+  if columns_desktop == 1
+    assign columns_tablet = 1
+  endif
+-%}
+
+{% capture list_items %}
+  {% for child_block in block.blocks %}
+    <li id="Slide-{{ child_block.id }}-{{ forloop.index }}" class="grid__item editorial-item {% if show_mobile_slider or block.settings.layout_type == 'carousel' %} swiper-slide{% endif %}{% if block.settings.border_separator_items %} border-separator-item{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+      {% if settings.animations_reveal_on_scroll %} style="--animation-order: {{ forloop.index }};"{% endif %}
+    >
+      {% render child_block %}
+    </li>
+
+    {% unless forloop.last %}
+      <!--@list/split-->
+    {% endunless %}
+  {% endfor %}
+{% endcapture %}
+
+<div class="editorial-grid-layout{% if show_mobile_slider %} has-swiper-mobile{% endif %} w-full block">
+  {%- if show_mobile_slider -%}
+    <swiper-component
+      class="swiper-component-mobile" 
+      data-swiper-mobile
+      {%- render 'swiper-data',
+        settings: block.settings,
+        loop: false,
+        slides_per_view: mobile_columns,
+        space_between: block.settings.column_gap
+      -%}
+      style="
+        {% render 'swiper-style',
+          columns_mobile: mobile_columns,
+          columns_tablet: columns_tablet,
+          columns_desktop: columns_desktop,
+          columns_gap: block.settings.column_gap,
+        %}
+      "
+    >
+      <div class="swiper swiper-mobile"
+          style="
+            {% if block.settings.pagination_type == 'bullets' and block.settings.navigation == 'pagination' or block.settings.navigation == 'arrows-pagination' %}
+              --dots-top-offset: {{ block.settings.dots_top_offset }}px;
+            {% elsif block.settings.pagination_type == 'progressbar' and block.settings.navigation == 'pagination' or block.settings.navigation == 'arrows-pagination' %}
+              --progress-top-offset: {{ block.settings.progress_top_offset }}px;
+            {% endif %}"
+      >
+  {%- endif -%}
+  <ul
+    id="Grid-{{ block.id }}"
+    data-id="{{ block.id }}"
+    class="grid grid-layout list-unstyled editorial-list{% if show_mobile_slider %} swiper-wrapper md:grid{% endif %} lg:grid-layout--{{ columns_desktop }} md:grid-layout--{{ columns_tablet }} max-sm:grid-layout--{{ mobile_columns }}"
+    role="list"
+    aria-label="{{ 'content.grid.name' | t }}"
+    style="--grid-desktop-horizontal-spacing: {{ block.settings.column_gap }}px; --grid-desktop-vertical-spacing: {{ block.settings.vertical_gap }}px;"
+  >
+    {{- list_items -}}
+  </ul>
+  {%- if show_mobile_slider -%}
+    {%- if enable_navigation -%}
+      <div class="swiper-btns-wrap">
+        {%- render 'swiper-button' -%}
+      </div>
+    {%- endif -%}
+    {%- if enable_pagination -%}
+      <div class="swiper-pagination"></div>
+    {%- endif -%}
+    </div>
+    </swiper-component>
+  {%- endif -%}
+</div>
+
+{% schema %}
+  {
+    "name": "Editorial List",
+    "tag": null,
+    "blocks": [
+      {
+        "type": "_editorial_item"
+      }
+    ],
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:content.layout"
+      },
+      {
+        "type": "checkbox",
+        "id": "carousel_on_mobile",
+        "label": "t:settings.carousel_on_mobile",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "columns_grid",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "default": 2,
+        "label": "t:settings.columns"
+      },
+      {
+        "type": "select",
+        "id": "mobile_columns_grid",
+        "label": "t:settings.mobile_columns",
+        "options": [
+          {
+            "value": "1",
+            "label": "1"
+          },
+          {
+            "value": "2",
+            "label": "2"
+          }
+        ],
+        "default": "1"
+      },
+      {
+        "type": "range",
+        "id": "mobile_columns_carousel",
+        "label": "t:settings.mobile_columns",
+        "min": 1,
+        "max": 2,
+        "step": 0.1,
+        "default": 1,
+        "visible_if": "{{ block.settings.carousel_on_mobile }}"
+      },
+      {
+        "type": "range",
+        "id": "vertical_gap",
+        "label": "t:settings.vertical_gap",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 15
+      },
+      {
+        "type": "range",
+        "id": "column_gap",
+        "label": "t:settings.column_gap",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 15
+      }
+    ],
+    "presets": [
+      {
+        "name": "Editorial List"
+      }
+    ]
+  }
+{% endschema %}

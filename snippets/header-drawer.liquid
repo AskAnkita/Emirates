@@ -1,0 +1,195 @@
+{% comment %}
+  Renders a header drawer menu for mobile and desktop.
+
+  Usage:
+  {% render 'header-drawer' %}
+{% endcomment %}
+
+<link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+
+{%- liquid
+  assign listmenu = section.settings.menu.links
+  assign listmenu_size = listmenu.size
+  if localization.available_countries.size > 1 and section.settings.show_country or section.settings.show_language and localization.available_languages.size > 1
+    assign localization_forms = true
+  endif
+
+  assign class_link = 'menu-drawer__menu-item list-menu__item link link--text focus-inset'
+  assign class_item_animate = 'menu-drawer__item-animate'
+  assign class_link_active = 'menu-drawer__menu-item--active'
+-%}
+
+{%- capture icon_arrow -%}
+  <span class="svg-wrapper">
+    {{- 'icon-arrow.svg' | inline_asset_content -}}
+  </span>
+{%- endcapture -%}
+
+<side-drawer
+  class="drawer__container drawer drawer--menu fixed top-0 left-0 w-screen h-full z-9 flex no-js-hidden"
+  id="Drawer-Menu"
+  data-drawer-direction="left"
+>
+  <div id="Drawer-Overlay-Menu" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <header-drawer class="side-drawer" data-drawer-content data-breakpoint="tablet">
+    <div
+      class="drawer__inner d-flex flex-column h-full color-{{ color_scheme }}"
+      role="dialog"
+      aria-modal="true"
+      aria-label="{{ 'accessibility.menu' | t }}"
+      tabindex="-1"
+    >
+    <div class="drawer__header flex justify-between items-center relative" style="--p: var(--padding-xs) 0;">
+      <h2 class="drawer__heading break m-0 h5">{{ 'content.menu' | t }}</h2>
+      <button
+        class="drawer__close block t-button bor-none cursor-pointer"
+        type="button"
+        onclick="this.closest('side-drawer').close()"
+        aria-label="{{ 'accessibility.close_dialog' | t }}"
+      >
+        <span class="svg-wrapper">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    </div>
+      {% comment %} <div class="drawer__header flex justify-end items-center relative" style="--p: 0 0 1.5rem;">
+      </div> {% endcomment %}
+      <div class="drawer__wrapper menu-drawer relative h-full motion-reduce" style="--p: 1.5rem 0 0;">
+        <div class="menu-drawer__navigation-container cus-scrollbar">
+          <nav class="menu-drawer__navigation">
+            <ul class="menu-drawer__menu has-submenu list-menu" role="list">
+              {%- for link in listmenu -%}
+                <menu-drawer class="menu-drawer__list-item" style="--menu-drawer-animation-index: {{ forloop.index }};">
+                  {%- if link.links != blank -%}
+                    <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">
+                      <summary
+                        id="HeaderDrawer-{{ link.handle }}"
+                        class="{{ class_link }}{% if link.child_active %} {{ class_link_active }}{% endif %} {{ class_item_animate }}"
+                      >
+                        {{ link.title | escape }}
+                        {{- icon_arrow -}}
+                      </summary>
+                      <div
+                        id="link-{{ link.handle | escape }}"
+                        class="menu-drawer__submenu has-submenu motion-reduce"
+                        tabindex="-1"
+                      >
+                        <div class="menu-drawer__inner-submenu">
+                          <button class="menu-drawer__close-button link link--text focus-inset" aria-expanded="true">
+                            {{- icon_arrow -}}
+                            {{ link.title | escape }}
+                          </button>
+                          <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
+                            <li>
+                              <a
+                                id="Goto-HeaderDrawer-{{ link.handle }}"
+                                href="{{ link.url }}"
+                                class="{{ class_link }} link--go-to"
+                                {% if childlink.current %}
+                                  aria-current="page"
+                                {% endif %}
+                              >
+                                {{ 'content.go_to' | t: name: link.title | escape }}
+                              </a>
+                            </li>
+                            {%- for childlink in link.links -%}
+                              <li>
+                                {%- if childlink.links == blank -%}
+                                  <a
+                                    id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
+                                    href="{{ childlink.url }}"
+                                    class="{{ class_link }}{% if childlink.current %} {{ class_link_active }}{% endif %}"
+                                    {% if childlink.current %}
+                                      aria-current="page"
+                                    {% endif %}
+                                  >
+                                    {{ childlink.title | escape }}
+                                  </a>
+                                {%- else -%}
+                                  <details id="Details-menu-drawer-{{ link.handle }}-{{ childlink.handle }}">
+                                    <summary
+                                      id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
+                                      class="{{ class_link }}"
+                                    >
+                                      {{ childlink.title | escape }}
+                                      {{- icon_arrow -}}
+                                    </summary>
+                                    <div
+                                      id="childlink-{{ childlink.handle | escape }}"
+                                      class="menu-drawer__submenu has-submenu motion-reduce"
+                                    >
+                                      <button
+                                        class="menu-drawer__close-button link link--text focus-inset"
+                                        aria-expanded="true"
+                                      >
+                                        {{- icon_arrow -}}
+                                        {{ childlink.title | escape }}
+                                      </button>
+                                      <ul
+                                        class="menu-drawer__menu list-menu"
+                                        role="list"
+                                        tabindex="-1"
+                                      >
+                                        <li>
+                                          <a
+                                            id="Goto-HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}"
+                                            href="{{ childlink.url }}"
+                                            class="{{ class_link }} link--go-to"
+                                            {% if grandchildlink.current %}
+                                              aria-current="page"
+                                            {% endif %}
+                                          >
+                                            {{ 'content.go_to' | t: name: childlink.title | escape }}
+                                          </a>
+                                        </li>
+                                        {%- for grandchildlink in childlink.links -%}
+                                          <li>
+                                            <a
+                                              id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                                              href="{{ grandchildlink.url }}"
+                                              class="{{ class_link }}{% if grandchildlink.current %} {{ class_link_active }}{% endif %}"
+                                              {% if grandchildlink.current %}
+                                                aria-current="page"
+                                              {% endif %}
+                                            >
+                                              {{ grandchildlink.title | escape }}
+                                            </a>
+                                          </li>
+                                        {%- endfor -%}
+                                      </ul>
+                                    </div>
+                                  </details>
+                                {%- endif -%}
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        </div>
+                      </div>
+                    </details>
+                  {%- else -%}
+                    <a
+                      id="HeaderDrawer-{{ link.handle }}"
+                      href="{{ link.url }}"
+                      class="{{ class_link }}{% if link.current %} {{ class_link_active }}{% endif %} {{ class_item_animate }}"
+                      {% if link.current %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      {{ link.title | escape }}
+                    </a>
+                  {%- endif -%}
+                </menu-drawer>
+              {%- endfor -%}
+            </ul>
+          </nav>
+          {%- render 'menu-drawer-utility',
+            sec_settings: section.settings,
+            listmenu_size: listmenu_size,
+            class_animated: class_item_animate,
+            section_id: section_id
+          -%}
+        </div>
+      </div>
+    </div>
+  </header-drawer>
+</side-drawer>

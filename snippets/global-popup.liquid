@@ -1,0 +1,29 @@
+<side-drawer
+  class="popup__content drawer fixed top-0 left-0 z-9 w-screen h-full flex justify-center no-js-hidden"
+  element-s-popup
+  id="PopupModal-{{ section.id }}"
+>
+  <div id="Drawer-Overlay-{{ section.id }}" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <div class="popup__inner color-{{ settings.popover_color_scheme }} w-auto h-full absolute-c-c flex flex-column global-settings-popup" style="--min-w-md: 50vw; --max-w: 90vw;">
+    <div class="popup__inner--content relative w-full h-full overflow-auto cus-scrollbar">
+      <div
+        class="drawer__header flex justify-between items-center relative"
+        style="--gap-x: 1rem;--p: var(--padding-xs) 0;"
+      >
+        <h2 class="drawer__heading break m-0 h5">
+          <span class="tab-title-text"></span>
+        </h2>
+        <button
+          onclick="this.closest('side-drawer').close()"
+          class="button button-unstyled close-button popup__close minimum-touch-target-before drawer__close block t-button bor-none rounded-full cursor-pointer absolute"
+          type="button"
+          aria-label="{{ 'accessibility.close_dialog' | t }}"
+          style="--top: 0.3rem; --right: 0.3rem;"
+        >
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </button>
+      </div>
+      <div class="popup-content-wrapper"></div>
+    </div>
+  </div>
+</side-drawer>

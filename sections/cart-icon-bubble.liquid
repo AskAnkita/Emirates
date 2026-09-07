@@ -1,0 +1,15 @@
+<span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
+
+<span class="visually-hidden">{{ 'accessibility.cart' | t }}</span>
+{%- if cart != empty -%}
+  <div class="cart-count-bubble">
+    <span aria-hidden="true" data-cart-count>
+      {%- if cart.item_count < 100 -%}
+        {{ cart.item_count }}
+      {%- else -%}
+        {{ 'content.cart_count_max.more' | t }}
+      {%- endif -%}
+    </span>
+    <span class="visually-hidden" data-cart-text>{{ 'content.cart_count' | t: count: cart.item_count }}</span>
+  </div>
+{%- endif -%}

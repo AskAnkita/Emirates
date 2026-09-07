@@ -1,0 +1,90 @@
+<div class="article-editorial-block spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}"
+>
+  <div class="article-editorial__content">
+    <div class="article-editorial__content-top">
+      <div class="article-editorial__content-left">
+        {% content_for 'block', id: 'heading', type: 'text' %}
+        {% content_for 'block', id: 'button', type: 'button' %}
+      </div>
+      <div class="article-editorial__image-container">
+        <a {% if article.url != blank %}href="{{ article.url }}"{% else %}role="link" aria-disabled="true"{% endif %}>
+          {% content_for 'block', id: 'image', type: '_blog-post-image', image: article.image %}
+        </a>
+      </div>
+      <div class="article-editorial__title-container">
+        {% content_for 'block', id: 'title', type: '_card-article-title-flex', article: article %}
+      </div>
+    </div>
+    {% content_for 'block', id: 'description', type: '_card-article-description-flex', article: article %}
+  </div>
+  <div class="blog-post-block__content">
+    {% content_for 'blocks', closest.article: article %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.article_editorial",
+  "blocks": [
+    { "type": "@app" },
+    { "type": "group" },
+    { "type": "_card-article-title-flex" },
+    { "type": "_card-article-details-flex" },
+    { "type": "_card-article-description-flex" },
+    { "type": "_card-article-button-flex" },
+    { "type": "_card-article-group-infor" }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.article_editorial"
+    }
+  ]
+}
+{% endschema %}

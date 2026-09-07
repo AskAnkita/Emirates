@@ -1,0 +1,186 @@
+{%- doc -%}
+  Renders block content for all blocks that extend the group block.
+
+  @param {string} children - The DOM content of the group block.
+  @param {object} settings - The settings of the group block.
+  @param {string} shopify_attributes - String with Shopify attributes for the editor.
+  @param {string} [class] - Custom classes for the group block.
+  @param {string} [style] - Custom inline styles for the group block.
+  @param {string} [image_ratio] - The image ratio of the group block.
+  @param {string} [background_image] - The background image of the group block.
+  @param {string} [background_media] - The background media of the group block.
+  @param {string} [video] - The video of the group block.
+  @param {string} [video_position] - The video position of the group block.
+  @param {string} [background_image_position] - The background image position of the group block.
+  @param {string} [placeholder] - The placeholder of the group block.
+  @param {string} [enable_parallax] - The enable parallax of the group block.
+  @param {string} [parallax_speed] - The parallax speed of the group block.
+  @param {string} [horizontal_position] - The horizontal position of the group block.
+  @param {string} [vertical_position] - The vertical position of the group block.
+  @param {string} [link] - The link of the group block.
+  @param {string} [open_in_new_tab] - The open in new tab of the group block.
+  @param {string} [border] - The border of the group block.
+  @param {string} [border_width] - The border width of the group block.
+  @param {string} [border_opacity] - The border opacity of the group block.
+  @param {string} [border_radius] - The border radius of the group block.
+  @param {string} [content_overlay] - The content overlay of the group block.
+  @param {string} [content_match_height] - The content match height of the group block.
+  @param {string} [inherit_color_scheme] - The inherit color scheme of the group block.
+  @param {string} [color_scheme] - The color scheme of the group block.
+  @param {string} [height] - The height of the group block.
+  @param {string} [width] - The width of the group block.
+  @param {string} [content_direction] - The content direction of the group block.
+  @param {string} [content_direction_tablet] - The content direction tablet of the group block.
+  @param {string} [content_direction_mobile] - The content direction mobile of the group block.
+  @param {string} [disable_parallax_mobile] - The disable parallax mobile of the group block.
+  @param {string} [toggle_overlay] - The toggle overlay of the group block.
+
+  @example
+  {% render 'group', children: children, settings: block.settings, shopify_attributes: block.shopify_attributes %}
+{%- enddoc -%}
+
+{%- liquid
+  assign ratio = 1
+  assign image_ratio = image_ratio | default: settings.image_ratio
+  assign background_image = background_image | default: settings.background_image
+  assign background_media = background_media | default: settings.background_media
+  assign video = video | default: settings.video
+  assign video_position = video_position | default: settings.video_position
+  assign background_image_position = background_image_position | default: settings.background_image_position
+  assign placeholder = placeholder | default: settings.placeholder
+  assign enable_parallax = enable_parallax | default: settings.enable_parallax
+  assign parallax_speed = parallax_speed | default: settings.parallax_speed
+  assign horizontal_position = horizontal_position | default: settings.horizontal_position
+  assign vertical_position = vertical_position | default: settings.vertical_position
+  assign link = link | default: settings.link
+  assign open_in_new_tab = open_in_new_tab | default: settings.open_in_new_tab
+  assign border = border | default: settings.border
+  assign border_width = border_width | default: settings.border_width
+  assign border_opacity = border_opacity | default: settings.border_opacity
+  assign border_radius = border_radius | default: settings.border_radius
+  assign content_overlay = content_overlay | default: settings.content_overlay
+  assign content_match_height = content_match_height | default: settings.content_match_height
+  assign inherit_color_scheme = inherit_color_scheme | default: settings.inherit_color_scheme
+  assign color_scheme = color_scheme | default: settings.color_scheme
+  assign height = height | default: settings.height
+  assign width = width | default: settings.width
+  assign content_direction = content_direction | default: settings.content_direction
+  assign content_direction_tablet = content_direction_tablet | default: settings.content_direction_tablet
+  assign content_direction_mobile = content_direction_mobile | default: settings.content_direction_mobile
+  assign disable_parallax_mobile = disable_parallax_mobile | default: settings.disable_parallax_mobile
+  assign toggle_overlay = toggle_overlay | default: settings.toggle_overlay
+
+  case image_ratio
+    when 'landscape'
+      assign ratio = '16 / 9'
+    when 'portrait'
+      assign ratio = '4 / 5'
+    when 'adapt'
+      if background_image != blank
+        assign ratio = background_image.aspect_ratio
+        else
+        assign ratio = video.aspect_ratio
+      endif
+  endcase
+
+  if ratio == 0 or ratio == null
+    assign ratio = 1
+  endif
+
+  assign element = 'div'
+  if enable_parallax == 'parallax_items'
+    assign element = 'parallax-element'
+    assign class_content = ' parallax--target'
+  endif
+-%}
+
+{% capture attributes %}
+  {{ shopify_attributes }}
+  {% if enable_parallax == 'parallax_items' %}
+    is="content"
+    data-parallax="true"
+    data-speed="{{ parallax_speed }}"
+    data-horizontal-position="{{ horizontal_position }}% {{ horizontal_position }}%"
+    data-vertical-position="{{ vertical_position }}% {{ vertical_position }}%"
+  {% endif %}
+{% endcapture %}
+
+{%- capture group_block_class -%}
+  group-block relative
+  group-block--height-{{ height }}
+  group-block--width-{{ width }}
+  {% if settings.hide_on_tablet %}max-md:hidden{% endif %}
+  {% if settings.hide_on_mobile %}max-sm:hidden{% endif %}
+  {% if border != 'none' %}border-style{% endif %}
+  spacing-style
+  size-style
+  shadow-style
+  {% if content_overlay %}group-block--content-overlay {% if content_match_height %}group-block--content-match-height{% endif %}{% endif %}
+  {% if inherit_color_scheme == false %}color-{{ color_scheme }} color-scheme-custom{% endif %}
+  {{ class }}
+{%- endcapture -%}
+
+<{{ element }}
+  class="{{ group_block_class | strip | strip_newlines }}"
+  style="
+    {% if border != 'none' %}
+      {% render 'border-override', settings: settings %}
+    {% endif %}
+    {% render 'spacing-style', settings: settings %}
+    {% render 'size-style', settings: settings %}
+    {% render 'shadow-style', settings: settings %}
+    {% if inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: settings %}
+    {% endif %}
+    {{ style }}
+  "
+  {{ attributes }}
+  data-testid="group-block"
+  {% if enable_parallax == 'parallax_items' and disable_parallax_mobile %}
+    data-disable-parallax-mobile="true"
+  {% endif %}
+>
+  {%- if link != blank -%}
+    <a
+      href="{{ link }}"
+      class="group-block__link"
+      aria-label="Group Block Link"
+      {% if open_in_new_tab %}
+        target="_blank" rel="noopener"
+      {% endif %}
+    ></a>
+  {%- endif -%}
+
+  <div class="group-block__media-wrapper{% if background_image == blank %} media--empty{% endif %}{% if background_media == 'none' %} none{% endif %}">
+    {% render 'background-media',
+      background_media: background_media,
+      background_video: video,
+      background_video_position: video_position,
+      background_image: background_image,
+      background_image_position: background_image_position,
+      placeholder: placeholder,
+      ratio: ratio,
+      enable_parallax: enable_parallax,
+    %}
+  </div>
+  {% if toggle_overlay %}
+    {% render 'overlay', settings: settings, layer: '0' %}
+  {% endif %}
+
+  <div
+    class="
+      group-block-content relative
+      {%- if request.design_mode %} group-block-content--design-mode{% endif %}
+      layout-panel-flex
+      layout-panel-flex--{{ content_direction | default: 'column' }}
+      {% if content_direction_tablet %}
+        tablet-layout-panel-flex--{{ content_direction_tablet | default: 'column' }}
+      {% endif %}
+      mobile-{{ content_direction_mobile | default: 'column' }}
+      {{ class_content }}
+    "
+    style="{%- render 'layout-panel-style', settings: settings, scale_min: 0 -%}"
+  >
+    {{- children -}}
+  </div>
+</{{ element }}>

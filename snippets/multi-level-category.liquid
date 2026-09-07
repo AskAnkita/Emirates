@@ -1,0 +1,360 @@
+<div class="multi-category_wrapper z-3 center">
+  <div class="multi-category">
+    <nav id="navPages" style="display: none;">
+      {%- assign category_filter = settings.category_filter -%}
+      {% if linklists[category_filter].links.size > 0 %}
+        <ul>
+          {% for link in linklists[category_filter].links %}
+            <li
+              {% if link.active %}
+                class="active"
+              {% endif %}
+            >
+              <a href="{{ link.url}}" title=" {{ link.title }}">
+                {{ link.title }}
+              </a>
+              {% if linklists[link.handle] != empty %}
+                {% assign link_child = link.handle %}
+                <ul>
+                  {% for link_child_item in linklists[link_child].links %}
+                    <li
+                      {% if link_child_item.current %}
+                        class="active"
+                      {% endif %}
+                    >
+                      <a href="{{ link_child_item.url }}" data-value="{{ link_child_item.title | handle }}">
+                        {{ link_child_item.title }}
+                      </a>
+
+                      {% if linklists[link_child_item.handle] != empty %}
+                        {% assign link_child = link_child_item.handle %}
+                        <ul>
+                          {% for link_child_2 in linklists[link_child].links %}
+                            <li
+                              {% if link_child_2.current %}
+                                class="active"
+                              {% endif %}
+                            >
+                              <a href="{{ link_child_2.url }}" data-value="{{ link_child_2.title | handle }}">
+                                {{ link_child_2.title }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </nav>
+    <div class="multi-category_filter">
+      <div class="form-wrapper flex-center flex-nowrap">
+        <div class="form-field inline-block relative left w-full">
+          <label class="form-label block m-0 p-0">{{ settings.category_filter_label1 }}</label>
+          <span class="da-force-up form-select whitespace-nowrap overflow-hidden relative capitalize block cursor-pointer form-control">
+            {{ settings.category_filter_label1 }}
+          </span>
+          <div class="dropdown-up none absolute w-auto min-w-full overflow-hidden" id="multi-category_select-level-1">
+            <ul class="list-unstyled overflow-x-h">
+              <li class="hide1" onclick="changeOptionAll(1)">{{ settings.category_filter_label1 }}</li>
+            </ul>
+          </div>
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fal"
+            data-icon="angle-down"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 256 512"
+            class="svg-inline--fa fa-angle-down fa-w-8 fa-7x"
+          >
+            <path fill="currentColor" d="M119.5 326.9L3.5 209.1c-4.7-4.7-4.7-12.3 0-17l7.1-7.1c4.7-4.7 12.3-4.7 17 0L128 287.3l100.4-102.2c4.7-4.7 12.3-4.7 17 0l7.1 7.1c4.7 4.7 4.7 12.3 0 17L136.5 327c-4.7 4.6-12.3 4.6-17-.1z" class=""></path>
+          </svg>
+        </div>
+        <div class="form-field inline-block relative left w-full">
+          <label class="form-label block m-0 p-0">{{ settings.category_filter_label2 }}</label>
+          <span class="da-force-up form-select whitespace-nowrap overflow-hidden relative capitalize block cursor-pointer form-control">
+            {{ settings.category_filter_label2 }}
+          </span>
+          <div class="dropdown-up none absolute w-auto min-w-full overflow-hidden" id="multi-category_select-level-2">
+            <ul class="list-unstyled overflow-x-h">
+              <li class="hide1" onclick="changeOptionAll(2)">{{ settings.category_filter_label2 }}</li>
+            </ul>
+          </div>
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fal"
+            data-icon="angle-down"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 256 512"
+            class="svg-inline--fa fa-angle-down fa-w-8 fa-7x"
+          >
+            <path fill="currentColor" d="M119.5 326.9L3.5 209.1c-4.7-4.7-4.7-12.3 0-17l7.1-7.1c4.7-4.7 12.3-4.7 17 0L128 287.3l100.4-102.2c4.7-4.7 12.3-4.7 17 0l7.1 7.1c4.7 4.7 4.7 12.3 0 17L136.5 327c-4.7 4.6-12.3 4.6-17-.1z" class=""></path>
+          </svg>
+        </div>
+        <div class="form-field inline-block relative left w-full form-field-last">
+          <label class="form-label block m-0 p-0">{{ settings.category_filter_label3 }}</label>
+          <span class="da-force-up form-select whitespace-nowrap overflow-hidden relative capitalize block cursor-pointer form-control">
+            {{ settings.category_filter_label3 }}
+          </span>
+          <div class="dropdown-up none absolute w-auto min-w-full overflow-hidden" id="multi-category_select-level-3">
+            <ul class="list-unstyled overflow-x-h">
+              <li class="hide1" onclick="changeOptionAll(3)">{{ settings.category_filter_label3 }}</li>
+            </ul>
+          </div>
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fal"
+            data-icon="angle-down"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 256 512"
+            class="svg-inline--fa fa-angle-down fa-w-8 fa-7x"
+          >
+            <path fill="currentColor" d="M119.5 326.9L3.5 209.1c-4.7-4.7-4.7-12.3 0-17l7.1-7.1c4.7-4.7 12.3-4.7 17 0L128 287.3l100.4-102.2c4.7-4.7 12.3-4.7 17 0l7.1 7.1c4.7 4.7 4.7 12.3 0 17L136.5 327c-4.7 4.6-12.3 4.6-17-.1z" class=""></path>
+          </svg>
+        </div>
+        <div class="group-button flex justify-center">
+          <a class="button button-unstyled" href="javascript:void(0)" id="multi-category_select-browse">
+            {{- settings.category_filter_button -}}
+          </a>
+          <a class="button button-unstyled" href="javascript:void(0)" id="multi-category_clear-select">
+            <span class="svg-wrapper">
+              <svg id="icon-refresh" class="icon icon--big" viewBox="0 0 16 16">
+                <path d="M2.083,9H0.062H0v5l1.481-1.361C2.932,14.673,5.311,16,8,16c4.08,0,7.446-3.054,7.938-7h-2.021 c-0.476,2.838-2.944,5-5.917,5c-2.106,0-3.96-1.086-5.03-2.729L5.441,9H2.083z"></path>
+                <path d="M8,0C3.92,0,0.554,3.054,0.062,7h2.021C2.559,4.162,5.027,2,8,2c2.169,0,4.07,1.151,5.124,2.876 L11,7h2h0.917h2.021H16V2l-1.432,1.432C13.123,1.357,10.72,0,8,0z"></path>
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="loading" style="display: none;">
+        {%- render 'loading-spinner' -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% javascript %}
+  var first = true;
+
+  function getCategories(root) {
+    var result = [];
+    var lis = root.querySelectorAll(':scope > li');
+    lis.forEach(function (li) {
+      var link = li.querySelector(':scope > a');
+      var childrenUl = li.querySelector(':scope > ul');
+      var node = {
+        link: link ? link.getAttribute('href') : '',
+        title: link ? link.innerHTML : '',
+        children: childrenUl ? getCategories(childrenUl) : [],
+      };
+      result.push(node);
+    });
+    return result;
+  }
+
+  function setActive() {
+    var result = [];
+    var curLi = document.querySelector('nav#navPages > ul .active');
+    if (!curLi || curLi.parentElement == null) return false;
+    var index = Array.from(curLi.parentElement.children).indexOf(curLi);
+    if (index === -1) return false;
+    result.push(index);
+
+    curLi = curLi.parentElement.parentElement;
+    if (curLi && curLi.id !== 'navPages') {
+      index = Array.from(curLi.parentElement.children).indexOf(curLi);
+      result.push(index);
+      curLi = curLi.parentElement.parentElement;
+      if (curLi && curLi.id !== 'navPages') {
+        index = Array.from(curLi.parentElement.children).indexOf(curLi);
+        result.push(index);
+      }
+    }
+    return result;
+  }
+
+  function buildSelect(level, level_List) {
+    for (var i = level; i <= 4; i++) {
+      var ul = document.querySelector('#multi-category_select-level-' + i + ' ul');
+      if (ul) {
+        ul.querySelectorAll('li[data-value]').forEach((li) => li.remove());
+      }
+    }
+    var container = document.querySelector('#multi-category_select-level-' + level + ' ul');
+    if (!container) return;
+    for (var i = 0; i < level_List.length; i++) {
+      var li = document.createElement('li');
+      li.setAttribute('data-value', i);
+      li.textContent = level_List[i].title.trim();
+      li.addEventListener(
+        'click',
+        (function (lvl, idx) {
+          return function () {
+            changeOption(lvl, idx);
+          };
+        })(level, i)
+      );
+      container.appendChild(li);
+    }
+  }
+
+  function changeOptionAll(level) {
+    var ul = document.querySelector('#multi-category_select-level-' + level + ' ul');
+    if (!ul) return;
+    ul.querySelectorAll('li').forEach((li) => li.classList.remove('active'));
+    var select_option = ul.querySelector('li:nth-child(1)').innerHTML;
+    var label = document.querySelector('#multi-category_select-level-' + level).previousElementSibling;
+    label.innerHTML = select_option;
+  }
+
+  function changeOption(level, num) {
+    if (num != null) {
+      var redirect = false;
+      var selector = '#multi-category_select-level-' + level + ' ul li[data-value="' + num + '"]';
+      var activeLi = document.querySelector(selector);
+      if (activeLi && !activeLi.classList.contains('active')) {
+        redirect = true;
+      }
+      var ul = document.querySelector('#multi-category_select-level-' + level + ' ul');
+      ul.querySelectorAll('li').forEach((li) => li.classList.remove('active'));
+      ul.querySelectorAll('li').forEach(function (li) {
+        if (li.getAttribute('data-value') == num) {
+          li.classList.add('active');
+          document.querySelector('#multi-category_select-level-' + level).previousElementSibling.textContent =
+            li.textContent;
+        }
+      });
+
+      resetDrop(level);
+
+      var level_List = list;
+      for (var i = 1; i <= level; i++) {
+        var active = document.querySelector('#multi-category_select-level-' + i + ' ul .active');
+        if (active) {
+          var index = parseInt(active.getAttribute('data-value'));
+          if (level_List[index] !== undefined) {
+            level_List = level_List[index].children;
+          }
+        }
+      }
+
+      if (level == 3 && redirect == true) {
+        document.querySelector('#multi-category_select-browse').click();
+      }
+
+      level = parseInt(level) + 1;
+      buildSelect(level, level_List);
+
+      if (level_List.length && first == false) {
+        var loading = document.querySelector('.multi-category_filter .loading');
+        loading.style.display = 'block';
+        setTimeout(function () {
+          document.querySelector('#multi-category_select-level-' + level).classList.add('open');
+          loading.style.display = 'none';
+        }, 300);
+      }
+    }
+  }
+
+  function resetDrop(num) {
+    for (var i = num + 1; i <= list.length; i++) {
+      var ul = document.querySelector('#multi-category_select-level-' + i + ' ul');
+      if (!ul) continue;
+      var select_option = ul.querySelector('li:nth-child(1)') ? ul.querySelector('li:nth-child(1)').innerHTML : '';
+      var label = document.querySelector('#multi-category_select-level-' + i).previousElementSibling;
+      label.innerHTML = select_option;
+      ul.innerHTML = '<li onclick="changeOptionAll(' + i + ')">' + select_option + '</li>';
+    }
+  }
+
+  var list = getCategories(document.querySelector('nav#navPages > ul'));
+
+  function MultiCategory() {
+    if (!document.querySelector('.multi-category')) {
+      return;
+    }
+
+    buildSelect(1, list);
+
+    var level = 1;
+    document.cookie = 'multiLevelCategory=; path=/;';
+
+    var cookie = document.cookie.split('; ').find((row) => row.startsWith('multiLevelCategory='));
+    if (cookie && cookie.split('=')[1] != '') {
+      var active = cookie.split('=')[1].split(',');
+      for (var i = 0; i < active.length; i++) {
+        changeOption(level, active[i]);
+        level++;
+      }
+      document.querySelector('.multi-category_filter .loading').style.display = 'none';
+      document.querySelectorAll('.dropdown-up').forEach((el) => el.classList.remove('open'));
+    }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('da-force-up')) {
+        var dropdown = e.target.parentElement.querySelector('.dropdown-up');
+        var isOpen = dropdown.classList.contains('open');
+        document.querySelectorAll('.dropdown-up').forEach((el) => el.classList.remove('open'));
+        if (!isOpen) dropdown.classList.add('open');
+      }
+    });
+
+    window.addEventListener('click', function (e) {
+      var container = document.querySelectorAll('.da-force-up');
+      container.forEach(function (el) {
+        if (el !== e.target && !el.contains(e.target)) {
+          var dropdown = el.nextElementSibling;
+          if (dropdown && dropdown.classList.contains('dropdown-up')) {
+            dropdown.classList.remove('open');
+          }
+        }
+      });
+    });
+
+    document.querySelector('#multi-category_select-browse').addEventListener('click', function () {
+      var level_List = list;
+      var index = 0,
+        url = '';
+      var menu = [];
+      for (var i = 1; i <= 3; i++) {
+        var active = document.querySelector('#multi-category_select-level-' + i + ' ul .active');
+        if (active) {
+          index = parseInt(active.getAttribute('data-value'));
+          if (!isNaN(index)) {
+            menu.push(index);
+            url = level_List[index].link;
+            if (level_List[index].children.length) {
+              level_List = level_List[index].children;
+            }
+          }
+        }
+      }
+      document.cookie = 'multiLevelCategory=' + menu.join(',') + '; path=/; max-age=' + 60 * 60 * 24;
+      location.href = url;
+    });
+
+    document.querySelector('#multi-category_clear-select').addEventListener('click', function () {
+      resetDrop(1);
+      var ul = document.querySelector('#multi-category_select-level-1 ul');
+      var select_option = ul.querySelector('li:nth-child(1)').innerHTML;
+      document.querySelector('#multi-category_select-level-1').previousElementSibling.innerHTML = select_option;
+      ul.querySelectorAll('li').forEach((li) => li.classList.remove('active'));
+    });
+
+    first = false;
+  }
+
+  window.addEventListener('load', () => {
+    MultiCategory();
+  });
+{% endjavascript %}

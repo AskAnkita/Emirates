@@ -1,0 +1,71 @@
+{%- comment -%}
+  Renders the language picker for the localization form
+
+  Accepts:
+    - localPosition: pass in the position in which the form is coming up to create specific IDs
+{%- endcomment -%}
+
+{%- liquid
+  assign localization_font = '--menu-localization-font: var(--font-[localization_font]--family); ' | replace: '[localization_font]', section.settings.localization_font
+  assign localization_font_size = '--menu-localization-font-size: [localization_font_size]; ' | replace: '[localization_font_size]', section.settings.localization_font_size
+  assign color_shadow = '--color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));'
+  assign form_style = localization_font | append: localization_font_size | append: color_shadow
+-%}
+
+<div class="disclosure" style="{{ form_style }}">
+  <button
+    type="button"
+    class="disclosure__button localization-form__select localization-selector link link--text caption-large"
+    aria-expanded="false"
+    aria-controls="{{ localPosition }}List"
+    aria-describedby="{{ localPosition }}Label"
+  >
+    {% comment %} <span class="icon-flag icon-flag--{{ localization.language.iso_code }}"></span> {% endcomment %}
+    {% if country_style == true %}
+      <span class="icon-flag icon-flag--{{ localization.language.iso_code }}"></span>
+    {% endif %}
+    <span>{{ localization.language.endonym_name | capitalize }}</span>
+    {% comment %} {{ 'icon-caret.svg' | inline_asset_content }} {% endcomment %}
+  </button>
+  <div class="selector__dropdown" element-s-up>
+    <div id="Selector-Overlay" class="slide__overlay--mb"></div>
+    <div
+      class="slide__inner--mb disclosure__list-wrapper disclosure-selector"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="LanguageLocalization"
+      aria-label="Language Localization"
+      tabindex="-1"
+    >
+      <div class="language-filler flex items-center justify-end p-0">
+        <button class="selector__close-button button--small link" type="button" onclick="this.closest('localization-form').hidePanel()" aria-label="{{ 'accessibility.close' | t }}">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </button>
+      </div>
+      <ul id="{{ localPosition }}List" role="list" class="disclosure__list language-selector__list list-unstyled cus-scrollbar" style="{{ localization_font }} {{ localization_font_size }}">
+        {%- for language in localization.available_languages -%}
+          <li class="disclosure__item" tabindex="-1">
+            <a
+              class="disclosure__link caption-large focus-inset"
+              href="#"
+              hreflang="{{ language.iso_code }}"
+              lang="{{ language.iso_code }}"
+              {% if language.iso_code == localization.language.iso_code %}
+                aria-current="true"
+              {% endif %}
+              data-value="{{ language.iso_code }}"
+            >
+              {% if country_style == true %}
+                <span class="icon-flag icon-flag--{{ language.iso_code }}"></span>
+              {% endif %}
+              <span>
+                {{ language.endonym_name | capitalize }}
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+</div>
+<input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}">

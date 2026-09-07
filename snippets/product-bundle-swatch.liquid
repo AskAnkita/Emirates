@@ -1,0 +1,62 @@
+{%- liquid
+    assign product_swatch_option = settings.swatch | downcase
+-%}
+<variant-selects
+    {{ block.shopify_attributes }}
+    id="variant-selects-{{ block.id }}"
+    class="variant-selects spacing-style variant-selects--{{ bl_stts.alignment }}"
+    style="{% render 'spacing-style', settings: bl_stts %}"
+    data-section="{{ block.id }}"
+    data-section-id="{{ block.id }}"
+    data-product-id="{{ product.id }}"
+    data-block-id="{{ block.id }}"
+    data-product-url="{{ product.url }}"
+    ref="mainVariantSelects"
+    {% if product.id == product.id %}
+      data-template-product-match="true"
+    {% endif %}
+    {{ block.shopify_attributes }}
+    {% if request.visual_preview_mode %}
+      data-shopify-visual-preview
+    {% endif %}
+  >
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign product_swatch_option = settings.swatch | downcase
+        assign option_name = option.name | downcase
+        assign is_color = false
+        if product_swatch_option contains option_name
+          assign is_color = true
+        endif
+
+        if is_color
+          if bl_stts.variant_style == 'dropdowns'
+            assign variant_style = 'dropdowns'
+          else
+            assign variant_style = 'swatch'
+          endif
+        endif
+      -%}
+      <fieldset class="js product-form__input variant-option variant-option--buttons{% if is_color %} product-form__input--swatch variant-option--swatches{% else %} product-form__input--pill variant-option--pill{% endif %}" data-option-idx="{{ forloop.index0 }}">
+        <legend class="form__label">
+          {{ option.name }}:
+          <span data-selected-value>
+            {{- option.selected_value -}}
+          </span>
+        </legend>
+        {% render 'product-variant-options',
+          product: product,
+          option: option,
+          block: block,
+          variant_style: variant_style,
+          swatch_type: settings.swatch_type,
+          swatch_size: 40,
+          is_color: is_color,
+          index: forloop.index0,
+          section_name: '-bundle'
+        %}
+      </fieldset>
+    {%- endfor -%}
+
+    <script type="application/json" data-selected-variant>{{ product.selected_or_first_available_variant | json }}</script>
+  </variant-selects>

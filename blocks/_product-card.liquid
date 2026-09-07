@@ -1,0 +1,295 @@
+{% doc %}
+  Renders a product card
+
+  Accepts:
+  - card_product: {Object} Product Liquid object (optional)
+  - media_aspect_ratio: {String} Size of the product image card. Values are "square" and "portrait". Default is "square" (optional)
+  - image_shape: {String} Image mask to apply to the product image card. Values are "arch", "blob", "chevronleft", "chevronright", "diamond", "parallelogram", and "round". (optional)
+  - show_secondary_image: {Boolean} Show the secondary image on hover. Default: false (optional)
+  - show_vendor: {Boolean} Show the product vendor. Default: false
+  - show_rating: {Boolean} Show the product rating. Default: false
+  - extend_height: {Boolean} Card height extends to available container space. Default: true (optional)
+  - lazy_load: {Boolean} Image should be lazy loaded. Default: true (optional)
+  - skip_styles: {Boolean} Don't include component styles. Useful when rendering multiple product cards in a loop. Default: false (optional)
+  - quick_add: {Boolean} Show the quick add button.
+  - section_id: {String} The ID of the section that contains this card.
+  - horizontal_class: {Boolean} Add a card--horizontal class if set to true. Default: false (optional)
+  - horizontal_quick_add: {Boolean} Changes the quick add button styles when set to true. Default: false (optional)
+  - placeholder_image: {String} The placeholder image to use when no product exists. Default: 'product-apparel-2' (optional)
+
+  Usage:
+  {% render 'card-product', show_vendor: section.settings.show_vendor %}
+{% enddoc %}
+
+{%- liquid
+  assign bl_stts = block.settings
+  assign product = closest.product
+  assign show_badges = bl_stts.show_badges
+-%}
+
+{%- capture product_card_class -%}
+  card
+  card--quickadd-type-{{ settings.quick_add_type }}
+  {% if product.featured_media %} card--media{% else %} card--text{% endif %}
+  {% if horizontal_class %} card--horizontal{% endif %}
+  flex-{{ bl_stts.content_direction }}
+  flex-{{ bl_stts.wrap }}
+  items-{{ bl_stts.align_items}}
+  justify-{{ bl_stts.justify_content }}
+  gap-style
+  spacing-style
+  border-style
+{%- endcapture -%}
+
+<div 
+  class="card--block card-wrapper product-card-wrapper" 
+  data-product-handle="{{ product.handle }}"
+>
+  <div
+    class="{{ product_card_class | strip | strip_newlines }}{% if bl_stts.inherit_color_scheme == false %} color-scheme-custom{% endif %}"
+    style="
+      {%- render 'gap-style', value: bl_stts.gap -%}
+      --total-blocks: {{ block.blocks.size | plus: 2 }};
+      {%- if bl_stts.inherit_color_scheme == false -%}
+        {%- render 'color-scheme-style', settings: bl_stts -%}
+      {%- endif -%}
+    "
+  >
+    <template>
+      <div
+        data-json-product='{"id": {{product.id}},"handle": "{{product.handle}}","media": {{product.media | json | escape}},"variants": {{ product.variants | json | escape}}}'
+      ></div>
+    </template>
+    {% content_for 'block',
+      type: '_card-product-media',
+      id: 'card-product-media',
+      closest.product: product,
+      show_badges: show_badges
+    %}
+    {% content_for 'block',
+      type: '_card-product-information',
+      id: 'card-product-information',
+      closest.product: product
+    %}
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.product_card",
+  "tag": null,
+  "blocks": [
+    { "type": "@app" },
+    { "type": "spacer" },
+    { "type": "icon" },
+    { "type": "_card-product-information" },
+    { "type": "_card-product-media" }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_badges",
+      "label": "Show badges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_background",
+      "label": "t:settings.background",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color_background",
+      "id": "scheme_background_gradient",
+      "label": "t:settings.background_gradient",
+      "info": "t:info.background_gradient_info",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground_heading",
+      "label": "t:settings.headings",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground",
+      "label": "t:settings.text",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary",
+      "label": "t:settings.primary_color",
+      "default": "#000F9F",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary_hover",
+      "label": "t:settings.primary_hover_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_shadow",
+      "label": "t:settings.shadow_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "content_direction",
+      "label": "t:settings.direction",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "select",
+      "id": "wrap",
+      "label": "t:settings.wrap",
+      "default": "no-wrap",
+      "options": [
+        {
+          "value": "no-wrap",
+          "label": "t:options.no"
+        },
+        {
+          "value": "wrap",
+          "label": "t:options.yes"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "align_items",
+      "options": [
+        {
+          "value": "stretch",
+          "label": "t:options.default"
+        },
+        {
+          "value": "start",
+          "label": "t:options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:settings.bottom"
+        }
+      ],
+      "default": "stretch",
+      "label": "t:settings.align_items"
+    },
+    {
+      "type": "select",
+      "id": "justify_content",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.start"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.end"
+        },
+        {
+          "value": "between",
+          "label": "t:options.space_between"
+        },
+        {
+          "value": "around",
+          "label": "t:options.space_around"
+        },
+        {
+          "value": "evenly",
+          "label": "t:options.space_evenly"
+        }
+      ],
+      "default": "start",
+      "label": "t:settings.justify"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "default": 10,
+      "min": 0,
+      "max": 100,
+      "step": 1
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_card",
+      "blocks": {
+        "card-product-media": {
+          "type": "_card-product-media"
+        },
+        "card-product-information": {
+          "type": "_card-product-information",
+          "blocks": {
+            "card-product-title": {
+              "type": "_card-product-title-flex",
+              "settings": {
+                "product": "{{ closest.product }}"
+              }
+            },
+            "card-product-price": {
+              "type": "_card-product-price-flex",
+              "settings": {
+                "product": "{{ closest.product }}"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+{% endschema %}

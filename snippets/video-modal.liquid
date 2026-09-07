@@ -1,0 +1,63 @@
+{%- liquid
+  assign ratio = stts.media_ratio
+-%}
+{% capture video_style %}
+  --size-style-width: 100%; --size-style-width-mobile: 100%;
+  --media-image-fit: {{ stts.image_position }};
+  {% if ratio == 'adapt' %}
+    --media-adapt-ratio: 16/9;
+  {% endif %}
+{% endcapture %}
+
+<modal-dialog class="video-modal modal--popup fixed top-0 left-0 z-9 w-screen h-full flex-center no-js-hidden"
+  element-s-popup
+  id="VideoModal-{{ sec_id }}">
+  <div id="Modal-Overlay" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <div class="popup__inner video-modal__content w-auto h-full flex flex-column global-settings-popup"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ 'accessibility.play_video' | t }}"
+    tabindex="-1"
+    style="--modal-max-height: 85dvh; --w: max(72rem, 55vw);--p: 0rem;"
+  >
+    <button 
+      class="video-modal__close drawer__close block t-button bor-none rounded-full cursor-pointer" 
+      type="button" 
+      onclick="this.closest('.video-modal').hide()" 
+      aria-label="{{ 'accessibility.close_dialog' | t }}" 
+      data-modal-close
+      style="--top: 0.3rem; --right: 0.3rem;"
+    >
+      {{- 'icon-close.svg' | inline_asset_content -}}
+    </button>
+    {% if stts.source == 'uploaded' %}
+      {% render 'video-frame',
+        video: stts.video,
+        video_class: 'spacing-style size-style border-style',
+        video_loop: stts.video_loop,
+        video_autoplay: true,
+        video_style: video_style,
+        video_ratio: ratio,
+        video_preview_image: stts.banner_image,
+        additional_attributes: section.shopify_attributes,
+        section_id: sec_id,
+        section: section
+      %}
+    {% else %}
+      {% render 'video-frame',
+        video_from_url: true,
+        video: stts.video_url.id,
+        video_class: 'spacing-style size-style border-style',
+        video_type: stts.video_url.type,
+        video_autoplay: true,
+        video_style: video_style,
+        video_ratio: ratio,
+        video_alt: stts.alt,
+        video_preview_image: stts.banner_image,
+        additional_attributes: section.shopify_attributes,
+        section_id: sec_id,
+        section: section
+      %}
+    {% endif %}
+  </div>
+</modal-dialog>

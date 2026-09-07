@@ -1,0 +1,160 @@
+{% liquid
+  assign content_type = block.settings.content_type
+  assign show_content_on_img = block.settings.show_content_on_img
+  assign content_position_top = block.settings.content_position_top
+  assign content_position_right = block.settings.content_position_right
+  assign content_position_bottom = block.settings.content_position_bottom
+  assign content_position_left = block.settings.content_position_left
+
+  assign animation_type = block.settings.animation_type
+%}
+
+{% capture attr %}
+style="
+{% if content_position_top != 0 %}--posTop: {{ content_position_top }}px; {% endif %}
+{% if content_position_right != 0 %}--posRight: {{ content_position_right }}px; {% endif %}
+{% if content_position_bottom != 0 %}--posBottom: {{ content_position_bottom }}px; {% endif %}
+{% if content_position_left != 0 %}--posLeft: {{ content_position_left }}px; {% endif %}
+"
+{% endcapture %}
+
+{% capture class %}
+  {% if content_type == 'absolute-c-x' %} top-0 {% endif %}{% if show_content_on_img != blank %} {{ content_type }}{% endif %} {% if animation_type != 'none' %} animate--{{ animation_type }}{% endif %}
+{% endcapture %}
+
+<div class="hover-content-block {{ class }}" {{ attr }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+  {
+    "name": "t:names.content_hover",
+    "blocks": [
+      {
+      "type": "group"
+      },
+      {
+        "type": "image"
+      },
+      {
+        "type": "text"
+      },
+      {
+        "type": "button"
+      },
+      {
+        "type": "icon"
+      }
+    ],
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:content.animation"
+      },
+      {
+        "type": "select",
+        "id": "animation_type",
+        "label": "t:settings.animation_type",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:options.none"
+          },
+          {
+            "value": "slide-in",
+            "label": "t:options.slide_in"
+          },
+          {
+            "value": "reveal",
+            "label": "t:options.reveal"
+          }
+        ],
+        "default": "reveal"
+      },
+      {
+        "type": "header",
+        "content": "t:content.content"
+      },
+      {
+        "type": "checkbox",
+        "label": "t:settings.show_content_on_image",
+        "id": "show_content_on_img",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "content_type",
+        "label": "t:settings.content_type",
+        "options": [
+          {
+            "value": "absolute-c-c",
+            "label": "t:options.center_center"
+          },
+          {
+            "value": "absolute-c-x",
+            "label": "t:options.center_horizontal"
+          },
+          {
+            "value": "absolute-c-y",
+            "label": "t:options.center_vertical"
+          },
+          {
+            "value": "custom",
+            "label": "t:options.custom"
+          }
+        ],
+        "default": "absolute-c-c",
+        "visible_if": "{{ block.settings.show_content_on_img }}"
+      },
+      {
+        "type": "range",
+        "id": "content_position_top",
+        "label": "t:settings.top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.content_type == 'custom' }}"
+      },
+      {
+        "type": "range",
+        "id": "content_position_left",
+        "label": "t:options.left",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 20,
+        "visible_if": "{{ block.settings.content_type == 'custom' }}"
+      },
+      {
+        "type": "range",
+        "id": "content_position_right",
+        "label": "t:options.right",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0,
+        "visible_if": "{{ block.settings.content_type == 'custom' }}"
+      },
+      {
+        "type": "range",
+        "id": "content_position_bottom",
+        "label": "t:settings.bottom",  
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 20,
+        "visible_if": "{{ block.settings.content_type == 'custom' }}"
+      }
+    ],
+    "presets": [
+      {
+        "name": "t:names.content_hover"
+      }
+    ]
+  }
+{% endschema %}

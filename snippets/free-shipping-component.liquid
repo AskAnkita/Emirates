@@ -1,0 +1,23 @@
+<free-shipping-component class="haloCalculatorShipping" data-free-shipping-wrapper style="display: block;">
+  <div class="progress{% if cart.item_count == 0 %} progress-hidden{% endif %}" 
+    data-text-enabled="{% if settings.calculator_free_shipping_message_icon == 'percentage' %}true{% else %}false{% endif %}" 
+    data-shipping-progress
+  >
+    <div class="progress_shipping icon-{{ settings.calculator_free_shipping_message_icon | replace: '_', '-' }}" role="progressbar">
+      <div class="progress-meter" style="width: 0" data-free-shipping-progress-meter>
+          {% if settings.calculator_free_shipping_message_icon == 'shipping_truck' %}
+            <div class="progress-truck-wrapper">
+              <svg class="icon-shipping-truck" xmlns="http://www.w3.org/2000/svg" width="20" height="14" viewBox="0 0 20 14"> <path d="M19.3937 7.34005C19.3913 6.92338 19.2765 6.51499 19.0599 6.15754L17.2239 3.34505V3.34623C16.909 2.9639 16.4403 2.74372 15.9455 2.74608H13.333V1.09126C13.3319 0.840319 13.1294 0.637901 12.8785 0.636719H3.18152C3.06078 0.636719 2.94478 0.684067 2.85955 0.769295C2.77433 0.854522 2.72698 0.970525 2.72698 1.09126V2.29154H0.75728C0.506334 2.29154 0.302734 2.49514 0.302734 2.74608C0.302734 2.99703 0.506334 3.20063 0.75728 3.20063H4.47304C4.72398 3.20063 4.92758 3.40423 4.92758 3.65517C4.92758 3.90612 4.72398 4.10972 4.47304 4.10972H2.72707V4.85545H0.757371C0.506425 4.85545 0.302825 5.05905 0.302825 5.30999C0.302825 5.56094 0.506425 5.76454 0.757371 5.76454H5.30282C5.55377 5.76454 5.75737 5.96814 5.75737 6.21908C5.75737 6.47003 5.55377 6.67363 5.30282 6.67363H2.72707V7.41817H1.58125C1.3303 7.41817 1.1267 7.62177 1.1267 7.87272C1.1267 8.12366 1.3303 8.32726 1.58125 8.32726H4.47307C4.72401 8.32726 4.92761 8.53086 4.92761 8.78181C4.92761 9.03276 4.72401 9.23636 4.47307 9.23636H2.7271V11.3824C2.72828 11.6322 2.93188 11.8346 3.18164 11.837H4.61158C4.82228 12.7247 5.61419 13.3521 6.52682 13.3521C7.43946 13.3521 8.23255 12.7247 8.44207 11.837H13.3875C13.597 12.7247 14.3901 13.3521 15.3028 13.3521C16.2154 13.3521 17.0085 12.7247 17.218 11.837H18.9391C19.1889 11.8346 19.3925 11.6322 19.3937 11.3824V7.34005ZM6.5267 12.4431C6.09819 12.4431 5.71113 12.185 5.54658 11.7885C5.38323 11.3919 5.47319 10.9362 5.77741 10.632C6.08044 10.329 6.53616 10.2378 6.93271 10.4024C7.32925 10.5669 7.58732 10.9528 7.58732 11.3825C7.58495 11.9672 7.11146 12.4407 6.5267 12.4431ZM15.3028 12.4431C14.8742 12.4431 14.4872 12.185 14.3226 11.7885C14.1593 11.3919 14.2493 10.9362 14.5523 10.632C14.8565 10.329 15.3122 10.2378 15.7088 10.4024C16.1053 10.5669 16.3634 10.9528 16.3634 11.3825C16.3622 11.9684 15.8887 12.4419 15.3028 12.4431ZM13.3272 6.38247L13.3331 3.6552H15.9455C16.1527 3.65165 16.3527 3.73569 16.4971 3.88484L18.1271 6.3813L13.3272 6.38247Z"/> </svg>
+            </div>
+          {% elsif settings.calculator_free_shipping_message_icon == 'percentage' %}
+            <span class="text">0%</span>
+          {% elsif settings.calculator_free_shipping_message_icon == 'circle' %}
+            <div class="circle-wrapper"></div>
+          {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="message" data-shipping-message="">
+    <span>{{ 'content.free_shipping_message' | t }} {{ settings.calculator_free_shipping_message_price }}</span>
+  </div>
+</free-shipping-component>

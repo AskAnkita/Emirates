@@ -1,0 +1,70 @@
+{%- doc -%}
+  Renders a grid and places items inside of it using an editorial layout.
+
+  @param {object} items - An array of HTML strings for the collection list items
+
+  @example
+  {% render 'editorial-collection-grid', items: items %}
+{%- enddoc -%}
+
+<div class="editorial-collection__grid editorial-collection__grid--default">
+  <div class="editorial-collection__spacer"></div>
+  {% for item in items %}
+    {% liquid
+      assign current_grid_index = forloop.index0 | divided_by: 10
+      assign current_item_index = forloop.index0 | modulo: 10
+
+      case current_item_index
+        when 0
+          assign grid_column = '1 / span 6'
+          assign grid_row = 1
+          assign grid_row_span = 9
+        when 1
+          assign grid_column = '9 / span 4'
+          assign grid_row = 2
+          assign grid_row_span = 7
+        when 2
+          assign grid_column = '1 / span 5'
+          assign grid_row = 12
+          assign grid_row_span = 8
+        when 3
+          assign grid_column = '8 / span 5'
+          assign grid_row = 10
+          assign grid_row_span = 9
+        when 4
+          assign grid_column = '1 / span 4'
+          assign grid_row = 21
+          assign grid_row_span = 7
+        when 5
+          assign grid_column = '5 / span 4'
+          assign grid_row = 22
+          assign grid_row_span = 7
+        when 6
+          assign grid_column = '9 / span 4'
+          assign grid_row = 21
+          assign grid_row_span = 7
+        when 7
+          assign grid_column = '1 / span 4'
+          assign grid_row = 29
+          assign grid_row_span = 7
+        when 8
+          assign grid_column = '5 / span 4'
+          assign grid_row = 30
+          assign grid_row_span = 7
+        when 9
+          assign grid_column = '9 / span 4'
+          assign grid_row = 29
+          assign grid_row_span = 7
+      endcase
+
+      assign full_grid_rows = current_grid_index | times: 37
+      assign grid_row = grid_row | plus: full_grid_rows
+    %}
+    <div
+      class="editorial-collection__item editorial-collection__item-{{ forloop.index0 | modulo: 4 }} collection--current__item-{{ current_item_index }}"
+      style="grid-column: {{ grid_column }}; grid-row: {{ grid_row }} / span {{ grid_row_span }};"
+    >
+      {{ item }}
+    </div>
+  {% endfor %}
+</div>

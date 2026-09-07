@@ -1,0 +1,394 @@
+{% comment %} INSERT_YOUR_REWRITE_HERE {% endcomment %}
+{{ 'az-brands-layout.css' | asset_url | stylesheet_tag }}
+
+{% liquid
+  assign array = "A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|#" | split: "|"
+  assign gap_between_top_content = block.settings.gap_between_top_content
+  assign pl = block.settings.padding_left
+  assign pt = block.settings.padding_top
+  assign pb = block.settings.padding_bottom
+  assign pr = block.settings.padding_right
+  assign brand_row_gap = block.settings.brand_row_gap
+%}
+
+{%- capture attr -%}
+style="
+{% if pl != 0 %}--pl:{{ pl }}px;{% endif %}
+{% if pt != 0 %}--pt:{{ pt }}px;{% endif %}
+{% if pb != 0 %}--pb:{{ pb }}px;{% endif %}
+{% if pr != 0 %}--pr:{{ pr }}px;{% endif %}
+--gap: {{ brand_row_gap }}px;
+"
+{%- endcapture -%}
+
+<azTable class="azTable">
+  <div class="azTable__top" style="--mb: {{ gap_between_top_content }}px;">
+    <ul id="haloAZTable" class="haloAZTable list-unstyled scroll-snap-mobile disable-srollbar">
+      <li data-letter="all" class="all-letter is-active">
+        <a href="#" role="button">All</a>
+      </li>
+      {%- for item in array -%}
+        <li data-letter="{{ item | downcase }}" class="disable">
+          <a href="#az-code-{{ item | downcase }}" data-href="{{ item | downcase }}" role="button">{{ item | downcase }}</a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <div class="azTable__content">
+    <div id="haloAZWrapper" class="haloAZWrapper active-all">
+      {%- for item in array -%}
+        <div class="az-group" {{ attr }} data-letter="{{ item | downcase }}" id="az-code-{{ item | downcase }}">
+          <h3 class="az-group-title">{{ item | downcase }}</h3>
+          <ul class="az-group-list list-unstyled" role="list"></ul>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</azTable>
+
+<script type="text/javascript">
+  const azWrapper = document.getElementById('haloAZWrapper');
+  const azNavigation = document.getElementById('haloAZTable');
+
+  getAllBrands();
+
+  function getAllBrands() {
+    let brandGroup, brand;
+    {%- for vendor in shop.vendors -%}
+      {% assign letter = vendor | strip_html | downcase | truncate: 1, '' %}
+
+      {% assign link = vendor | link_to_vendor %}
+      brand = `{{ link }}`;
+
+      {%- if letter == '1' or letter == '2' or letter == '3' or letter == '4' or letter == '5' or letter == '6' or letter == '7' or letter == '8' or letter == '9' or letter == '0' -%}
+        brandGroup = azWrapper.querySelector('.az-group[data-letter="#"] ul');
+      {%- else -%}
+        brandGroup = azWrapper.querySelector('.az-group[data-letter="{{ letter }}"] ul');
+      {%- endif -%}
+
+      if (brandGroup) {
+        const li = document.createElement('li');
+        li.className = 'brand';
+        li.setAttribute('data-az-letter', '{{ letter }}');
+        li.innerHTML = brand;
+        brandGroup.appendChild(li);
+      }
+    {%- endfor -%}
+
+    parseBrandList();
+  }
+
+  function parseBrandList() {
+    const azGroups = azWrapper.querySelectorAll('.az-group');
+    azGroups.forEach((element) => {
+      const letter = element.getAttribute('data-letter');
+      const groupList = element.querySelector('.az-group-list');
+
+      if (groupList && groupList.children.length > 0) {
+        const navItem = azNavigation.querySelector(`[data-letter="${letter}"]`);
+        if (navItem) {
+          navItem.classList.remove('disable');
+          navItem.classList.add('has-letter');
+        }
+        // Ensure group is visible initially
+        element.classList.remove('is-hidden');
+        element.style.display = 'flex';
+        element.style.visibility = 'visible';
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+      } else {
+        // Hide empty groups using class and display none
+        element.classList.add('is-hidden');
+        element.style.display = 'none';
+        element.style.visibility = 'hidden';
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(-10px)';
+      }
+    });
+
+    addNavigationClickHandlers();
+  }
+
+  function addNavigationClickHandlers() {
+    const navItems = azNavigation.querySelectorAll('li[data-letter]');
+
+    navItems.forEach((navItem) => {
+      navItem.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        if (this.classList.contains('disable')) {
+          return;
+        }
+
+        const letter = this.getAttribute('data-letter');
+
+        navItems.forEach(item => {
+          item.classList.remove('is-active');
+        });
+
+        this.classList.add('is-active');
+
+        showBrandGroup(letter);
+
+        scrollToContent(letter);
+      });
+    });
+  }
+
+  function showBrandGroup(selectedLetter) {
+    const azGroups = azWrapper.querySelectorAll('.az-group');
+    const letterOrder = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '#'];
+
+    azGroups.forEach((group) => {
+      const groupLetter = group.getAttribute('data-letter');
+      const brandItems = group.querySelectorAll('.brand');
+
+      if (selectedLetter === 'all') {
+        // Show all groups
+        if (group.classList.contains('is-hidden')) {
+          group.classList.remove('is-hidden');
+          group.style.display = 'flex';
+          group.style.opacity = '0';
+          group.style.transform = 'translateY(20px)';
+          group.style.visibility = 'visible';
+
+          setTimeout(() => {
+            group.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            group.style.opacity = '1';
+            group.style.transform = 'translateY(0)';
+
+            animateBrandItems(brandItems);
+          }, 50);
+        }
+      } else {
+        const selectedIndex = letterOrder.indexOf(selectedLetter);
+        const groupIndex = letterOrder.indexOf(groupLetter);
+
+        if (groupIndex === -1) {
+          // Handle empty groups or unknown letters
+          if (!group.classList.contains('is-hidden')) {
+            group.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
+            group.style.opacity = '0';
+            group.style.transform = 'translateY(-10px)';
+
+            setTimeout(() => {
+              group.style.visibility = 'hidden';
+              group.style.display = 'none';
+              group.classList.add('is-hidden');
+            }, 200);
+          }
+        } else if (groupIndex < selectedIndex) {
+          // Hide groups before selected letter with display: none
+          if (!group.classList.contains('is-hidden')) {
+            group.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
+            group.style.opacity = '0';
+            group.style.transform = 'translateY(-10px)';
+
+            setTimeout(() => {
+              group.style.visibility = 'hidden';
+              group.style.display = 'none';
+              group.classList.add('is-hidden');
+            }, 200);
+          }
+        } else if (groupIndex === selectedIndex) {
+          // Show selected group only
+          if (group.classList.contains('is-hidden')) {
+            group.classList.remove('is-hidden');
+            group.style.display = 'flex';
+            group.style.opacity = '0';
+            group.style.transform = 'translateY(20px)';
+            group.style.visibility = 'visible';
+
+            setTimeout(() => {
+              group.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+              group.style.opacity = '1';
+              group.style.transform = 'translateY(0)';
+
+              // Animate individual brand items with stagger
+              animateBrandItems(brandItems);
+            }, 100);
+          }
+        } else {
+          // Hide all other groups (both before and after selected letter)
+          if (!group.classList.contains('is-hidden')) {
+            group.style.transition = 'opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease';
+            group.style.opacity = '0';
+            group.style.transform = 'translateY(-10px)';
+
+            setTimeout(() => {
+              group.style.visibility = 'hidden';
+              group.style.display = 'none';
+              group.classList.add('is-hidden');
+            }, 200);
+          }
+        }
+      }
+    });
+  }
+
+  function animateBrandItems(brandItems) {
+    brandItems.forEach((item, index) => {
+      // Reset any existing styles
+      item.style.opacity = '0';
+      item.style.transform = 'translateY(15px)';
+      item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+      // Force a reflow to ensure the reset is applied
+      item.offsetHeight;
+
+      // Animate in with stagger
+      setTimeout(() => {
+        item.style.opacity = '1';
+        item.style.transform = 'translateY(0)';
+      }, index * 40); // Reduced stagger for smoother feel
+    });
+  }
+
+  function scrollToContent(selectedLetter) {
+    const contentArea = document.querySelector('.azTable__content');
+    if (contentArea) {
+      // Add a delay to allow animations to complete
+      setTimeout(() => {
+        let targetElement;
+
+        if (selectedLetter === 'all') {
+          // For "All", scroll to the first visible group
+          targetElement = contentArea.querySelector('.az-group:not(.is-hidden)');
+        } else {
+          // For specific letters, scroll to that specific group
+          targetElement = contentArea.querySelector(`.az-group[data-letter="${selectedLetter}"]:not(.is-hidden)`);
+        }
+
+        if (targetElement) {
+          // Calculate offset to account for any fixed headers
+          const isMobile = window.innerWidth <= 750;
+          const offset = isMobile ? 120 : 100; // Larger offset for single letter view
+          const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = Math.max(0, elementPosition - offset);
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        } else {
+          // Fallback to content area
+          contentArea.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest'
+          });
+        }
+      }, 400); // Longer delay to ensure single letter view is ready
+    }
+  }
+
+  window.addEventListener('load', () => {
+    const collectionLinksElement = document.querySelector('.azTable')
+    const collectionLinksList = [...collectionLinksElement.querySelectorAll('ul li')]
+    const firstLink = collectionLinksList[0]
+    const lastLink = collectionLinksList.pop()
+
+    collectionLinksElement.classList.add('initialized')
+
+    const scrollToLastObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        collectionLinksElement.classList.add('disable-last')
+      } else {
+        collectionLinksElement.classList.remove('disable-last')
+      }
+    }, {
+      threshold: 0.6
+    })
+
+    const scrollToFirstObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        collectionLinksElement.classList.add('disable-first')
+      } else {
+        collectionLinksElement.classList.remove('disable-first')
+      }
+    }, {
+      threshold: 0.6
+    })
+
+    scrollToLastObserver.observe(lastLink)
+    scrollToFirstObserver.observe(firstLink)
+  })
+</script>
+
+{% schema %}
+{
+  "name": "t:names.az_brands_layout",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "range",
+      "id": "gap_between_top_content",
+      "label": "t:settings.spacing_between_table_and_content",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "t:content.brand_row"
+    },
+    {
+      "type": "range",
+      "id": "brand_row_gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 70
+    },
+    {
+      "type":  "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 0
+    }
+  ],
+  "presets": [
+    { "name": "t:names.az_brands_layout", "category": "t:categories.custom" }
+  ]
+}
+{% endschema %}

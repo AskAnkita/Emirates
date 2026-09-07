@@ -1,0 +1,15 @@
+<div class="halo-compare-product-content">
+	<div class="relative max-w-full max-h-full overflow-x-a">
+		<table class="compareTable relative">
+			<thead>
+				<tr class="compare-table-row">
+					{%- assign headings = 'product,sku,description,collection,availability,product_type,other_details' | split: ',' -%}
+					{%- for heading in headings -%}
+						<th class="compareTable-heading center font-bold uppercase body-l-font-size"><span class="whitespace-nowrap">{{ 'content.compare.' | append: heading | t }}</span></th>
+					{%- endfor -%}
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,406 @@
+<div class="cart-edit" data-template-cart-edit data-count="1">
+  {%- liquid
+    assign current_variant = product.selected_or_first_available_variant
+    assign variantCount = product.variants | size
+  -%}
+  <script>
+    {% assign selected_variant = current_variant %}
+    window.edit_cart_inven_array_{{ product.id }} = {
+      '{{ selected_variant.id }}': '{{ selected_variant.inventory_quantity }}',
+    };
+  </script>
+  <div
+    class="product-edit-item product-edit-itemFirst isChecked"
+    id="product-edit-{{ product.id }}"
+    data-cart-edit-id="{{ product.id }}"
+    data-position="0"
+  >
+    <div class="product-edit-itemLeft">
+      {%- liquid
+        if current_variant.image
+          assign image = current_variant.image
+        else
+          assign image = product.featured_image.src
+        endif
+      -%}
+      <a
+        class="product-edit-image media media--adapt"
+        href="{{ product.url }}"
+        style="--media-adapt-ratio: {{ image.aspect_ratio }};"
+      >
+        <img
+          srcset="{{ image | img_url: '270x' }}"
+          src="{{ image | img_url: '270x' }}"
+          alt="{{ product.title | escape }}"
+          sizes="270px"
+          {% if settings.enable_lazyload %}
+            loading="lazy"
+          {% endif %}
+        >
+      </a>
+      <a href="javascript:void(0)" class="product-edit-remove" data-edit-cart-remove>
+        <span class="svg-wrapper">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+      </a>
+    </div>
+    <div class="product-edit-itemCenter">
+      <h3 class="product-edit-title h6">
+        {{ product.title | escape }}
+      </h3>
+      <span class="product-edit-title-variant" data-change-title>{{ current_variant.title }}</span>
+      <div class="product-edit-price">
+        <span
+          class="compare-price old-price"
+          {% unless current_variant.compare_at_price %}
+            style="display: none;"
+          {% endunless %}
+        >
+          {{ current_variant.compare_at_price | money }}
+        </span>
+        <span class="price{% if current_variant.compare_at_price %} new-price{% endif %}">
+          {{ current_variant.price | money }}
+        </span>
+      </div>
+      <div class="product-edit-quantity quantity__group">
+        <label class="form-label quantity__label" for="edit-quantity-{{ product.id }}">
+          {{ 'products.product.quantity.label' | t }}:
+        </label>
+        <quantity-popover>
+          <div class="cart-item__quantity-wrapper quantity-popover-wrapper items-center">
+            <div class="quantity-popover-container{% if has_qty_rules or has_vol_pricing %} quantity-popover-container--hover{% endif %}">
+              <quantity-input>
+                <div class="quantity cart-quantity">
+                  <button class="quantity__button" name="minus" type="button">
+                    <span class="visually-hidden">
+                      {{-
+                        'products.product.quantity.decrease'
+                        | t: product: product.title
+                        | escape
+                      -}}
+                    </span>
+                    <span class="svg-wrapper">
+                      {{- 'icon-minus.svg' | inline_asset_content -}}
+                    </span>
+                  </button>
+                  <input
+                    class="quantity__input"
+                    data-inventory-quantity="{{ current_variant.inventory_quantity }}"
+                    type="number"
+                    data-quantity-variant-id="{{ product.variant.id }}"
+                    name="updates[]"
+                    value="1"
+                    {% # theme-check-disable %}
+                    data-cart-quantity="{{ cart | item_count_for_variant: product.variant.id }}"
+                    min="1"
+                    data-min="1"
+                    {% if product.variant.inventory_management != blank and product.variant.inventory_quantity > 0 %} max="{{ product.variant.inventory_quantity }}"{% endif %}
+                    step="{{ product.variant.quantity_rule.increment }}"
+                    {% # theme-check-enable %}
+                    aria-label="{{ 'products.product.quantity.input_label' | t: product: product.title | escape }}"
+                    inputmode="numeric"
+                    id="Edit-cart-quantity-{{ product.index | plus: 1 }}"
+                    data-index="{{ product.index | plus: 1 }}"
+                  >
+                  <button class="quantity__button" name="plus" type="button">
+                    <span class="visually-hidden">
+                      {{-
+                        'products.product.quantity.increase'
+                        | t: product: product.product.title
+                        | escape
+                      -}}
+                    </span>
+                    <span class="svg-wrapper">
+                      {{- 'icon-plus.svg' | inline_asset_content -}}
+                    </span>
+                  </button>
+                </div>
+                <span class="quantity__message alertBox alertBox--error" style="display: none;"></span>
+              </quantity-input>
+            </div>
+            <cart-remove-button
+              id="CartDrawer-Remove-{{ product.index | plus: 1 }}"
+              data-index="{{ product.index | plus: 1 }}"
+            >
+              <button
+                type="button"
+                class="button button--tertiary cart-remove-button"
+                aria-label="{{ 'content.remove_title' | t: title: product.title | escape }}"
+                data-variant-id="{{ product.variant.id }}"
+              >
+                <span class="svg-wrapper">
+                  {{- 'icon-remove.svg' | inline_asset_content -}}
+                </span>
+              </button>
+            </cart-remove-button>
+          </div>
+          {%- if has_qty_rules or has_vol_pricing -%}
+            <button
+              type="button"
+              class="quantity-popover__info-button quantity-popover__info-button--icon-with-label button button--tertiary"
+              aria-expanded="false"
+            >
+              <span class="svg-wrapper">
+                {{- 'icon-info.svg' | inline_asset_content -}}
+              </span>
+              <span>
+                {%- if has_vol_pricing -%}
+                  {{ 'products.product.volume_pricing.note' | t }}
+                {%- elsif has_qty_rules -%}
+                  {{ 'products.product.quantity.note' | t }}
+                {%- endif -%}
+              </span>
+            </button>
+          {%- endif -%}
+          {%- if has_vol_pricing or has_qty_rules -%}
+            <div
+              class="cart-items__info global-settings-popup quantity-popover__info"
+              tabindex="-1"
+              hidden
+            >
+              {%- if has_qty_rules == false -%}
+                <span class="volume-pricing-label caption">
+                  {{- 'products.product.volume_pricing.title' | t -}}
+                </span>
+              {%- endif -%}
+              <div class="quantity__rules caption">
+                {%- if product.variant.quantity_rule.increment > 1 -%}
+                  <span class="divider">
+                    {{-
+                      'products.product.quantity.multiples_of'
+                      | t: quantity: product.variant.quantity_rule.increment
+                    -}}
+                  </span>
+                {%- endif -%}
+                {%- if product.variant.quantity_rule.min > 1 -%}
+                  <span class="divider">
+                    {{-
+                      'products.product.quantity.min_of'
+                      | t: quantity: product.variant.quantity_rule.min
+                    -}}
+                  </span>
+                {%- endif -%}
+                {%- if product.variant.quantity_rule.max != null -%}
+                  <span class="divider">
+                    {{-
+                      'products.product.quantity.max_of'
+                      | t: quantity: product.variant.quantity_rule.max
+                    -}}
+                  </span>
+                {%- endif -%}
+              </div>
+              <button
+                class="button-close button button--tertiary"
+                type="button"
+                aria-label="{{ 'accessibility.close' | t }}"
+              >
+                <span class="svg-wrapper">
+                  {{- 'icon-close.svg' | inline_asset_content -}}
+                </span>
+              </button>
+              {%- if product.variant.quantity_price_breaks.size > 0 -%}
+                <volume-pricing class="parent-display">
+                  <ul class="list-unstyled">
+                    <li>
+                      <span>{{ product.variant.quantity_rule.min }}+</span>
+                      <span>{{ product.variant.price | money_with_currency }}/ea</span>
+                    </li>
+                    {%- for price_break in product.variant.quantity_price_breaks -%}
+                      <li>
+                        <span>
+                          {{- price_break.minimum_quantity -}}
+                          <span aria-hidden="true">+</span></span
+                        >
+                        <span>{{ price_break.price | money_with_currency }}/ea</span>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </volume-pricing>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+          <div
+            id="CartDrawer-LineItemError-{{ item.index | plus: 1 }}"
+            class="cart-item__error"
+            role="alert"
+          >
+            <small class="cart-item__error-text"></small>
+            <span class="svg-wrapper">
+              {{- 'icon-error.svg' | inline_asset_content -}}
+            </span>
+          </div>
+        </quantity-popover>
+      </div>
+      {%- if settings.show_notify_form -%}
+        {%- assign form_id = 'product-edit-cart-notify-form-' | append: product.id -%}
+        <div class="product-edit-notifyMe halo-notifyMe" style="display: none;">
+          {% render 'halo-notify-sold-out', id: product.id, id_form: form_id, current_variant: current_variant %}
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="product-edit-itemRight" data-section="{{ product.id }}">
+      {%- assign product_form_id = 'product-form-edit-' | append: product.id -%}
+      {% form 'product', product, id: product_form_id, novalidate: 'novalidate' %}
+        <input type="hidden" name="id" value="{{ current_variant.id }}">
+      {% endform %}
+      <div class="product-edit-options halo-productOptions" id="product-edit-options-{{ product.id }}">
+        {%- if variantCount > 0 and product.has_only_default_variant != true -%}
+          {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
+          {{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
+          {{ 'component-swatch.css' | asset_url | stylesheet_tag }}
+          <variant-edit-selects
+            id="variant-selects-{{ product.id }}"
+            class="variant-selects spacing-style has-default variant-selects--{{ settings.alignment }}"
+            style="{% render 'spacing-style', settings: bl_stts %}"
+            data-section="{{ product.id }}"
+            data-section-id="{{ product.id }}"
+            data-product-id="{{ product.id }}"
+            data-block-id="{{ product.id }}"
+            data-product-url="{{ product.url }}"
+            ref="mainVariantSelects"
+            {% if product.id == product.id %}
+              data-template-product-match="true"
+            {% endif %}
+            {% if request.visual_preview_mode %}
+              data-shopify-visual-preview
+            {% endif %}
+          >
+            {%- if custom_fields != blank and settings.enable_combined_products_listing -%}
+            <div class="swatch-custom product-form__input">
+                <p class="form__label-combined form__label">{{ 'products.product.color' | t }}<span>{{ product.metafields.custom.combined_products_listing_name_color }}</span></p>
+                <ul class="list-unstyled flex flex-align-center flex-wrap">
+                    {%- for referenced_product in custom_fields.value -%}
+                        {%- liquid
+                            assign image_custom = referenced_product.metafields.custom.combined_products_listing_image.value
+                        -%}
+                        <li class="item-custom{% if referenced_product.id == product.id %} current-item{% endif %} swatch-item">
+                            <div class="item-custom--image">
+                                <{% if referenced_product.id == product.id %}span{% else %}a href ="{{shop.url | append: "/products/" | append: referenced_product.handle }}"{% endif %}
+                                    class="item-custom--inner"
+                                    style="
+                                        {%- if image_custom != blank -%}
+                                            background: url({{ image_custom | img_url: 'medium' }});
+                                        {%- else -%}
+                                            background: url({{ referenced_product.featured_image | img_url: 'medium' }});
+                                        {%- endif -%}
+                                        background-size: cover;"
+                                    title="{{referenced_product.title}}"
+                                >
+                                </{% if referenced_product.id == product.id %}span{% else %}a{% endif %}>
+                            </div>
+                        </li>
+                    {%- endfor -%}
+                </ul>
+            </div>
+            {%- endif -%}
+            {%- for product_option in product.options_with_values -%}
+              {%- liquid
+                assign variant_style = settings.quick_edit_cart_picker_type
+                assign show_swatches = true
+                assign swatch_size = 38
+                assign product_swatch_option = settings.swatch | downcase
+                assign swatch_type = settings.swatch_type
+                assign option_name = product_option.name | downcase
+                assign is_color = false
+                if show_swatches and product_swatch_option contains option_name
+                  assign is_color = true
+                endif
+
+                if is_color
+                  if settings.quick_edit_cart_picker_type == 'dropdowns'
+                    assign variant_style = 'dropdowns'
+                  else
+                    assign variant_style = 'pills'
+                  endif
+                endif
+              -%}
+              {%- if variant_style == 'pills' or variant_style == 'swatch' -%}
+                <fieldset  class="js product-form__input variant-option variant-option--buttons{% if is_color %} product-form__input--swatch variant-option--swatches{% else %} product-form__input--pill variant-option--pill{% endif %}">
+                  <legend class="form__label">
+                    {{ product_option.name  | escape }}:
+                    <span data-selected-value>
+                      {{- product_option.selected_value -}}
+                    </span>
+                  </legend>
+                  {% render 'product-variant-options',
+                    option: product_option,
+                    block: product,
+                    variant_style: variant_style,
+                    swatch_type: swatch_type,
+                    swatch_size: swatch_size,
+                    is_color: is_color,
+                    index: forloop.index0
+                  %}
+                </fieldset>
+              {%- elsif variant_style == 'dropdowns' -%}
+                {% liquid
+                  assign property_being_updated = false
+                  if settings.variant_swatch_width != settings.variant_swatch_height
+                    assign property_being_updated = true
+                    assign new_width = settings.variant_swatch_width | times: 1.0 | divided_by: settings.variant_swatch_height | times: 20
+                  endif
+                %}
+                <div class="product-form__input product-form__input--dropdown variant-option variant-option--dropdowns">
+                  <label class="form__label" for="Option-{{ product.id }}-{{ forloop.index0 }}">
+                    {{ product_option.name  | escape }}:
+                    <span data-selected-value>
+                      {{- product_option.selected_value -}}
+                    </span>
+                  </label>
+                  <div
+                    class="select variant-option__select-wrapper"
+                    style="
+                      {%- if property_being_updated  -%}
+                        --variant-selects-swatch-width: clamp(10px,{{ new_width }}px, 50px);
+                      {%- endif -%}
+                    "
+                  >
+                    {% render 'product-variant-options',
+                      option: product_option,
+                      block: product,
+                      variant_style: variant_style,
+                      swatch_type: swatch_type,
+                      swatch_size: swatch_size,
+                      is_color: is_color,
+                      index: forloop.index0
+                    %}
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+            <div class="product-edit-message alertBox alertBox--error" style="display: none;">
+              <p class="alertBox-message"></p>
+            </div>
+
+            <script type="application/json" data-selected-variant>
+              {{ product.variants | json }}
+            </script>
+          </variant-edit-selects>
+          {%- if settings.show_hot_stock -%}
+            {% assign productMaxStock = settings.hot_stock_limit | plus: 0 %}
+            <div class="product-edit-hotStock" data-edit-cart-hot-stock="{{ productMaxStock }}">
+              <span class="hotStock-text {{ type_preset }}">
+                {%- if current_variant.inventory_management -%}
+                  {%- if current_variant.inventory_quantity > 0
+                    and current_variant.inventory_quantity <= productMaxStock
+                  -%}
+                    {{ 'products.product.hot_stock' | t: inventory: current_variant.inventory_quantity }}
+                  {%- endif -%}
+                {%- endif -%}
+              </span>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
+    <edit-cart-add-more class="add-more link link-underline" data-edit-cart-add-more role="button">
+      <span class="text">{{ 'products.product.add_more' | t }}</span>
+    </edit-cart-add-more>
+  </div>
+</div>
+<add-all-edit-cart class="product-edit-action">
+  <button data-update-cart-edit class="button-secondary button--full-width prevent-active" id="add-all-to-cart">
+    {%- render 'loading-spinner' -%}
+    {{ 'products.product.add_to_cart' | t }}
+  </button>
+</add-all-edit-cart>

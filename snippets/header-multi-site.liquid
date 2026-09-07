@@ -1,0 +1,145 @@
+{%- liquid
+  assign menu_tab = blocks | where: 'type', 'menu_tab'
+
+  assign page_handle = ''
+  case request.page_type
+    when 'index'
+      assign page_handle = 'homepage'
+    when 'page'
+      assign page_handle = page.handle
+    when 'product'
+      assign page_handle = product.handle
+    when 'collection'
+      assign page_handle = collection.handle
+    when 'blog'
+      assign page_handle = blog.handle
+    when 'article'
+      assign page_handle = article.handle
+    when 'cart'
+      assign page_handle = 'cart'
+    when 'search'
+      assign page_handle = 'search'
+  endcase
+-%}
+
+{%- if menu_tab.size > 0 -%}
+  <div
+    class="header-multi-site{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %} color-{{ settings.color_scheme_top }}"
+  >
+    <div
+      class="flex overflow-x-a disable-srollbar header-menu--tab"
+      data-menu-tab
+    >
+      {%- if request.page_type == 'index'-%}
+        <h1 class="header__heading visually-hidden">{{ shop.name }}</h1>
+      {%- endif -%}
+      {%- for block in blocks -%}
+        {% liquid
+          assign bl_stts = block.settings
+
+          assign text_color = bl_stts.text_color.rgb
+          assign text_bg = bl_stts.text_bg
+          assign text_color_active = bl_stts.text_color_active.rgb
+          assign text_bg_active = bl_stts.text_bg_active.rgb
+
+          assign text_style = '--color: ' | append: text_color | append: ';' | append: '--background-color: ' | append: text_bg | append: ';' | append: '--color-active: ' | append: text_color_active | append: ';' | append: '--background-color-active: ' | append: text_bg_active | append: ';'
+
+          assign logo_width = '16'
+          assign logo_width_mobile = '16'
+          assign logo_height = logo_width | divided_by: bl_stts.logo.aspect_ratio | ceil
+          assign logo_height_mobile = logo_width_mobile | divided_by: bl_stts.logo.aspect_ratio | ceil
+
+          assign logo_style = '--header-logo-image-width: ' | append: 'auto;' | append: '--header-logo-image-width-mobile: ' | append: 'auto; --header-logo-image-height: ' | append: logo_height | append: 'px; --header-logo-image-height-mobile: ' | append: logo_height_mobile | append: 'px;'
+        %}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            {% render block %}
+          {%- when 'menu_tab' -%}
+            <div
+              class="
+                shrink-0
+                {% if bl_stts.divider %} divider--right{% endif %}
+              "
+              style="{{ text_style }}"
+            >
+              {%- liquid
+                assign multi_site_handle = block.settings.link.handle | default: 'homepage'
+                assign multi_site_url = block.settings.link.url
+                assign class = 'link link--multi-site'
+
+                if forloop.first
+                  assign class = class
+                endif
+
+                if multi_site_url != blank
+                  assign url = multi_site_url
+                else
+                  assign url = routes.root_url
+                endif
+              -%}
+              <a
+                {% if url == blank %}
+                  role="link" aria-disabled="true"
+                {% else %}
+                  href="{{ url }}"
+                {% endif %}
+                class="{{ class }}"
+                data-handle-page="{{ multi_site_handle }}"
+                data-load-page="{{ multi_site_handle }}"
+                style="--logo_size: {{ bl_stts.logo_size }}px;"
+              >
+                {%- if bl_stts.logo_tab != blank -%}
+                  {%- liquid
+                    assign logo_alt = bl_stts.logo_tab.alt | default: shop.name | escape
+                    assign image = bl_stts.logo_tab
+                    assign text_fallback = shop.name | escape
+                  -%}
+                  {% capture widths %}{{ section.settings.logo_width }}, {{ section.settings.logo_width | times: 1.5 | round }}, {{ section.settings.logo_width | times: 2 }}{% endcapture %}
+                  {{
+                    image
+                    | image_url: width: 600
+                    | image_tag:
+                      image: image,
+                      class: 'header__heading-logo motion-reduce',
+                      widths: widths,
+                      height: logo_height,
+                      width: section.settings.logo_width,
+                      text_fallback: text_fallback,
+                      alt: logo_alt,
+                      sizes: sizes,
+                      style: logo_style,
+                      fetch_priority: 'high'
+                  }}
+                {%- elsif bl_stts.logo_svg_tab != blank -%}
+                  {{ bl_stts.logo_svg_tab }}
+                {%- else -%}
+                  {{ shop.name }}
+                {%- endif -%}
+              </a>
+              {%- if multi_site_handle != blank -%}
+                {%- liquid
+
+                  if linklists[multi_site_handle].links.size > 0
+                    assign menu = linklists[multi_site_handle].links
+                  elsif section.settings.menu != blank and linklists[section.settings.menu].links.size > 0
+                    assign menu = linklists[section.settings.menu].links
+                  endif
+
+                  assign logo = bl_stts.logo
+                  assign logo_svg = bl_stts.logo_text
+
+                  assign logo_fallback = bl_stts.logo_tab
+                  assign logo_fallback_svg = bl_stts.logo_svg_tab
+                -%}
+                {% render 'header-menu-multi-site', blocks: blocks, menu: menu, menu_gap: menu_gap, logo: logo, logo_svg: logo_svg, logo_fallback: logo_fallback, logo_fallback_svg: logo_fallback_svg, url: url %}
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    window.page_active = {{ page_handle | json }};
+  </script>
+{%- endif -%}

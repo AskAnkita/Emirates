@@ -1,0 +1,70 @@
+{% doc %}
+  @prompt
+    In the header section (header.liquid or the Header- Electronics section), the navigation is currently rendering BOTH the standard main-menu nav links AND the luxury_mega_menu blocks, causing a duplicate vertical list to appear below the horizontal nav bar. Fix this so that when luxury_mega_menu blocks are present in the header section, the standard main-menu navigation list is hidden and only the luxury_mega_menu block nav labels are shown as the horizontal nav triggers. The luxury_mega_menu blocks should be the sole source of navigation items in the header when they exist. Do not break the hover panel behavior of the luxury_mega_menu blocks.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign has_luxury_menu = false %}
+
+{% for block in section.blocks %}
+  {% if block.type == 'luxury_mega_menu' %}
+    {% assign has_luxury_menu = true %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% style %}
+  .ai-nav-controller-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  {% if has_luxury_menu %}
+    .header__inline-menu,
+    .header-menu,
+    .header__menu,
+    .menu-drawer__navigation,
+    nav[role="navigation"]:not(.luxury-mega-menu-nav),
+    .main-menu:not(.luxury-mega-menu),
+    ul.menu:not(.luxury-mega-menu__list) {
+      display: none !important;
+    }
+
+    .luxury-mega-menu,
+    .luxury-mega-menu-nav,
+    .luxury-mega-menu__list,
+    [data-luxury-menu="true"] {
+      display: flex !important;
+    }
+  {% endif %}
+{% endstyle %}
+
+<div class="ai-nav-controller-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if has_luxury_menu %}
+    <div class="luxury-menu-active" data-luxury-menu="true">
+    </div>
+  {% else %}
+    <div class="standard-menu-active">
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Navigation controller",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Navigation display"
+    },
+    {
+      "type": "paragraph",
+      "content": "This block automatically hides the standard main menu when luxury mega menu blocks are present in the header. No configuration needed."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Navigation controller"
+    }
+  ]
+}
+{% endschema %}

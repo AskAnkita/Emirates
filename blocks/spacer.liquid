@@ -1,0 +1,42 @@
+<span class="spacer{% if block.settings.hide_on_mobile %} max-sm:hidden{% endif %}" style="--spacerHeight: {{ block.settings.spacer_height |  append: 'px'}}; --spacerWidth: {{ block.settings.spacer_width |  append: 'px'}}"></span>
+
+{% schema %}
+{
+  "name": "t:names.spacer",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "spacer_height",
+      "label": "t:settings.vertical",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "spacer_width",
+      "label": "t:settings.horizontal",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "t:settings.hide_on_mobile",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.spacer",
+      "category": "t:categories.layout"
+    }
+  ]
+}
+{% endschema %}

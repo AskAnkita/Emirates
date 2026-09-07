@@ -1,0 +1,752 @@
+{%- if request.page_type != 'product' -%}
+  {% liquid
+    assign show_on_desktop = section.settings.enable_sticky_notification
+    assign show_on_mobile = section.settings.enable_sticky_notification_mb
+  -%}
+
+  {%- if show_on_desktop or show_on_mobile -%}
+    <link rel="stylesheet" href="{{ 'component-sticky-notification.css' | asset_url }}" media="print" onload="this.media='all'">
+    <noscript>{{ 'component-sticky-notification.css' | asset_url | stylesheet_tag }}</noscript>
+
+    {% liquid
+      assign show_notification_again_when = section.settings.show_notification_again_when
+      assign time_interval = section.settings.time_interval
+      assign vertical_padding = section.settings.notification_vertical_padding | append: 'px'
+      assign horizontal_padding = section.settings.notification_horizontal_padding | append: 'px'
+      assign background = section.settings.notification_background_color
+      assign background_gradient = section.settings.notification_background_gradient
+      assign background_hover = section.settings.notification_background_color_hover
+      assign background_gradient_hover = section.settings.notification_background_gradient_hover
+      assign background_image = section.settings.notification_background_image
+      assign intro_text_desktop = section.settings.notification_intro_text_desktop
+      assign intro_text_mobile = section.settings.notification_intro_text_mobile
+      assign intro_text_color = section.settings.notification_intro_text_color
+      assign intro_text_color_hover = section.settings.notification_intro_text_color_hover
+      assign intro_text_font_size = section.settings.notification_intro_text_font_size | append: 'px'
+      assign intro_text_font_size_mb = section.settings.notification_intro_text_font_size_mb | append: 'px'
+      assign intro_text_font_weight = section.settings.notification_intro_text_font_weight
+      assign link_text_desktop = section.settings.notification_link_text_desktop
+      assign link_text_mobile = section.settings.notification_link_text_mobile
+      assign link = section.settings.notification_link    
+      assign link_text_color = section.settings.notification_link_text_color
+      assign link_text_color_hover = section.settings.notification_link_text_color_hover
+      assign link_text_font_size = section.settings.notification_link_text_font_size | append: 'px'
+      assign link_text_font_size_mb = section.settings.notification_link_text_font_size_mb | append: 'px'
+      assign link_text_font_weight = section.settings.notification_link_text_font_weight
+      assign link_action = section.settings.notification_link_click_action 
+      assign popup_title = section.settings.notification_popup_title 
+      assign popup_description = section.settings.notification_popup_description
+      assign popup_image = section.settings.notification_popup_image
+      assign popup_link_text = section.settings.notification_popup_link_text
+      assign popup_link = section.settings.notification_popup_link
+      assign arrow_right_size = section.settings.notification_link_desktop_arrow_size | append: 'px'
+      assign icon_image_size = section.settings.notification_link_mobile_icons_size | append: 'px'
+      assign mobile_icon_image_1 = section.settings.notification_mobile_icon_1
+      assign mobile_icon_image_2 = section.settings.notification_mobile_icon_2
+    -%}
+
+    {%- if background_image != blank -%}
+      {%- style -%}
+        #sticky-notification.sticky-notification {
+          background: url({{ background_image | image_url }});
+          background-repeat: no-repeat;
+          background-size: cover
+        }
+      {%- endstyle -%}
+    {%- endif -%}
+
+    <sticky-notification
+      data-display-type="{{ show_notification_again_when }}"
+      data-hide-interval="{{ time_interval }}"
+      class="sticky-notification notification-shaking{% unless show_on_desktop %} hide-on-desktop{% endunless %}{% unless show_on_mobile %} hide-on-mobile{% endunless %}"
+      id="sticky-notification"
+      data-link-action="{{ link_action }}"
+      style="display: none;
+        --vertical-padding: {{ vertical_padding }};
+        --horizontal-padding: {{ horizontal_padding }};
+        --background: {% if background_gradient != blank %}{{ background_gradient }}{% elsif background != blank %}{{ background }}{% endif %};
+        --background-hover: {% if background_gradient_hover != blank %}{{ background_gradient_hover }}{% elsif background_hover != blank %}{{ background_hover }}{% endif %};
+        --intro-text-color: {% if intro_text_color != blank %}{{ intro_text_color }}{% endif %};
+        --intro-text-color-hover: {% if intro_text_color_hover != blank %}{{ intro_text_color_hover }}{% endif %};
+        --intro-text-font-size: {{ intro_text_font_size }};
+        --intro-text-font-size-mb: {{ intro_text_font_size_mb }};
+        --intro-text-font-weight: {{ intro_text_font_weight }};
+        --link-text-color: {% if link_text_color != blank %}{{ link_text_color }}{% endif %};
+        --link-text-color-hover: {% if link_text_color_hover != blank %}{{ link_text_color_hover }}{% endif %};
+        --link-text-font-size: {{ link_text_font_size }};
+        --link-text-font-size-mb: {{ link_text_font_size_mb }};
+        --link-text-font-weight: {{ link_text_font_weight }};
+        --right-arrow-size: {{ arrow_right_size }};
+        --mobile-icon-size: {{ icon_image_size }};"
+    >
+      {%- if mobile_icon_image_1 != blank -%}
+        <span class="adaptive_height image-zoom mobile-image-icon fancybox" rel="gallery1" href="{{ mobile_icon_image_1 | image_url }}" data-fancybox="sticky-notification-images">
+          <img
+            src="{{ mobile_icon_image_1 | image_url: width: 100 }}"
+            srcset="{{ mobile_icon_image_1 | image_url: width: 100 }} 100w, {{ mobile_icon_image_1 | image_url: width: 200 }} 200w"
+            width="100"
+            height="100"
+            sizes="auto, (min-width: 750px) 100px, 100px"
+            loading="lazy"
+            alt="{{ mobile_icon_image_1.alt | default: shop.name | escape }}"
+          >
+        </span>
+      {%- endif -%}
+
+      <div class="text-wrapper" data-text-wrapper>
+        <div class="intro-text intro-text-desktop">{{ intro_text_desktop }}</div>
+        <div class="intro-text intro-text-mobile">{{ intro_text_mobile }}</div>
+        {%- if link != blank and link_action != 'popup' -%}
+          <a href="{{ link }}"{% if link_action == 'new_tab' %} target="_blank"{% endif %} data-main-link>
+        {%- elsif link_action == 'popup' -%}
+          <side-drawer-opener
+            class="popup"
+            data-side-drawer="#StickyNotificationPopup-{{ section.id }}"
+          >
+            <button
+              id="StickyNotificationPopupButton-{{ section.id }}"
+              class="button button-unstyled"
+              type="button"
+              data-main-link
+            >
+        {%- else -%}
+          <div data-main-link>
+        {%- endif -%}
+          <span class="link-text link-text-desktop">
+            <span class="text">{{ link_text_desktop }}</span>
+            <span class="svg-wrapper">
+              {{- 'icon-right-arrow.svg' | inline_asset_content -}}
+            </span>
+          </span>
+          <span class="link-text link-text-mobile">{{ link_text_mobile }}</span>
+        {%- if link != blank and link_action != 'popup' -%}
+          </a>
+        {%- elsif link_action == 'popup' -%}
+            </button>
+          </side-drawer-opener>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+      </div>
+      {%- if mobile_icon_image_2 != blank -%}
+        <span class="adaptive_height image-zoom mobile-image-icon fancybox" rel="gallery1" href="{{ mobile_icon_image_2 | image_url }}" data-fancybox="sticky-notification-images">
+          <img
+            src="{{ mobile_icon_image_2 | image_url: width: 100 }}"
+            srcset="{{ mobile_icon_image_2 | image_url: width: 100 }} 100w, {{ mobile_icon_image_2 | image_url: width: 200 }} 200w"
+            width="100"
+            height="100"
+            sizes="auto, (min-width: 750px) 100px, 100px"
+            loading="lazy"
+            alt="{{ mobile_icon_image_2.alt | default: shop.name | escape }}"
+          >
+        </span>
+      {%- endif -%}
+      <span class="close-btn" data-close-notification-btn>
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </span>
+    </sticky-notification>
+
+    {%- if link_action == 'popup' -%}
+      {%- liquid
+        assign popup_title_font_size = section.settings.notification_popup_title_font_size | append: 'px'
+        assign popup_title_font_size_mb = section.settings.notification_popup_title_font_size_mb | append: 'px'
+        assign popup_title_font_weight = section.settings.notification_popup_title_font_weight
+        assign popup_title_color = section.settings.notification_popup_title_color
+        assign popup_title_alignment = section.settings.notification_popup_title_alignment
+
+        assign popup_description_font_size = section.settings.notification_popup_description_font_size | append: 'px'
+        assign popup_description_font_size_mb = section.settings.notification_popup_description_font_size_mb | append: 'px'
+        assign popup_description_font_weight = section.settings.notification_popup_description_font_weight
+        assign popup_description_color = section.settings.notification_popup_description_title_color
+
+        assign popup_link_text = section.settings.notification_popup_link_text
+        assign popup_link = section.settings.notification_popup_link
+        assign popup_link_font_size = section.settings.notification_popup_link_font_size | append: 'px'
+        assign popup_link_font_size_mb = section.settings.notification_popup_link_font_size_mb | append: 'px'
+        assign popup_link_font_weight = section.settings.notification_popup_link_font_weight
+        assign popup_link_color = section.settings.notification_popup_link_title_color
+        assign popup_link_alignment = section.settings.notification_popup_link_alignment
+      -%}
+      <side-drawer
+        class="popup__content drawer fixed top-0 left-0 z-9 w-screen h-full flex-center no-js-hidden"
+        element-s-popup
+        id="StickyNotificationPopup-{{ section.id }}"
+        data-drawer-direction="center"
+      >
+        <div id="Drawer-Overlay-{{ section.id }}" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+        <div
+          class="popup__inner w-auto h-full flex flex-column color-{{ settings.popover_color_scheme }} global-settings-popup"
+          role="dialog"
+          aria-modal="true"
+          aria-label="{% if popup_title != blank %}{{ popup_title | escape }}{% else %}Sticky notification popup{% endif %}"
+          tabindex="-1"
+          style="--modal-max-width: 72rem; --popup-max-height: 75vh;"
+          data-drawer-content
+        >
+          <div class="popup__inner--content relative w-full h-full overflow-auto cus-scrollbar">
+            <div class="sticky-notification-popup">
+              {%- if popup_image != blank -%}
+                <a class="adaptive_height image-zoom notification-popup-image fancybox" rel="gallery1" href="{{ popup_image | image_url }}" data-fancybox="sticky-notification-images" style="padding-top: {{ 1 | divided_by: popup_image.aspect_ratio | times: 100 }}%">
+                  <img
+                    src="{{ popup_image | image_url: width: 450 }}"
+                    srcset="{{ popup_image | image_url: width: 450 }} 450w, {{ popup_image | image_url: width: 900 }} 900w"
+                    width="450"
+                    height="450"
+                    sizes="auto, (min-width: 750px) 450px, 450px"
+                    loading="lazy"
+                    alt="{{ popup_image.alt | default: shop.name | escape }}"
+                  >
+                </a>
+              {%- endif -%}
+              {%- if popup_title != blank -%}
+                <h2 class="notification-popup-title text-{{ popup_title_alignment }}"
+                    style="--title-font-size: {{ popup_title_font_size }};
+                          --title-font-size-mb: {{ popup_title_font_size_mb }};
+                          --title-font-weight: {{ popup_title_font_weight }};
+                          --title-color: {% if popup_title_color != blank %}{{ popup_title_color }}{% endif %}">
+                  {{ popup_title }}
+                </h2>
+              {%- endif -%}
+              {%- if popup_description != blank -%}
+                <div class="notification-popup-description"
+                    style="--description-font-size: {{ popup_description_font_size }};
+                            --description-font-size-mb: {{ popup_description_font_size_mb }};
+                            --description-font-weight: {{ popup_description_font_weight }};
+                            --description-color: {% if popup_description_color != blank %}{{ popup_description_color }}{% endif %}">
+                  {{ popup_description }}
+                </div>
+              {%- endif -%}
+              {%- if popup_link_text != blank -%}
+                {%- if popup_link != blank -%}
+                  <a href="{{ popup_link }}" class="notification-popup-link text-{{ popup_link_alignment }}"
+                    style="--link-font-size: {{ popup_link_font_size }};
+                            --link-font-size-mb: {{ popup_link_font_size_mb }};
+                            --link-font-weight: {{ popup_link_font_weight }};
+                            --link-color: {% if popup_link_color != blank %}{{ popup_link_color }}{% endif %}">
+                {%- else -%}
+                  <div class="notification-popup-link text-{{ popup_link_alignment }}"
+                      style="--link-font-size: {{ popup_link_font_size }};
+                              --link-font-size-mb: {{ popup_link_font_size_mb }};
+                              --link-font-weight: {{ popup_link_font_weight }};
+                              --link-color: {% if popup_link_color != blank %}{{ popup_link_color }}{% endif %}">
+                {%- endif -%}
+                  <span class="text">{{ popup_link_text }}</span>
+                  <span class="svg-wrapper">
+                    {{- 'icon-right-arrow.svg' | inline_asset_content -}}
+                  </span>
+                {%- if popup_link != blank -%}
+                  </a>
+                {%- else -%}
+                  </div>
+                {%- endif -%}
+              {%- endif -%}
+            </div>
+            <button
+              onclick="this.closest('side-drawer').close()"
+              class="button button-unstyled close-button popup__close drawer__close block t-button bor-none rounded-full cursor-pointer absolute button-close-circle minimum-touch-target-before"
+              type="button"
+              aria-label="{{ 'accessibility.close_dialog' | t }}"
+              style="--top: 1rem; --right: 1rem;"
+            >
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </button>
+          </div>
+        </div>
+      </side-drawer>
+    {%- endif -%}
+
+    <script src="{{ 'sticky-notification-bar.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Sticky notification bar",
+  "tag": "section",
+  "class": "section-sticky-notification-bar",
+  "limit": 1,
+  "enabled_on": {
+    "groups": ["custom.popup"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_notification",
+      "label": "Show on desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_notification_mb",
+      "label": "Show on mobile",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "show_notification_again_when",
+      "label": "Show notification again when",
+      "default": "time",
+      "options": [
+        { "value": "time", "label": "Time interval" },
+        { "value": "refresh", "label": "Refresh page" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "time_interval",
+      "label": "Time interval to show notification again",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "default": 30,
+      "unit": "min"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "notification_vertical_padding",
+      "label": "Vertical padding",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "notification_horizontal_padding",
+      "label": "Horizontal padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 50,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "notification_background_color",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color_background",
+      "id": "notification_background_gradient",
+      "label": "Background gradient"
+    },
+    {
+      "type": "color",
+      "id": "notification_background_color_hover",
+      "label": "Background color hover",
+      "default": "#000000"
+    },
+    {
+      "type": "color_background",
+      "id": "notification_background_gradient_hover",
+      "label": "Background gradient hover"
+    },
+    {
+      "type": "image_picker",
+      "id": "notification_background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "notification_intro_text_desktop",
+      "label": "Intro text on desktop"
+    },
+    {
+      "type": "text",
+      "id": "notification_intro_text_mobile",
+      "label": "Intro text on mobile"
+    },
+    {
+      "type": "range",
+      "id": "notification_intro_text_font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "notification_intro_text_font_size_mb",
+      "label": "Font size on mobile",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "notification_intro_text_font_weight",
+      "label": "Font weight",
+      "default": "600",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "400",
+          "label": "t:options.regular"
+        },
+        {
+          "value": "600",
+          "label": "t:options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:options.bold"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "notification_intro_text_color",
+      "label": "Color",
+      "default": "#fff"
+    },
+    {
+      "type": "color",
+      "id": "notification_intro_text_color_hover",
+      "label": "Hover color",
+      "default": "#fff"
+    },
+    {
+      "type": "header",
+      "content": "Link"
+    },
+    {
+      "type": "text",
+      "id": "notification_link_text_desktop",
+      "label": "Link text on desktop",
+      "default": "Start your FREE TRIAL"
+    },
+    {
+      "type": "text",
+      "id": "notification_link_text_mobile",
+      "label": "Link text on mobile",
+      "default": "Start your FREE TRIAL"
+    },
+    {
+      "type": "url",
+      "id": "notification_link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "notification_link_click_action",
+      "label": "Action when link is clicked",
+      "default": "new_tab",
+      "options": [
+        { "value": "redirect", "label": "Redirect to link" },
+        { "value": "new_tab", "label": "Open in new tab" },
+        { "value": "popup", "label": "Open popup" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "notification_link_text_font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "notification_link_text_font_size_mb",
+      "label": "Font size on mobile",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "notification_link_text_font_weight",
+      "label": "Font weight",
+      "default": "700",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "400",
+          "label": "t:options.regular"
+        },
+        {
+          "value": "600",
+          "label": "t:options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:options.bold"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "notification_link_text_color",
+      "label": "Color",
+      "default": "#fff"
+    },
+    {
+      "type": "color",
+      "id": "notification_link_text_color_hover",
+      "label": "Hover color",
+      "default": "#fff"
+    },
+    {
+      "type": "range",
+      "id": "notification_link_desktop_arrow_size",
+      "label": "Icon size",
+      "default": 24,
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "notification_link_mobile_icons_size",
+      "label": "Icon size on mobile",
+      "default": 24,
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px"
+    },
+    {
+      "type": "image_picker",
+      "id": "notification_mobile_icon_1",
+      "label": "Mobile icon 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "notification_mobile_icon_2",
+      "label": "Mobile icon 2"
+    },
+    {
+      "type": "header",
+      "content": "Popup content"
+    },
+    {
+      "type": "paragraph",
+      "content": "This popup content settings below are for link click action option 3: show popup"
+    },
+    {
+      "type": "range",
+      "id": "notification_popup_title_font_size",
+      "label": "Title font size",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "notification_popup_title_font_size_mb",
+      "label": "Title font size on mobile",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "notification_popup_title_font_weight",
+      "label": "Title font weight",
+      "default": "600",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "400",
+          "label": "t:options.regular"
+        },
+        {
+          "value": "600",
+          "label": "t:options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:options.bold"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "notification_popup_title_color",
+      "label": "Title color",
+      "default": "#191919"
+    },
+    {
+      "type": "select",
+      "id": "notification_popup_title_alignment",
+      "label": "Title alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "notification_popup_description",
+      "label": "Description",
+      "default": "Popup Description"
+    },
+    {
+      "type": "range",
+      "id": "notification_popup_description_font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "notification_popup_description_font_size_mb",
+      "label": "Font size on mobile",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "default": 14,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "notification_popup_description_font_weight",
+      "label": "Font weight",
+      "default": "400",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "400",
+          "label": "t:options.regular"
+        },
+        {
+          "value": "600",
+          "label": "t:options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:options.bold"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "notification_popup_description_title_color",
+      "label": "Color",
+      "default": "#191919"
+    },
+    {
+      "type": "image_picker",
+      "id": "notification_popup_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "notification_popup_link_text",
+      "label": "Link text",
+      "default": "Link Text"
+    },
+    {
+      "type": "url",
+      "id": "notification_popup_link",
+      "label": "Link"
+    },
+    {
+      "type": "range",
+      "id": "notification_popup_link_font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "default": 18,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "notification_popup_link_font_size_mb",
+      "label": "Font size on mobile",
+      "min": 10,
+      "max": 80,
+      "step": 1,
+      "default": 16,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "notification_popup_link_font_weight",
+      "label": "Font weight",
+      "default": "600",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "400",
+          "label": "t:options.regular"
+        },
+        {
+          "value": "600",
+          "label": "t:options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:options.bold"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "notification_popup_link_title_color",
+      "label": "Color",
+      "default": "#191919"
+    },
+    {
+      "type": "select",
+      "id": "notification_popup_link_alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sticky notification bar"
+    }
+  ]
+}
+{% endschema %}

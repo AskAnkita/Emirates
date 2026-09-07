@@ -1,0 +1,47 @@
+{%- liquid
+    assign show_product_marquee = settings.show_product_marquee
+
+    assign product_marquee_type = settings.product_marquee_type
+    if product_marquee_type == 'text'
+        assign product_marquee_text = settings.product_marquee_text
+    elsif product_marquee_type == 'metafield'
+        if product.metafields.c_f.product_card_marquee
+            assign product_marquee_text = product.metafields.c_f.product_card_marquee
+        endif
+    elsif product_marquee_type == 'sale-text'
+        assign current_variant = product.selected_or_first_available_variant
+        if current_variant.compare_at_price > current_variant.price
+            assign product_marquee_text = 'products.product.on_sale' | t
+        endif
+    else
+        assign current_variant = product.selected_or_first_available_variant
+        if current_variant.compare_at_price > current_variant.price
+            assign sale_text = 'products.product.off_text' | t
+            assign product_marquee_text = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round | append: '%'
+            assign product_marquee_text = product_marquee_text | append: sale_text
+        endif
+    endif
+
+    if is_blocks == true
+        assign class = ''
+    else
+        assign class = ' absolute left-0 right-0 bottom-0'
+    endif
+-%}
+
+{%- if product_marquee_text != blank and show_product_marquee -%}
+    <div class="card-marquee marquee-{{ product_marquee_type }}{{ class }}" style="--bg-color: {{ settings.product_marquee_background_color }}; --fg-color: {{ settings.product_marquee_text_color }};">
+        <div class="card-marquee-box flex overflow-hidden">
+            {%- capture card_marquee_item_html -%}
+                <div class="card-marquee__item flex items-center w-max shrink-0{% if settings.product_marquee_reverse_direction %} marquee-animate{% else %} marquee-animate-rtl{% endif %}" style="--marquee-duration: {{settings.product_marquee_speed | append: 's'}};">
+                    {%- for i in (1..10) -%}
+                        <span class="text shrink-0">{{ product_marquee_text }}</span>
+                        &nbsp;
+                    {%- endfor -%}
+                </div>
+            {%- endcapture -%}
+            {{card_marquee_item_html}}
+            {{card_marquee_item_html}}
+        </div>
+    </div>
+{%- endif -%}

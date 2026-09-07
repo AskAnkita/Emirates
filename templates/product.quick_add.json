@@ -1,0 +1,284 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-product-quick-add",
+      "blocks": {
+        "media-gallery": {
+          "type": "_quick-add-product-media-gallery",
+          "static": true,
+          "settings": {},
+          "blocks": {
+            "text_3C4bed": {
+              "type": "text",
+              "name": "Text",
+              "settings": {
+                "text": "<p>{{ closest.product.vendor }}</p>",
+                "typing_text": false,
+                "primary_text": "Welcome to our store!",
+                "secondary_text": "Exclusive offers just for you.",
+                "third_text": "Shop now and enjoy deals!",
+                "highlight_text": false,
+                "highlight_text_content": "",
+                "highlight_text_type": "text",
+                "highlight_text_color": "#000000",
+                "highlight_underline_color": "#000000",
+                "spacing_text": false,
+                "spacing_text_content": "",
+                "spacing_text_left": 0,
+                "spacing_text_right": 0,
+                "stroke_text": false,
+                "stroke_text_content": "",
+                "width": "fit-content",
+                "unit": "percent",
+                "custom_width": 100,
+                "custom_width_pixel": 500,
+                "inherit_text_alignment": true,
+                "alignment": "left",
+                "width_tablet": "fit-content",
+                "unit_tablet": "percent",
+                "custom_width_tablet": 100,
+                "custom_width_tablet_pixel": 100,
+                "inherit_text_alignment_tablet": true,
+                "alignment_tablet": "left",
+                "width_mobile": "fit-content",
+                "unit_mobile": "percent",
+                "custom_width_mobile": 100,
+                "custom_width_mobile_pixel": 100,
+                "inherit_text_alignment_mobile": true,
+                "alignment_mobile": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1.6rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "enable_border": false,
+                "enable_border_bottom": false,
+                "border": "none",
+                "border_width": 0,
+                "border_width_type": "100%",
+                "border_custom_width": 100,
+                "border_radius": 0,
+                "text_effect": "none",
+                "animation_repeat": false,
+                "padding-block-start": 0,
+                "padding-block-end": 4,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "text_zdCcfm": {
+              "type": "text",
+              "name": "Heading",
+              "settings": {
+                "text": "<h2>{{ closest.product.title }}</h2>",
+                "typing_text": false,
+                "primary_text": "Welcome to our store!",
+                "secondary_text": "Exclusive offers just for you.",
+                "third_text": "Shop now and enjoy deals!",
+                "highlight_text": false,
+                "highlight_text_content": "",
+                "highlight_text_type": "text",
+                "highlight_text_color": "#000000",
+                "highlight_underline_color": "#000000",
+                "spacing_text": false,
+                "spacing_text_content": "",
+                "spacing_text_left": 0,
+                "spacing_text_right": 0,
+                "stroke_text": false,
+                "stroke_text_content": "",
+                "width": "fit-content",
+                "unit": "percent",
+                "custom_width": 100,
+                "custom_width_pixel": 500,
+                "inherit_text_alignment": true,
+                "alignment": "left",
+                "width_tablet": "fit-content",
+                "unit_tablet": "percent",
+                "custom_width_tablet": 100,
+                "custom_width_tablet_pixel": 100,
+                "inherit_text_alignment_tablet": true,
+                "alignment_tablet": "left",
+                "width_mobile": "fit-content",
+                "unit_mobile": "percent",
+                "custom_width_mobile": 100,
+                "custom_width_mobile_pixel": 100,
+                "inherit_text_alignment_mobile": true,
+                "alignment_mobile": "left",
+                "type_preset": "h6",
+                "font": "var(--font-body--family)",
+                "font_size": "1.6rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground-heading)",
+                "background": false,
+                "background_color": "#00000026",
+                "enable_border": false,
+                "enable_border_bottom": false,
+                "border": "none",
+                "border_width": 0,
+                "border_width_type": "100%",
+                "border_custom_width": 100,
+                "border_radius": 0,
+                "text_effect": "none",
+                "animation_repeat": false,
+                "padding-block-start": 0,
+                "padding-block-end": 8,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_nGzEEi": {
+              "type": "price",
+              "name": "Product price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "color": "var(--color-foreground)",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "text_3C4bed",
+            "text_zdCcfm",
+            "price_nGzEEi"
+          ]
+        },
+        "product-details": {
+          "type": "_product-details",
+          "static": true,
+          "settings": {
+            "gap": 12,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "inherit_color_scheme": true,
+            "padding-block-start": 10,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "variant_picker_3pG9wJ": {
+              "type": "variant-picker",
+              "name": "Product variant picker",
+              "settings": {
+                "variant_style": "pills",
+                "show_swatches": true,
+                "swatch_size": 38,
+                "alignment": "left",
+                "padding-block-start": 0,
+                "padding-block-end": 8,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "buy_buttons_MQiEdK": {
+              "type": "buy-buttons",
+              "name": "Product buy buttons",
+              "settings": {
+                "stacking": false,
+                "show_pickup_availability": true,
+                "gift_card_form": true,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "quantity": {
+                  "type": "quantity",
+                  "static": true,
+                  "settings": {},
+                  "blocks": {}
+                },
+                "add-to-cart": {
+                  "type": "add-to-cart",
+                  "static": true,
+                  "settings": {
+                    "style_class": "button-secondary",
+                    "button_style": "default",
+                    "width": "100%",
+                    "unit": "percent",
+                    "custom_width": 100,
+                    "custom_width_pixel": 100,
+                    "buttons_padding_vertical": 10,
+                    "buttons_padding_horizontal": 20,
+                    "width_mobile": "fit-content",
+                    "unit_mobile": "percent",
+                    "custom_width_mobile": 100,
+                    "custom_width_mobile_pixel": 100,
+                    "buttons_padding_vertical_mobile": 10,
+                    "buttons_padding_horizontal_mobile": 10
+                  },
+                  "blocks": {}
+                },
+                "accelerated-checkout": {
+                  "type": "accelerated-checkout",
+                  "disabled": true,
+                  "static": true,
+                  "settings": {
+                    "agree_condition": true,
+                    "agree_condition_text": "I agree with the terms and conditions",
+                    "condition-padding-block-start": 20,
+                    "condition-padding-block-end": 20
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": []
+            }
+          },
+          "block_order": [
+            "variant_picker_3pG9wJ",
+            "buy_buttons_MQiEdK"
+          ]
+        }
+      },
+      "settings": {
+        "page_width": "page-width",
+        "desktop_media_position": "left",
+        "gap": 16,
+        "color_scheme": "scheme-1",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

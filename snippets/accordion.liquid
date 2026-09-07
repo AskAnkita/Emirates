@@ -1,0 +1,47 @@
+{%- doc -%}
+  Renders an accordion.
+
+  @param {string} [fallback_title] - fallback title if settings.heading does not exist
+  @param {string} [children] - children of the accordion
+  @param {object} block - block object
+{%- enddoc -%}
+
+{% liquid
+  assign bl_stts = block.settings
+  if fallback_title != blank
+    assign plain_text = fallback_title | strip_newlines | strip_html | strip
+    assign handle = plain_text | handleize
+  endif
+%}
+
+<div
+  class="
+    accordion accordion--{{ block.id }} accordion--{{ bl_stts.icon }} border-style spacing-style
+    {% if bl_stts.inherit_color_scheme == false %}color-scheme-custom{% endif %}
+    {% if bl_stts.dividers %} accordion--dividers{% endif %}
+    {% if fallback_title != blank %} filter-faqs-item{% endif %}
+  "
+  {% if fallback_title != blank %}
+    data-title-handle="{{ handle }}"
+  {% endif %}
+  style="
+    --summary-font-family: var(--font-{{ bl_stts.type_preset_heading }}--family);
+    --summary-font-style: var(--font-{{ bl_stts.type_preset_heading }}--style);
+    --summary-font-weight: var(--font-{{ bl_stts.type_preset_heading }}--weight);
+    --summary-font-size: var(--font-{{ bl_stts.type_preset_heading }}--size);
+    --summary-font-line-height: var(--font-{{ bl_stts.type_preset_heading }}--line-height);
+    --summary-font-case: var(--font-{{ bl_stts.type_preset_heading }}--case);
+    {% render 'spacing-style', settings: bl_stts %}
+    {% render 'border-override', settings: bl_stts %}
+    {% if bl_stts.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: bl_stts %}
+    {% endif %}
+  "
+  {{ block.shopify_attributes }}
+>
+  {% if fallback_title != blank %}
+    {% render 'text', width: '100%', block: block, fallback_text: fallback_title %}
+  {% endif %}
+
+  {{ children }}
+</div>

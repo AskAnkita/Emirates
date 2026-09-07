@@ -1,0 +1,69 @@
+{{ 'component-sbs-variant-picker.css' | asset_url | stylesheet_tag }}
+
+<step-indicator
+  class="step-by-step-variant-picker spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}"
+>
+  {% content_for 'block', type: '_sbs-variant-picker', id: 'sbs-variant-picker' %}
+  {% content_for 'block', type: '_sbs-buy-buttons', id: 'sbs-buy-buttons' %}
+</step-indicator>
+
+<script src="{{ 'step-by-step-variant-picker.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "t:names.step_variant_picker",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.step_variant_picker",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

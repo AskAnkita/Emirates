@@ -1,0 +1,89 @@
+<div class="parallax-scroll-list flex whitespace-nowrap" data-direction="{{ block.settings.scroll_direction }}" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.scrolling_row",
+  "blocks": [
+    { "type": "_scrolling-item" }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "scroll_direction",
+      "label": "t:settings.direction",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:settings.left"
+        },
+         {
+          "value": "right",
+          "label": "t:settings.right"
+        }
+      ],
+      "default": "left"
+    },
+  ],
+  "presets": [
+    {
+      "name": "t:names.scrolling_row",
+      "category": "t:categories.decorative",
+      "blocks": {
+        "scrolling-item": {
+          "type": "_scrolling-item",
+          "settings": {
+            "text": "Scrolling Item"
+          }
+        },
+        "scrolling-item-2": {
+          "type": "_scrolling-item",
+          "settings": {
+            "text": "Scrolling Item"
+          }
+        },
+        "scrolling-item-3": {
+          "type": "_scrolling-item",
+          "settings": {
+            "text": "Scrolling Item"
+          }
+        },
+        "scrolling-item-4": {
+          "type": "_scrolling-item", 
+          "settings": {
+            "text": "Scrolling Item"
+          }
+        },
+        "scrolling-item-5": {
+          "type": "_scrolling-item",
+          "settings": {
+            "text": "Scrolling Item"
+          }
+        },
+        "scrolling-item-6": {
+          "type": "_scrolling-item",
+          "settings": {
+            "text": "Scrolling Item"
+          }
+        },
+        "scrolling-item-7": {
+          "type": "_scrolling-item",
+          "settings": {
+            "text": "Scrolling Item"
+          }
+        }
+      },
+      "block_order": [
+        "scrolling-item",
+        "scrolling-item-2",
+        "scrolling-item-3",
+        "scrolling-item-4",
+        "scrolling-item-5",
+        "scrolling-item-6",
+        "scrolling-item-7"
+      ]
+    }
+  ]
+}
+{% endschema %}

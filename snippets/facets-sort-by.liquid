@@ -1,0 +1,59 @@
+<div class="facet-filters sorting caption{% if filter_type == 'horizontal' %} small-hide medium-hide{% endif %}">
+  <div class="facet-filters__field">
+    {%- assign results = results -%}
+    {%- assign sort_by = results.sort_by | default: results.default_sort_by -%}
+    {%- assign selected_sort_by = results.sort_options | where: 'value', sort_by | first -%}
+    <div class="flex items-center gap-lg">
+<span class="facet-filters__field-label shrink-0 {{ text_label_case }}" style="--font-size: {{ heading_label_font_size }}; color: var(--color, var(--color-foreground-heading)) ">{{ 'products.facets.sort_by_label' | t }}</span>      <details
+        id="Details-SortBy"
+        class="facets__panel facets__panel--{{ style }} details--dropdown facet-filters__sort relative caption-large"
+        is="dropdown-details"
+        activate-event="hover"
+        data-index="0"
+        {% if enable_hover_reveal %}
+          activate-event="hover"
+        {% endif %}
+      >
+        <summary class="details__summary facets__summary focus-inset">
+          <span class="flex items-center gap-xl {{ text_label_case }}" style="--font-size: {{ text_label_font_size }}; color: var(--color, var(--color-foreground-heading))">
+            {{ selected_sort_by.name }}
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </span>
+        </summary>
+        <div
+          id="SortByDropdown"
+          class="details__list facets__list absolute top-full right-0 z-1 global-settings-popup bg-background"
+          style="--min-w: 20rem;"
+          tabindex="-1"
+        >
+          <ul
+            class="list-unstyled"
+            role="list"
+          >
+            {%- for option in results.sort_options -%}
+              <li
+                class="facet-filters__sort_item relative{% if option.value == sort_by %} selected{% endif %}"
+                style="--p: 0.5rem 0;"
+                tabindex="-1"
+              >
+                <label
+                  for="Filter-{{ option.value | escape }}-{{ forloop.index }}"
+                  class="facet-checkbox cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    name="sort_by"
+                    value="{{ option.value | escape }}"
+                    id="Filter-{{ option.value | escape }}-{{ forloop.index }}"
+                    class="visually-hidden"
+                  >
+                  <span class="label full-unstyled-link {{ text_label_case }}">{{ option.name | escape }}</span>
+                </label>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      </details>
+    </div>
+  </div>
+</div>

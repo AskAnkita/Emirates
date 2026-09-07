@@ -1,0 +1,74 @@
+<div class="swiper-btns-on-header swiper-btns-wrap small-hide spacing-style" style="
+  {% render 'spacing-style', settings: block.settings %}
+  --gap: calc(var(--gap-scale, 1.0) * {{ block.settings.blocks_gap }}px);
+">
+  {%- render 'swiper-button' -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.arrows_group",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "blocks_gap",
+      "label": "t:settings.blocks_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.arrows_group"
+    }
+  ]
+}
+{% endschema %}

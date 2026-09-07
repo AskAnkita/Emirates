@@ -1,0 +1,992 @@
+{% doc %}
+  @prompt
+    Create a luxury mega menu dropdown for a jewelry store header navigation. When hovering over a nav item, show a full-width dropdown panel with this exact layout: Column 1 has two stacked groups split by a horizontal divider - top group is "METAL TYPE" (bold uppercase heading) with links Gold, Silver, Platinum, Rose Gold; bottom group is "STONE" with links Diamond, Sapphire, Emerald, Ruby. Column 2 (separated by thin vertical gray divider): "STYLE" heading with links Classic, Modern, Vintage, Art Deco, Minimalist. Column 3 (separated by vertical divider): "ETERNITY" heading with links Full Eternity, Half Eternity, Three Quarter, Anniversary. Column 4 (separated by vertical divider): featured image (configurable in theme editor). Column 5 (separated by vertical divider): second featured image (configurable in theme editor). Below all columns, a full-width horizontal divider line, then a "BEST SELLERS" row with outlined ghost buttons (bordered, no fill): Engagement Rings, Wedding Bands, Necklaces, Earrings, Bracelets. White background, clean minimal luxury aesthetic, all headings bold uppercase, links in regular gray. All column headings, links, images, and button labels must be configurable via theme editor settings.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-mega-menu-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-mega-menu-trigger-{{ ai_gen_id }} {
+    position: relative;
+    display: inline-block;
+  }
+
+  .ai-mega-menu-trigger-{{ ai_gen_id }} > a {
+    text-decoration: none;
+    color: inherit;
+    padding: 10px 15px;
+    display: block;
+  }
+
+  .ai-mega-menu-panel-{{ ai_gen_id }} {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background-color: {{ block.settings.panel_background }};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+  }
+
+  .ai-mega-menu-trigger-{{ ai_gen_id }}:hover .ai-mega-menu-panel-{{ ai_gen_id }} {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .ai-mega-menu-content-{{ ai_gen_id }} {
+    max-width: {{ block.settings.content_max_width }}px;
+    margin: 0 auto;
+    padding: {{ block.settings.panel_padding_vertical }}px {{ block.settings.panel_padding_horizontal }}px;
+  }
+
+  .ai-mega-menu-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: {{ block.settings.column_gap }}px;
+    margin-bottom: {{ block.settings.section_spacing }}px;
+  }
+
+  .ai-mega-menu-column-{{ ai_gen_id }} {
+    padding: 0 {{ block.settings.column_padding }}px;
+    position: relative;
+  }
+
+  .ai-mega-menu-column-{{ ai_gen_id }}:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: {{ block.settings.divider_color }};
+  }
+
+  .ai-mega-menu-column-split-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.group_spacing }}px;
+  }
+
+  .ai-mega-menu-group-{{ ai_gen_id }} {
+    padding-bottom: {{ block.settings.group_spacing }}px;
+  }
+
+  .ai-mega-menu-group-{{ ai_gen_id }}:not(:last-child) {
+    border-bottom: 1px solid {{ block.settings.divider_color }};
+  }
+
+  .ai-mega-menu-heading-{{ ai_gen_id }} {
+    font-weight: {{ block.settings.heading_font_weight }};
+    text-transform: uppercase;
+    font-size: {{ block.settings.heading_font_size }}px;
+    color: {{ block.settings.heading_color }};
+    margin-bottom: {{ block.settings.heading_margin_bottom }}px;
+    letter-spacing: {{ block.settings.heading_letter_spacing }}px;
+  }
+
+  .ai-mega-menu-links-{{ ai_gen_id }} {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ai-mega-menu-links-{{ ai_gen_id }} li {
+    margin-bottom: {{ block.settings.link_spacing }}px;
+  }
+
+  .ai-mega-menu-links-{{ ai_gen_id }} a {
+    text-decoration: none;
+    color: {{ block.settings.link_color }};
+    font-size: {{ block.settings.link_font_size }}px;
+    transition: color 0.2s ease;
+    display: block;
+  }
+
+  .ai-mega-menu-links-{{ ai_gen_id }} a:hover {
+    color: {{ block.settings.link_hover_color }};
+  }
+
+  .ai-mega-menu-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .ai-mega-menu-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  .ai-mega-menu-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-mega-menu-image-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-mega-menu-divider-{{ ai_gen_id }} {
+    height: 1px;
+    background-color: {{ block.settings.divider_color }};
+    margin: {{ block.settings.section_spacing }}px 0;
+  }
+
+  .ai-mega-menu-buttons-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.button_gap }}px;
+    flex-wrap: wrap;
+  }
+
+  .ai-mega-menu-button-{{ ai_gen_id }} {
+    padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    border: {{ block.settings.button_border_width }}px solid {{ block.settings.button_border_color }};
+    background-color: transparent;
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    font-size: {{ block.settings.button_font_size }}px;
+    transition: all 0.2s ease;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    display: inline-block;
+  }
+
+  .ai-mega-menu-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+    color: {{ block.settings.button_hover_text_color }};
+    border-color: {{ block.settings.button_hover_border_color }};
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-mega-menu-grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: {{ block.settings.section_spacing }}px;
+    }
+
+    .ai-mega-menu-column-{{ ai_gen_id }}::after {
+      display: none;
+    }
+
+    .ai-mega-menu-column-{{ ai_gen_id }} {
+      padding: 0;
+    }
+  }
+{% endstyle %}
+
+<luxury-mega-menu-{{ ai_gen_id }} class="ai-mega-menu-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-mega-menu-trigger-{{ ai_gen_id }}">
+    <a href="{{ block.settings.nav_link }}">{{ block.settings.nav_label }}</a>
+    
+    <div class="ai-mega-menu-panel-{{ ai_gen_id }}">
+      <div class="ai-mega-menu-content-{{ ai_gen_id }}">
+        <div class="ai-mega-menu-grid-{{ ai_gen_id }}">
+          <div class="ai-mega-menu-column-{{ ai_gen_id }}">
+            <div class="ai-mega-menu-column-split-{{ ai_gen_id }}">
+              <div class="ai-mega-menu-group-{{ ai_gen_id }}">
+                <h3 class="ai-mega-menu-heading-{{ ai_gen_id }}">{{ block.settings.col1_heading1 }}</h3>
+                <ul class="ai-mega-menu-links-{{ ai_gen_id }}">
+                  {% if block.settings.col1_link1_label != blank %}
+                    <li><a href="{{ block.settings.col1_link1_url }}">{{ block.settings.col1_link1_label }}</a></li>
+                  {% endif %}
+                  {% if block.settings.col1_link2_label != blank %}
+                    <li><a href="{{ block.settings.col1_link2_url }}">{{ block.settings.col1_link2_label }}</a></li>
+                  {% endif %}
+                  {% if block.settings.col1_link3_label != blank %}
+                    <li><a href="{{ block.settings.col1_link3_url }}">{{ block.settings.col1_link3_label }}</a></li>
+                  {% endif %}
+                  {% if block.settings.col1_link4_label != blank %}
+                    <li><a href="{{ block.settings.col1_link4_url }}">{{ block.settings.col1_link4_label }}</a></li>
+                  {% endif %}
+                </ul>
+              </div>
+              
+              <div class="ai-mega-menu-group-{{ ai_gen_id }}">
+                <h3 class="ai-mega-menu-heading-{{ ai_gen_id }}">{{ block.settings.col1_heading2 }}</h3>
+                <ul class="ai-mega-menu-links-{{ ai_gen_id }}">
+                  {% if block.settings.col1_link5_label != blank %}
+                    <li><a href="{{ block.settings.col1_link5_url }}">{{ block.settings.col1_link5_label }}</a></li>
+                  {% endif %}
+                  {% if block.settings.col1_link6_label != blank %}
+                    <li><a href="{{ block.settings.col1_link6_url }}">{{ block.settings.col1_link6_label }}</a></li>
+                  {% endif %}
+                  {% if block.settings.col1_link7_label != blank %}
+                    <li><a href="{{ block.settings.col1_link7_url }}">{{ block.settings.col1_link7_label }}</a></li>
+                  {% endif %}
+                  {% if block.settings.col1_link8_label != blank %}
+                    <li><a href="{{ block.settings.col1_link8_url }}">{{ block.settings.col1_link8_label }}</a></li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-mega-menu-column-{{ ai_gen_id }}">
+            <h3 class="ai-mega-menu-heading-{{ ai_gen_id }}">{{ block.settings.col2_heading }}</h3>
+            <ul class="ai-mega-menu-links-{{ ai_gen_id }}">
+              {% if block.settings.col2_link1_label != blank %}
+                <li><a href="{{ block.settings.col2_link1_url }}">{{ block.settings.col2_link1_label }}</a></li>
+              {% endif %}
+              {% if block.settings.col2_link2_label != blank %}
+                <li><a href="{{ block.settings.col2_link2_url }}">{{ block.settings.col2_link2_label }}</a></li>
+              {% endif %}
+              {% if block.settings.col2_link3_label != blank %}
+                <li><a href="{{ block.settings.col2_link3_url }}">{{ block.settings.col2_link3_label }}</a></li>
+              {% endif %}
+              {% if block.settings.col2_link4_label != blank %}
+                <li><a href="{{ block.settings.col2_link4_url }}">{{ block.settings.col2_link4_label }}</a></li>
+              {% endif %}
+              {% if block.settings.col2_link5_label != blank %}
+                <li><a href="{{ block.settings.col2_link5_url }}">{{ block.settings.col2_link5_label }}</a></li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <div class="ai-mega-menu-column-{{ ai_gen_id }}">
+            <h3 class="ai-mega-menu-heading-{{ ai_gen_id }}">{{ block.settings.col3_heading }}</h3>
+            <ul class="ai-mega-menu-links-{{ ai_gen_id }}">
+              {% if block.settings.col3_link1_label != blank %}
+                <li><a href="{{ block.settings.col3_link1_url }}">{{ block.settings.col3_link1_label }}</a></li>
+              {% endif %}
+              {% if block.settings.col3_link2_label != blank %}
+                <li><a href="{{ block.settings.col3_link2_url }}">{{ block.settings.col3_link2_label }}</a></li>
+              {% endif %}
+              {% if block.settings.col3_link3_label != blank %}
+                <li><a href="{{ block.settings.col3_link3_url }}">{{ block.settings.col3_link3_label }}</a></li>
+              {% endif %}
+              {% if block.settings.col3_link4_label != blank %}
+                <li><a href="{{ block.settings.col3_link4_url }}">{{ block.settings.col3_link4_label }}</a></li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <div class="ai-mega-menu-column-{{ ai_gen_id }}">
+            {% if block.settings.featured_image1 %}
+              <div class="ai-mega-menu-image-{{ ai_gen_id }}">
+                <img
+                  src="{{ block.settings.featured_image1 | image_url: width: 600 }}"
+                  alt="{{ block.settings.featured_image1.alt | escape }}"
+                  loading="lazy"
+                  width="{{ block.settings.featured_image1.width }}"
+                  height="{{ block.settings.featured_image1.height }}"
+                >
+              </div>
+            {% else %}
+              <div class="ai-mega-menu-image-placeholder-{{ ai_gen_id }}">
+                {{ 'image' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="ai-mega-menu-column-{{ ai_gen_id }}">
+            {% if block.settings.featured_image2 %}
+              <div class="ai-mega-menu-image-{{ ai_gen_id }}">
+                <img
+                  src="{{ block.settings.featured_image2 | image_url: width: 600 }}"
+                  alt="{{ block.settings.featured_image2.alt | escape }}"
+                  loading="lazy"
+                  width="{{ block.settings.featured_image2.width }}"
+                  height="{{ block.settings.featured_image2.height }}"
+                >
+              </div>
+            {% else %}
+              <div class="ai-mega-menu-image-placeholder-{{ ai_gen_id }}">
+                {{ 'image' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="ai-mega-menu-divider-{{ ai_gen_id }}"></div>
+
+        <div class="ai-mega-menu-buttons-{{ ai_gen_id }}">
+          {% if block.settings.button1_label != blank %}
+            <a href="{{ block.settings.button1_url }}" class="ai-mega-menu-button-{{ ai_gen_id }}">
+              {{ block.settings.button1_label }}
+            </a>
+          {% endif %}
+          {% if block.settings.button2_label != blank %}
+            <a href="{{ block.settings.button2_url }}" class="ai-mega-menu-button-{{ ai_gen_id }}">
+              {{ block.settings.button2_label }}
+            </a>
+          {% endif %}
+          {% if block.settings.button3_label != blank %}
+            <a href="{{ block.settings.button3_url }}" class="ai-mega-menu-button-{{ ai_gen_id }}">
+              {{ block.settings.button3_label }}
+            </a>
+          {% endif %}
+          {% if block.settings.button4_label != blank %}
+            <a href="{{ block.settings.button4_url }}" class="ai-mega-menu-button-{{ ai_gen_id }}">
+              {{ block.settings.button4_label }}
+            </a>
+          {% endif %}
+          {% if block.settings.button5_label != blank %}
+            <a href="{{ block.settings.button5_url }}" class="ai-mega-menu-button-{{ ai_gen_id }}">
+              {{ block.settings.button5_label }}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</luxury-mega-menu-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class LuxuryMegaMenu{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.trigger = this.querySelector('.ai-mega-menu-trigger-{{ ai_gen_id }}');
+        this.panel = this.querySelector('.ai-mega-menu-panel-{{ ai_gen_id }}');
+        
+        if (this.trigger && this.panel) {
+          this.setupEventListeners();
+        }
+      }
+
+      setupEventListeners() {
+        this.trigger.addEventListener('mouseenter', () => {
+          this.panel.style.opacity = '1';
+          this.panel.style.visibility = 'visible';
+          this.panel.style.transform = 'translateY(0)';
+        });
+
+        this.trigger.addEventListener('mouseleave', () => {
+          this.panel.style.opacity = '0';
+          this.panel.style.visibility = 'hidden';
+          this.panel.style.transform = 'translateY(-10px)';
+        });
+      }
+    }
+
+    customElements.define('luxury-mega-menu-{{ ai_gen_id }}', LuxuryMegaMenu{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Luxury mega menu",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Navigation trigger"
+    },
+    {
+      "type": "text",
+      "id": "nav_label",
+      "label": "Navigation label",
+      "default": "Shop"
+    },
+    {
+      "type": "url",
+      "id": "nav_link",
+      "label": "Navigation link"
+    },
+    {
+      "type": "header",
+      "content": "Column 1 - Metal type"
+    },
+    {
+      "type": "text",
+      "id": "col1_heading1",
+      "label": "First group heading",
+      "default": "METAL TYPE"
+    },
+    {
+      "type": "text",
+      "id": "col1_link1_label",
+      "label": "Link 1 label",
+      "default": "Gold"
+    },
+    {
+      "type": "url",
+      "id": "col1_link1_url",
+      "label": "Link 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "col1_link2_label",
+      "label": "Link 2 label",
+      "default": "Silver"
+    },
+    {
+      "type": "url",
+      "id": "col1_link2_url",
+      "label": "Link 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "col1_link3_label",
+      "label": "Link 3 label",
+      "default": "Platinum"
+    },
+    {
+      "type": "url",
+      "id": "col1_link3_url",
+      "label": "Link 3 URL"
+    },
+    {
+      "type": "text",
+      "id": "col1_link4_label",
+      "label": "Link 4 label",
+      "default": "Rose Gold"
+    },
+    {
+      "type": "url",
+      "id": "col1_link4_url",
+      "label": "Link 4 URL"
+    },
+    {
+      "type": "header",
+      "content": "Column 1 - Stone"
+    },
+    {
+      "type": "text",
+      "id": "col1_heading2",
+      "label": "Second group heading",
+      "default": "STONE"
+    },
+    {
+      "type": "text",
+      "id": "col1_link5_label",
+      "label": "Link 1 label",
+      "default": "Diamond"
+    },
+    {
+      "type": "url",
+      "id": "col1_link5_url",
+      "label": "Link 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "col1_link6_label",
+      "label": "Link 2 label",
+      "default": "Sapphire"
+    },
+    {
+      "type": "url",
+      "id": "col1_link6_url",
+      "label": "Link 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "col1_link7_label",
+      "label": "Link 3 label",
+      "default": "Emerald"
+    },
+    {
+      "type": "url",
+      "id": "col1_link7_url",
+      "label": "Link 3 URL"
+    },
+    {
+      "type": "text",
+      "id": "col1_link8_label",
+      "label": "Link 4 label",
+      "default": "Ruby"
+    },
+    {
+      "type": "url",
+      "id": "col1_link8_url",
+      "label": "Link 4 URL"
+    },
+    {
+      "type": "header",
+      "content": "Column 2 - Style"
+    },
+    {
+      "type": "text",
+      "id": "col2_heading",
+      "label": "Heading",
+      "default": "STYLE"
+    },
+    {
+      "type": "text",
+      "id": "col2_link1_label",
+      "label": "Link 1 label",
+      "default": "Classic"
+    },
+    {
+      "type": "url",
+      "id": "col2_link1_url",
+      "label": "Link 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "col2_link2_label",
+      "label": "Link 2 label",
+      "default": "Modern"
+    },
+    {
+      "type": "url",
+      "id": "col2_link2_url",
+      "label": "Link 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "col2_link3_label",
+      "label": "Link 3 label",
+      "default": "Vintage"
+    },
+    {
+      "type": "url",
+      "id": "col2_link3_url",
+      "label": "Link 3 URL"
+    },
+    {
+      "type": "text",
+      "id": "col2_link4_label",
+      "label": "Link 4 label",
+      "default": "Art Deco"
+    },
+    {
+      "type": "url",
+      "id": "col2_link4_url",
+      "label": "Link 4 URL"
+    },
+    {
+      "type": "text",
+      "id": "col2_link5_label",
+      "label": "Link 5 label",
+      "default": "Minimalist"
+    },
+    {
+      "type": "url",
+      "id": "col2_link5_url",
+      "label": "Link 5 URL"
+    },
+    {
+      "type": "header",
+      "content": "Column 3 - Eternity"
+    },
+    {
+      "type": "text",
+      "id": "col3_heading",
+      "label": "Heading",
+      "default": "ETERNITY"
+    },
+    {
+      "type": "text",
+      "id": "col3_link1_label",
+      "label": "Link 1 label",
+      "default": "Full Eternity"
+    },
+    {
+      "type": "url",
+      "id": "col3_link1_url",
+      "label": "Link 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "col3_link2_label",
+      "label": "Link 2 label",
+      "default": "Half Eternity"
+    },
+    {
+      "type": "url",
+      "id": "col3_link2_url",
+      "label": "Link 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "col3_link3_label",
+      "label": "Link 3 label",
+      "default": "Three Quarter"
+    },
+    {
+      "type": "url",
+      "id": "col3_link3_url",
+      "label": "Link 3 URL"
+    },
+    {
+      "type": "text",
+      "id": "col3_link4_label",
+      "label": "Link 4 label",
+      "default": "Anniversary"
+    },
+    {
+      "type": "url",
+      "id": "col3_link4_url",
+      "label": "Link 4 URL"
+    },
+    {
+      "type": "header",
+      "content": "Featured images"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image1",
+      "label": "Featured image 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image2",
+      "label": "Featured image 2"
+    },
+    {
+      "type": "header",
+      "content": "Best sellers buttons"
+    },
+    {
+      "type": "text",
+      "id": "button1_label",
+      "label": "Button 1 label",
+      "default": "Engagement Rings"
+    },
+    {
+      "type": "url",
+      "id": "button1_url",
+      "label": "Button 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "button2_label",
+      "label": "Button 2 label",
+      "default": "Wedding Bands"
+    },
+    {
+      "type": "url",
+      "id": "button2_url",
+      "label": "Button 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "button3_label",
+      "label": "Button 3 label",
+      "default": "Necklaces"
+    },
+    {
+      "type": "url",
+      "id": "button3_url",
+      "label": "Button 3 URL"
+    },
+    {
+      "type": "text",
+      "id": "button4_label",
+      "label": "Button 4 label",
+      "default": "Earrings"
+    },
+    {
+      "type": "url",
+      "id": "button4_url",
+      "label": "Button 4 URL"
+    },
+    {
+      "type": "text",
+      "id": "button5_label",
+      "label": "Button 5 label",
+      "default": "Bracelets"
+    },
+    {
+      "type": "url",
+      "id": "button5_url",
+      "label": "Button 5 URL"
+    },
+    {
+      "type": "header",
+      "content": "Panel style"
+    },
+    {
+      "type": "color",
+      "id": "panel_background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content max width",
+      "min": 1000,
+      "max": 2000,
+      "step": 50,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_vertical",
+      "label": "Vertical padding",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Headings"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "heading_font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom",
+      "label": "Margin bottom",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "Links"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Hover color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "link_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "link_spacing",
+      "label": "Spacing",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Border color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Hover text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_border_color",
+      "label": "Hover border color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "label": "Vertical padding",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "label": "Border width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "button_gap",
+      "label": "Gap between buttons",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider color",
+      "default": "#E6E6E6"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Column gap",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "column_padding",
+      "label": "Column padding",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "group_spacing",
+      "label": "Group spacing",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "label": "Section spacing",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury mega menu"
+    }
+  ]
+}
+{% endschema %}

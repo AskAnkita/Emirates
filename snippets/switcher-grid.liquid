@@ -1,0 +1,77 @@
+{% comment %}
+  Render grid view
+  Accepts:
+  - columns_desktop: {String} Type of columns
+  - filter_type: {String} Type of filter
+
+  Usage:
+  {% render 'switcher-grid', columns_desktop: columns_desktop, filter_type: 'vertical' %}
+{% endcomment %}
+
+{% case section.settings.product_card_size %}
+  {% when 'small' %}
+    {% assign columns_desktop = 5 %}
+  {% when 'medium' %}
+    {% assign columns_desktop = 4 %}
+  {% when 'large' %}
+    {% assign columns_desktop = 3 %}
+  {% when 'extra-large' %}
+    {% assign columns_desktop = 2 %}
+  {% when 'extra-extra-large' %}
+    {% assign columns_desktop = 1 %}
+{% endcase %}
+
+<grid-view class="switcher-grid flex items-center {{ class }}">
+  <span class="switcher-grid__label facet-filters__field-label block {{ text_label_case }}" style="--font-size: {{ heading_label_font_size }};">{{ 'content.view_as' | t }}</span>
+  <ul
+    class="grid-view--list desktop-grid-view flex justify-center list-unstyled"
+    role="list"
+    style="--p: 1.3rem 2rem;"
+  >
+    <li class="grid-view--item grid-view-list">
+      <button
+        class="button--grid-view t-button flex items-center justify-center{% if columns_desktop == 1 %} active{% else %} cursor-pointer{% endif %}"
+        type="button"
+        aria-label="list"
+        data-grid="1"
+        style="--p: 1rem;--w: 4rem;--h: 4rem;"
+      ></button>
+    </li>
+    <li class="grid-view--item grid-view-2">
+      <button
+        class="button--grid-view t-button flex items-center justify-center{% if columns_desktop == 2 %} active{% else %} cursor-pointer{% endif %}"
+        type="button"
+        aria-label="2"
+        data-grid="2"
+        style="--p: 1rem;--w: 4rem;--h: 4rem;"
+      ></button>
+    </li>
+    <li class="grid-view--item grid-view-3">
+      <button
+        class="button--grid-view t-button flex items-center justify-center{% if columns_desktop == 3 %} active{% else %} cursor-pointer{% endif %}"
+        type="button"
+        aria-label="3"
+        data-grid="3"
+        style="--p: 1rem;--w: 4rem;--h: 4rem;"
+      ></button>
+    </li>
+    <li class="grid-view--item grid-view-4">
+      <button
+        class="button--grid-view t-button flex items-center justify-center{% if columns_desktop == 4 %} active{% else %} cursor-pointer{% endif %}"
+        type="button"
+        aria-label="4"
+        data-grid="4"
+        style="--p: 1rem;--w: 4rem;--h: 4rem;"
+      ></button>
+    </li>
+    <li class="grid-view--item grid-view-5">
+      <button
+        class="button--grid-view t-button flex items-center justify-center{% if columns_desktop == 5 %} active{% else %} cursor-pointer{% endif %}"
+        type="button"
+        aria-label="5"
+        data-grid="5"
+        style="--p: 1rem;--w: 4rem;--h: 4rem;"
+      ></button>
+    </li>
+  </ul>
+</grid-view>

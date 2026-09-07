@@ -1,0 +1,116 @@
+{%- capture direction -%}
+  {%- assign rtl_locales = "ar,ae,arc,fa,he,ur,ps,sd,dv,yi,ug,ha,ckb,ku,ks,pnb,bcc,bqi,azb,mzn,glk,nqo,kwh" | split: "," -%}
+  {%- if rtl_locales contains request.locale.iso_code -%}
+    rtl
+  {%- else -%}
+    ltr
+  {%- endif -%}
+{%- endcapture -%}
+
+<!doctype html>
+<html class="no-js{% if request.design_mode %} shopify-design-mode{% endif %}" lang="{{ request.locale.iso_code }}" dir="{% if settings.enable_rtl_layout %}{{ direction }}{% else %}ltr{% endif %}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link
+      rel="canonical"
+      href="{{ canonical_url }}"
+      canonical-url="{{ shop.url }}/"
+    >
+
+    {%- if settings.favicon != blank -%}
+      <link
+        rel="icon"
+        type="image/png"
+        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
+      >
+    {%- endif -%}
+
+    {%- unless settings.type_header_font.system?
+      and settings.type_body_font.system?
+      and settings.type_subheading_font.system?
+    -%}
+      <link
+        rel="preconnect"
+        href="https://fonts.shopifycdn.com"
+        crossorigin
+      >
+    {%- endunless -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %}
+        &ndash; tagged "{{ current_tags | join: ', ' }}"
+      {%- endif -%}
+      {%- if current_page != 1 %}
+        &ndash; Page {{ current_page -}}
+      {%- endif -%}
+      {%- unless page_title contains shop.name %}
+        &ndash; {{ shop.name -}}
+      {%- endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {% render 'meta-tags' %}
+
+    {% render 'global-style' %}
+
+    {% render 'global-css', direction: direction %}
+    {%- render 'global-script' -%}
+
+    {{ content_for_header }}
+
+    
+  </head>
+
+  <body
+    class="
+      template-{{ request.page_type | replace: 'customers/', '' }}{% if settings.enable_preloading_screen %} has--preload-screen{% endif %}
+      {% if settings.animations_hover_elements != 'none' %} card-hover--{{ settings.animations_hover_elements }}{% endif %}
+      {% if settings.animation_hover_buttons %} button-hover--effect{% endif %}
+    "
+  >
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+
+    {% render 'preload-screen' %}
+
+    <div id="header-group">
+      {% sections 'header-group' %}
+    </div>
+
+    {%- liquid
+      sections 'popup-group'
+      sections 'general-group'
+      sections 'toolbar-mobile'
+    -%}
+
+    <main
+      id="MainContent"
+      class="content-for-layout focus-none relative z-2"
+      role="main"
+      tabindex="-1"
+    >
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    <ul hidden>
+      <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
+      <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>
+    </ul>
+
+    {%- if settings.predictive_search_enabled -%}
+      <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {% render 'halo-popup' %}
+
+    {% render 'halo-global' %}
+  </body>
+</html>

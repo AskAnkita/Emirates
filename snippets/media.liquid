@@ -1,0 +1,105 @@
+{% doc %}
+  Renders media block contents (used in _media and _media-without-appearance blocks)
+
+  @param {boolean} [unset_image_tag] - if true, ignores the image focal point in the image
+  @param {string} [video_style] - additional styles for the video
+  @param {string} [section] - the section
+  @param {string} [block] - the block
+{% enddoc %}
+
+{% liquid
+  assign show_image = false
+  assign show_video = false
+
+  if block.settings.image != blank
+    assign aspect_ratio = block.settings.image.aspect_ratio
+  else
+    assign aspect_ratio = '16 / 9'
+  endif
+
+  if block.settings.media_type == 'image'
+    assign show_image = true
+  endif
+
+  if block.settings.media_type == 'video'
+    assign show_video = true
+  endif
+%}
+
+{% if animation_type == 'parallax' %}
+  {% assign animation_element = 'parallax-background' %}
+{% else' %}
+  {% assign animation_element = 'div' %}
+{% endif %}
+
+<{{ animation_element }}
+  class="
+    media-block
+    spacing-style
+    {% if block.settings.inherit_color_scheme == false %}color-scheme-custom{% endif %}
+    {% if show_image and block.settings.image_position == 'contain' or show_video and block.settings.video_position == 'contain' %}
+      media-block--contain
+    {% endif %}
+  "
+  style="
+    {% render 'border-override', settings: block.settings %}
+    {% render 'spacing-style', settings: block.settings %}
+    {% if block.settings.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: block.settings %}
+    {% endif %}
+    --image-position: {{ block.settings.image_position }};
+    --video-position: {{ block.settings.video_position }};
+    --aspect-ratio: {{ aspect_ratio }};
+  "
+  {{ block.shopify_attributes }}
+>
+  {%- if show_image -%}
+    {% capture image_tag %}
+      {% if block.settings.image != blank %}
+        {% render 'image',
+          image: block.settings.image,
+          class: 'media-block__media border-style parallax-image',
+          unset_image_tag: unset_image_tag,
+          animation_type: animation_type
+        %}
+      {% else %}
+        <div class="media-block__media border-style placeholder-svg" style="height: 100%;">
+          {{ 'hero-apparel-1' | placeholder_svg_tag }}
+        </div>
+      {% endif %}
+    {% endcapture %}
+
+    {% if block.settings.link != blank %}
+      <a
+        href="{{ block.settings.link }}"
+        class="media-block__media-link"
+      >
+        {{ image_tag }}
+      </a>
+    {% else %}
+      {{ image_tag }}
+    {% endif %}
+  {%- elsif show_video -%}
+    {% render 'video',
+      video: block.settings.video,
+      video_class: 'media-block__media media-block__media--video spacing-style size-style border-style',
+      video_type: block.settings.video_url.type,
+      video_autoplay: block.settings.video_autoplay,
+      video_loop: block.settings.video_loop,
+      video_style: video_style,
+      video_ratio: ratio,
+      video_alt: block.settings.alt,
+      video_preview_image: block.settings.banner_image,
+      additional_attributes: block.shopify_attributes,
+      section_id: block.id,
+      section: section
+    %}
+  {%- else -%}
+    <div class="placeholder-image media-block__media border-style">
+      <placeholder-image
+        data-block-id="{{ section.id }}-{{ block.id }}"
+        data-type="general"
+      ></placeholder-image>
+    </div>
+  {%- endif -%}
+</{{ animation_element }}>

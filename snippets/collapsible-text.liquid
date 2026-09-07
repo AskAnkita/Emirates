@@ -1,0 +1,23 @@
+<collapsible-text-component
+  class="
+    spacing-style size-style collapsible-text
+    {% if settings.inherit_color_scheme == false %}color-scheme-custom{% endif %}
+  "
+  style="
+    {% render 'spacing-style', settings: settings %}
+    {% render 'size-style', settings: settings %}
+    {% if settings.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: settings %}
+    {% endif %}
+    --preview-height: {{ settings.preview_height | divided_by: 10.0 }}rem;
+    --text-align: {{ settings.text_content_alignment }};
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="collapsible-text-content collapsed" data-content-height="{{ settings.preview_height }}">
+    {{ children }}
+  </div>
+  <div class="collapsible-text-button-wrapper flex">
+    {{ button }}
+  </div>
+</collapsible-text-component>

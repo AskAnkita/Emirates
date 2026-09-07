@@ -1,0 +1,76 @@
+.halo-compare-colors-swatch {
+  margin: 0 0 15px;
+}
+
+.compare-colors-list {
+  gap: 10px;
+}
+
+.swatch-item:has(.swatch.active),
+.swatch-item.current-item {
+  --opacity-15: 1;
+}
+
+.halo-compare-colors-image {
+  position: relative;
+  white-space: nowrap;
+  overflow: auto;
+  margin: 0 -15px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.halo-compare-colors-image .item {
+  display: inline-block;
+  vertical-align: top;
+  width: 50%;
+  padding: 0 15px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.halo-compare-colors-image .image {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+  margin: 0 0 12px 0;
+}
+
+.halo-compare-colors-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  opacity: 1;
+  visibility: visible;
+  object-fit: cover;
+  max-height: 100%;
+  transition: all ease .3s;
+  z-index: 1;
+}
+
+.halo-compare-colors-image .image:before {
+  content: '';
+  display: block;
+  padding-top: 150%;
+}
+
+.halo-compare-colors-image .title {
+  display: block;
+  text-transform: capitalize;
+  margin: 0;
+}
+
+@media (min-width: 750px) {
+  .halo-compare-colors-image .item {
+    width: 33.3333333%;
+  }
+}
+
+@media (min-width: 1025px) {
+  .halo-compare-colors-image .item {
+    width: 20%;
+  }
+}

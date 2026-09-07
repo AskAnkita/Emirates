@@ -1,0 +1,227 @@
+{% liquid
+  assign unavailable_variants = product.variants | where: "available", false
+  assign button_style = block.settings.button_style
+  assign button_label = block.settings.button_label
+  assign notification_message = block.settings.notification_message
+
+  assign form_id = block.id | default: section.id | prepend: 'ContactForm-'
+  assign current_variant = product.selected_or_first_available_variant
+%}
+
+{% if unavailable_variants.size > 0 %}
+  <div class="back-in-stock-alert{% if current_variant.inventory_quantity > 0 or current_variant.inventory_policy == 'continue' %} hidden{% endif %}">
+    {% content_for 'blocks' %}
+    <contact-form id="{{ form_id }}">
+      {%- form 'contact', id: form_id -%}
+        <textarea rows="1" name="contact[product-title]" class="hidden">
+          {{ product.title }}
+        </textarea>
+        {% unless product.has_only_default_variant %}
+          <textarea rows="1" name="contact[product-variant]" class="hidden" data-back-instock-variant>
+            {{ unavailable_variants.first.title }}
+          </textarea>
+        {% endunless %}
+        <textarea rows="1" name="contact[product-url]" class="hidden">
+          {{ request.origin }}{{ product.url }}
+        </textarea>
+
+        <textarea rows="1" name="contact[message]" class="hidden">
+          {{ notification_message }}
+        </textarea>
+
+        <div class="flex flex-{{ block.settings.desktop_direction }} max-sm:flex-{{ block.settings.mobile_direction }}" style="--gap: {{ block.settings.gap }}px;">
+          {%- unless product.has_only_default_variant -%}
+            <textarea rows="1" back-instock-text class="back-instock-text hidden">{{ product.title }}{% unless product.has_only_default_variant %} ( {{ unavailable_variants.first.title }} ){% endunless %} - {{ request.origin }}{{ unavailable_variants.first.url }}?variant={{ unavailable_variants.first.id }}</textarea>
+            <select back-instock-select class="back-instock-select hidden" form="{{ form_id }}">
+              {%- for variant in unavailable_variants -%}
+                <option value="{{ variant.id }}"{% if unavailable_variants.first.id == variant.id %} selected{% endif %}>{{ variant.title }}</option>
+              {%- endfor -%}
+            </select>
+          {%- endunless -%}
+
+          <label for="{{ block.id }}" class="hidden">{{ 'content.label' | t }}</label>
+          <input id="{{ block.id }}" type="email" name="contact[email]" placeholder="Email" autocomplete="email" required="required" class="w-full flex-1">
+
+          <button class="button{% if button_style == 'outline' %}-secondary{% endif %} whitespace-nowrap" type="submit">{{ button_label }}</button>
+        </div>
+      {%- endform -%}
+    </contact-form>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:names.back_in_stock_alert",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:settings.layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_direction",
+      "label": "t:settings.direction",
+      "options": [
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        },
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        }
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "mobile_direction",
+      "label": "t:settings.direction_on_mobile",
+      "options": [
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        },
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "unit": "px",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:settings.button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:settings.label",
+      "default": "Notify me"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "outline",
+          "label": "t:options.outline"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "header",
+      "content": "t:content.message"
+    },
+    {
+      "type": "text",
+      "id": "notification_message",
+      "label": "t:settings.notification_message",
+      "default": "Please notify me when this product is back in stock.",
+      "info": "t:info.notification_message_info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.back_in_stock_alert",
+      "category": "t:categories.product",
+      "blocks": {
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Leave your email and we will notify as soon as the product/variant is back in stock</p>",
+            "typing_text": false,
+            "primary_text": "Welcome to our store!",
+            "secondary_text": "Exclusive offers just for you.",
+            "third_text": "Shop now and enjoy deals!",
+            "highlight_text": false,
+            "highlight_text_content": "",
+            "highlight_text_type": "text",
+            "underline_height": 18,
+            "underline_offset": 20,
+            "highlight_text_color": "#000000",
+            "highlight_underline_color": "#000000",
+            "spacing_text": false,
+            "spacing_text_content": "",
+            "spacing_text_left": 0,
+            "spacing_text_right": 0,
+            "stroke_text": false,
+            "stroke_text_content": "",
+            "width": "fit-content",
+            "unit": "percent",
+            "custom_width": 100,
+            "custom_width_pixel": 500,
+            "inherit_text_alignment": true,
+            "justify_alignment": false,
+            "alignment": "left",
+            "width_tablet": "fit-content",
+            "unit_tablet": "percent",
+            "custom_width_tablet": 100,
+            "custom_width_tablet_pixel": 100,
+            "inherit_text_alignment_tablet": true,
+            "justify_alignment_tablet": false,
+            "alignment_tablet": "left",
+            "width_mobile": "fit-content",
+            "unit_mobile": "percent",
+            "custom_width_mobile": 100,
+            "custom_width_mobile_pixel": 100,
+            "inherit_text_alignment_mobile": true,
+            "justify_alignment_mobile": false,
+            "alignment_mobile": "left",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1.6rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "enable_border": false,
+            "enable_border_bottom": false,
+            "border": "none",
+            "border_width": 0,
+            "border_width_type": "100%",
+            "border_custom_width": 100,
+            "border_radius": 0,
+            "text_effect": "none",
+            "animation_repeat": false,
+            "padding-block-start": 0,
+            "padding-block-end": 10,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": ["text"]
+    }
+  ]
+}
+{% endschema %}

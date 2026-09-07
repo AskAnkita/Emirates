@@ -1,0 +1,182 @@
+{% doc %}
+  Intended for use in a block similar to the product card block.
+
+  @param {boolean} [show_badges] - The show badges
+{% enddoc %}
+
+{%- liquid
+  assign card_product = closest.product
+  assign media_aspect_ratio = block.settings.image_ratio
+  assign show_secondary_image = block.settings.show_secondary_image
+  assign show_badges = show_badges | default: true
+  assign ratio = 1
+  if card_product.featured_media and media_aspect_ratio == 'portrait'
+    assign ratio = 0.8
+  elsif card_product.featured_media and media_aspect_ratio == 'adapt'
+    assign ratio = card_product.featured_media.aspect_ratio
+  endif
+  if ratio == 0 or ratio == null
+    assign ratio = 1
+  endif
+
+  if settings.show_new_badge
+    assign new_badge = false
+    assign new_badge_type = settings.new_badge_type
+    if new_badge_type == 'auto'
+      assign date_start = card_product.created_at | date: '%s'
+      assign date_now = 'now' | date: '%s'
+      assign date_minus = date_now | minus: date_start
+      assign date_difference = date_minus | divided_by: 86400
+      assign new_badge_time = settings.new_badge_time
+      if date_difference < new_badge_time
+        assign new_badge = true
+      endif
+    else
+      for tag in card_product.tags
+        assign tag_handle = tag | handle
+        if tag_handle == 'new'
+          assign new_badge = true
+        endif
+      endfor
+    endif
+  endif
+
+  if settings.show_custom_badge
+    assign custom_badge = false
+    assign custom_badge_text = card_product.metafields.custom.custom_badge
+
+    if custom_badge_text
+      assign custom_badge = true
+    endif
+  endif
+
+  if settings.badge_position == 'top left'
+    assign check_pos_badge = 'top-left'
+  elsif settings.badge_position == 'top right'
+    assign check_pos_badge = 'top-right'
+  elsif settings.badge_position == 'bottom left'
+    assign check_pos_badge = 'bottom-left'
+  elsif settings.badge_position == 'bottom right'
+    assign check_pos_badge = 'bottom-right'
+  endif
+-%}
+
+{%- if card_product and card_product != empty -%}
+  {%- if card_product.featured_media -%}
+    <div class="card--block-media overflow-hidden card-badge-is-{{ check_pos_badge }} relative group-block w-full" style="{%- if block.settings.width_option == 'custom' -%} --globalGroupWidth: {{ block.settings.custom_width }}%;{%- endif -%}">
+      <div class="ratio" style="--ratio-percent: {{ 1 | divided_by: ratio | times: 100 }}%;">
+        {%- render 'card-product-media', show_secondary_image: show_secondary_image, card_product: card_product -%}
+
+        {%- if show_badges -%}
+          <div class="card__content relative">
+            <div class="card__badge relative {{ settings.badge_position }}" style="{%- render 'badge-position-style' -%}">
+              {%- render 'product-badge',
+                card_product: card_product,
+                new_badge: new_badge,
+                custom_badge: custom_badge,
+                custom_badge_text: custom_badge_text
+              -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+      <div class="card--block-blocks">
+        {% content_for 'blocks' %}
+      </div>
+    </div>
+  {%- endif -%}
+{%- else -%}
+  <div
+    class="group-block media-block card__inner{% if settings.card_style == 'standard' %} color-{{ settings.card_color_scheme }}{% endif %} ratio"
+    data-cart-media
+    style="--ratio-percent: 100%;{%- if block.settings.width_option == 'custom' -%} --globalGroupWidth: {{ block.settings.custom_width }}%;{%- endif -%}"
+  >
+    <div class="card__media">
+      <div class="media media--transparent">
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.product_media",
+  "tag": null,
+  "blocks": [
+    { "type": "_card-product-bottom" },
+    { "type": "_card-product-group-button" },
+    { "type": "_card-product-group-content" }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:options.adapt_to_image"
+        },
+        {
+          "value": "portrait",
+          "label": "t:options.portrait"
+        },
+        {
+          "value": "square",
+          "label": "t:options.square"
+        }
+      ],
+      "default": "adapt",
+      "label": "t:settings.image_ratio"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "default": true,
+      "label": "t:settings.show_second_image_on_hover"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_add",
+      "default": true,
+      "label": "t:settings.enable_quick_add_button"
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "width_option",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "full",
+          "label": "t:options.full"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:settings.custom_percent",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 80,
+      "visible_if": "{{ block.settings.width_option == 'custom' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_media"
+    }
+  ]
+}
+{% endschema %}

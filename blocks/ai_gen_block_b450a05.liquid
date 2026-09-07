@@ -1,0 +1,770 @@
+{% doc %}
+  @prompt
+    Create a mega menu for the header navigation where hovering over a top-level menu item reveals a full-width dropdown panel. The panel should have a multi-column layout: a left column with sub-category links (with bold section headings), a middle column with more detailed sub-links, and a right side showing featured images that change dynamically when hovering over different sub-menu options. The images on the right should update/swap smoothly when the user hovers over different links in the left or middle columns. The mega menu should have a clean, luxury retail aesthetic with smooth transitions, white background, and elegant typography. It should work with the existing navigation menu link list from theme settings.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-mega-menu-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+
+  .ai-mega-menu-trigger-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: {{ block.settings.trigger_padding_vertical }}px {{ block.settings.trigger_padding_horizontal }}px;
+    color: {{ block.settings.trigger_text_color }};
+    text-decoration: none;
+    font-size: {{ block.settings.trigger_font_size }}px;
+    font-weight: {{ block.settings.trigger_font_weight }};
+    letter-spacing: {{ block.settings.trigger_letter_spacing }}px;
+    text-transform: {{ block.settings.trigger_text_transform }};
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+
+  .ai-mega-menu-trigger-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.trigger_hover_color }};
+  }
+
+  .ai-mega-menu-panel-{{ ai_gen_id }} {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    background-color: {{ block.settings.panel_background }};
+    box-shadow: 0 4px 20px rgba(0, 0, 0, {{ block.settings.panel_shadow_opacity }});
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    z-index: 1000;
+    padding: {{ block.settings.panel_padding_vertical }}px 0;
+  }
+
+  .ai-mega-menu-{{ ai_gen_id }}:hover .ai-mega-menu-panel-{{ ai_gen_id }} {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .ai-mega-menu-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.panel_max_width }}px;
+    margin: 0 auto;
+    padding: 0 {{ block.settings.panel_padding_horizontal }}px;
+  }
+
+  .ai-mega-menu-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: {{ block.settings.left_column_width }}% {{ block.settings.middle_column_width }}% 1fr;
+    gap: {{ block.settings.column_gap }}px;
+    align-items: start;
+  }
+
+  .ai-mega-menu-column-{{ ai_gen_id }} {
+    padding: 0 {{ block.settings.column_padding }}px;
+  }
+
+  .ai-mega-menu-section-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.section_heading_size }}px;
+    font-weight: {{ block.settings.section_heading_weight }};
+    color: {{ block.settings.section_heading_color }};
+    margin: 0 0 {{ block.settings.section_heading_margin }}px 0;
+    letter-spacing: {{ block.settings.section_heading_letter_spacing }}px;
+    text-transform: {{ block.settings.section_heading_transform }};
+  }
+
+  .ai-mega-menu-link-list-{{ ai_gen_id }} {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 {{ block.settings.link_list_spacing }}px 0;
+  }
+
+  .ai-mega-menu-link-item-{{ ai_gen_id }} {
+    margin-bottom: {{ block.settings.link_item_spacing }}px;
+  }
+
+  .ai-mega-menu-link-{{ ai_gen_id }} {
+    display: inline-block;
+    color: {{ block.settings.link_color }};
+    text-decoration: none;
+    font-size: {{ block.settings.link_font_size }}px;
+    line-height: 1.5;
+    transition: color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+  }
+
+  .ai-mega-menu-link-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.link_hover_color }};
+    transform: translateX(4px);
+  }
+
+  .ai-mega-menu-featured-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: {{ block.settings.featured_image_height }}px;
+    overflow: hidden;
+    border-radius: {{ block.settings.image_border_radius }}px;
+  }
+
+  .ai-mega-menu-featured-image-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity {{ block.settings.image_transition_speed }}s ease;
+  }
+
+  .ai-mega-menu-featured-image-{{ ai_gen_id }}.active {
+    opacity: 1;
+  }
+
+  .ai-mega-menu-featured-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-mega-menu-featured-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 200px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-mega-menu-panel-{{ ai_gen_id }} {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+<ai-mega-menu-{{ ai_gen_id }} class="ai-mega-menu-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <a class="ai-mega-menu-trigger-{{ ai_gen_id }}" href="{{ block.settings.menu_link }}">
+    {{ block.settings.menu_title }}
+  </a>
+
+  <div class="ai-mega-menu-panel-{{ ai_gen_id }}">
+    <div class="ai-mega-menu-container-{{ ai_gen_id }}">
+      <div class="ai-mega-menu-grid-{{ ai_gen_id }}">
+        <div class="ai-mega-menu-column-{{ ai_gen_id }} ai-mega-menu-left-column-{{ ai_gen_id }}">
+          {% if block.settings.left_section_heading != blank %}
+            <h3 class="ai-mega-menu-section-heading-{{ ai_gen_id }}">{{ block.settings.left_section_heading }}</h3>
+          {% endif %}
+          
+          {% if block.settings.left_menu != blank %}
+            <ul class="ai-mega-menu-link-list-{{ ai_gen_id }}">
+              {% for link in block.settings.left_menu.links %}
+                <li class="ai-mega-menu-link-item-{{ ai_gen_id }}">
+                  <a 
+                    href="{{ link.url }}" 
+                    class="ai-mega-menu-link-{{ ai_gen_id }}"
+                    data-image-index="{{ forloop.index0 }}"
+                  >
+                    {{ link.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="ai-mega-menu-column-{{ ai_gen_id }} ai-mega-menu-middle-column-{{ ai_gen_id }}">
+          {% if block.settings.middle_section_heading != blank %}
+            <h3 class="ai-mega-menu-section-heading-{{ ai_gen_id }}">{{ block.settings.middle_section_heading }}</h3>
+          {% endif %}
+          
+          {% if block.settings.middle_menu != blank %}
+            <ul class="ai-mega-menu-link-list-{{ ai_gen_id }}">
+              {% for link in block.settings.middle_menu.links %}
+                <li class="ai-mega-menu-link-item-{{ ai_gen_id }}">
+                  <a 
+                    href="{{ link.url }}" 
+                    class="ai-mega-menu-link-{{ ai_gen_id }}"
+                    data-image-index="{{ forloop.index0 | plus: block.settings.left_menu.links.size }}"
+                  >
+                    {{ link.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="ai-mega-menu-column-{{ ai_gen_id }} ai-mega-menu-right-column-{{ ai_gen_id }}">
+          <div class="ai-mega-menu-featured-image-wrapper-{{ ai_gen_id }}">
+            {% if block.settings.featured_image_1 %}
+              <img
+                src="{{ block.settings.featured_image_1 | image_url: width: 800 }}"
+                alt="{{ block.settings.featured_image_1.alt | escape }}"
+                class="ai-mega-menu-featured-image-{{ ai_gen_id }} active"
+                data-image-index="0"
+                loading="lazy"
+                width="800"
+                height="{{ block.settings.featured_image_height }}"
+              >
+            {% else %}
+              <div class="ai-mega-menu-featured-image-placeholder-{{ ai_gen_id }}">
+                {{ 'collection-apparel-1' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+
+            {% if block.settings.featured_image_2 %}
+              <img
+                src="{{ block.settings.featured_image_2 | image_url: width: 800 }}"
+                alt="{{ block.settings.featured_image_2.alt | escape }}"
+                class="ai-mega-menu-featured-image-{{ ai_gen_id }}"
+                data-image-index="1"
+                loading="lazy"
+                width="800"
+                height="{{ block.settings.featured_image_height }}"
+              >
+            {% endif %}
+
+            {% if block.settings.featured_image_3 %}
+              <img
+                src="{{ block.settings.featured_image_3 | image_url: width: 800 }}"
+                alt="{{ block.settings.featured_image_3.alt | escape }}"
+                class="ai-mega-menu-featured-image-{{ ai_gen_id }}"
+                data-image-index="2"
+                loading="lazy"
+                width="800"
+                height="{{ block.settings.featured_image_height }}"
+              >
+            {% endif %}
+
+            {% if block.settings.featured_image_4 %}
+              <img
+                src="{{ block.settings.featured_image_4 | image_url: width: 800 }}"
+                alt="{{ block.settings.featured_image_4.alt | escape }}"
+                class="ai-mega-menu-featured-image-{{ ai_gen_id }}"
+                data-image-index="3"
+                loading="lazy"
+                width="800"
+                height="{{ block.settings.featured_image_height }}"
+              >
+            {% endif %}
+
+            {% if block.settings.featured_image_5 %}
+              <img
+                src="{{ block.settings.featured_image_5 | image_url: width: 800 }}"
+                alt="{{ block.settings.featured_image_5.alt | escape }}"
+                class="ai-mega-menu-featured-image-{{ ai_gen_id }}"
+                data-image-index="4"
+                loading="lazy"
+                width="800"
+                height="{{ block.settings.featured_image_height }}"
+              >
+            {% endif %}
+
+            {% if block.settings.featured_image_6 %}
+              <img
+                src="{{ block.settings.featured_image_6 | image_url: width: 800 }}"
+                alt="{{ block.settings.featured_image_6.alt | escape }}"
+                class="ai-mega-menu-featured-image-{{ ai_gen_id }}"
+                data-image-index="5"
+                loading="lazy"
+                width="800"
+                height="{{ block.settings.featured_image_height }}"
+              >
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ai-mega-menu-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class AiMegaMenu{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.links = [];
+        this.images = [];
+        this.currentImageIndex = 0;
+      }
+
+      connectedCallback() {
+        this.links = this.querySelectorAll('.ai-mega-menu-link-{{ ai_gen_id }}');
+        this.images = this.querySelectorAll('.ai-mega-menu-featured-image-{{ ai_gen_id }}');
+        
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.links.forEach((link) => {
+          link.addEventListener('mouseenter', (e) => {
+            const imageIndex = parseInt(e.target.getAttribute('data-image-index'));
+            this.switchImage(imageIndex);
+          });
+        });
+      }
+
+      switchImage(index) {
+        if (index === this.currentImageIndex || index >= this.images.length) {
+          return;
+        }
+
+        this.images.forEach((img) => {
+          img.classList.remove('active');
+        });
+
+        if (this.images[index]) {
+          this.images[index].classList.add('active');
+          this.currentImageIndex = index;
+        }
+      }
+    }
+
+    customElements.define('ai-mega-menu-{{ ai_gen_id }}', AiMegaMenu{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Mega menu",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Menu trigger"
+    },
+    {
+      "type": "text",
+      "id": "menu_title",
+      "label": "Menu title",
+      "default": "Shop"
+    },
+    {
+      "type": "url",
+      "id": "menu_link",
+      "label": "Menu link"
+    },
+    {
+      "type": "color",
+      "id": "trigger_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "trigger_hover_color",
+      "label": "Hover color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "trigger_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "trigger_font_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "trigger_text_transform",
+      "label": "Text transform",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "Capitalize"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "trigger_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "trigger_padding_vertical",
+      "label": "Vertical padding",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "trigger_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Panel style"
+    },
+    {
+      "type": "color",
+      "id": "panel_background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "panel_shadow_opacity",
+      "label": "Shadow opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.1
+    },
+    {
+      "type": "range",
+      "id": "panel_max_width",
+      "label": "Maximum width",
+      "min": 1000,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_vertical",
+      "label": "Vertical padding",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Column layout"
+    },
+    {
+      "type": "range",
+      "id": "left_column_width",
+      "label": "Left column width",
+      "min": 15,
+      "max": 35,
+      "step": 5,
+      "unit": "%",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "middle_column_width",
+      "label": "Middle column width",
+      "min": 15,
+      "max": 35,
+      "step": 5,
+      "unit": "%",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Gap between columns",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "column_padding",
+      "label": "Column padding",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Left column"
+    },
+    {
+      "type": "text",
+      "id": "left_section_heading",
+      "label": "Section heading",
+      "default": "Categories"
+    },
+    {
+      "type": "link_list",
+      "id": "left_menu",
+      "label": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Middle column"
+    },
+    {
+      "type": "text",
+      "id": "middle_section_heading",
+      "label": "Section heading",
+      "default": "Featured"
+    },
+    {
+      "type": "link_list",
+      "id": "middle_menu",
+      "label": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Section headings"
+    },
+    {
+      "type": "range",
+      "id": "section_heading_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "section_heading_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semibold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "section_heading_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "section_heading_transform",
+      "label": "Text transform",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "Capitalize"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "section_heading_letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 3,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "section_heading_margin",
+      "label": "Bottom margin",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Links"
+    },
+    {
+      "type": "range",
+      "id": "link_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Color",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Hover color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "link_item_spacing",
+      "label": "Spacing between links",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "link_list_spacing",
+      "label": "Spacing after link list",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Featured images"
+    },
+    {
+      "type": "paragraph",
+      "content": "Images will change when hovering over menu links. Add images in order matching your menu items."
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image_1",
+      "label": "Image 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image_2",
+      "label": "Image 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image_3",
+      "label": "Image 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image_4",
+      "label": "Image 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image_5",
+      "label": "Image 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "featured_image_6",
+      "label": "Image 6"
+    },
+    {
+      "type": "range",
+      "id": "featured_image_height",
+      "label": "Image height",
+      "min": 200,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "image_transition_speed",
+      "label": "Transition speed",
+      "min": 0.1,
+      "max": 1,
+      "step": 0.1,
+      "unit": "s",
+      "default": 0.3
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mega menu"
+    }
+  ]
+}
+{% endschema %}

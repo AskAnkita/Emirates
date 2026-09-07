@@ -1,0 +1,340 @@
+{%- comment -%}
+  Renders the luxury mega menu inside the header menu row.
+
+  Accepts:
+  - block: {Object} A header section block of type "luxury_mega_menu"
+
+  Usage:
+    {% render 'luxury-mega-menu', block: block %}
+{%- endcomment -%}
+
+{%- liquid
+  assign uid = block.id | replace: '_', '' | replace: '-', '' | downcase
+  assign s = block.settings
+-%}
+
+{% style %}
+  .ai-mm-{{ uid }} {
+    display: inline-block;
+    position: relative;
+  }
+
+  .ai-mm-trigger-{{ uid }} {
+    position: relative;
+    display: inline-block;
+  }
+
+  .ai-mm-trigger-{{ uid }} > a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    padding: 10px 15px;
+    font-family: var(--button-type-font-link, inherit);
+    font-size: var(--button-font-size-link, 1.4rem);
+    font-weight: var(--button-font-weight-link, inherit);
+    text-transform: var(--text-transform, none);
+    white-space: nowrap;
+  }
+
+  .ai-mm-panel-{{ uid }} {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    background-color: {{ s.panel_background }};
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+  }
+
+  .ai-mm-{{ uid }}:hover .ai-mm-panel-{{ uid }},
+  .ai-mm-{{ uid }}:focus-within .ai-mm-panel-{{ uid }} {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .ai-mm-content-{{ uid }} {
+    max-width: {{ s.content_max_width }}px;
+    margin: 0 auto;
+    padding: {{ s.panel_padding_vertical }}px {{ s.panel_padding_horizontal }}px;
+  }
+
+  .ai-mm-grid-{{ uid }} {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: {{ s.column_gap }}px;
+  }
+
+  .ai-mm-col-{{ uid }} {
+    padding: 0 {{ s.column_padding }}px;
+    position: relative;
+  }
+
+  .ai-mm-col-{{ uid }}:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: calc({{ s.column_gap }}px / -2);
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: {{ s.divider_color }};
+  }
+
+  .ai-mm-group-{{ uid }}:not(:last-child) {
+    padding-bottom: {{ s.group_spacing }}px;
+    margin-bottom: {{ s.group_spacing }}px;
+    border-bottom: 1px solid {{ s.divider_color }};
+  }
+
+  .ai-mm-heading-{{ uid }} {
+    font-weight: {{ s.heading_font_weight }};
+    text-transform: uppercase;
+    font-size: {{ s.heading_font_size }}px;
+    color: {{ s.heading_color }};
+    margin: 0 0 {{ s.heading_margin_bottom }}px;
+    letter-spacing: {{ s.heading_letter_spacing }}px;
+  }
+
+  .ai-mm-links-{{ uid }} {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ai-mm-links-{{ uid }} li {
+    margin-bottom: {{ s.link_spacing }}px;
+  }
+
+  .ai-mm-links-{{ uid }} li:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-mm-links-{{ uid }} a {
+    text-decoration: none;
+    color: {{ s.link_color }};
+    font-size: {{ s.link_font_size }}px;
+    transition: color 0.2s ease;
+    display: block;
+  }
+
+  .ai-mm-links-{{ uid }} a:hover {
+    color: {{ s.link_hover_color }};
+  }
+
+  .ai-mm-media-{{ uid }} img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  .ai-mm-placeholder-{{ uid }} {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-mm-placeholder-{{ uid }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-mm-rule-{{ uid }} {
+    height: 1px;
+    background-color: {{ s.divider_color }};
+    margin: {{ s.section_spacing }}px 0;
+  }
+
+  .ai-mm-buttons-heading-{{ uid }} {
+    font-weight: {{ s.heading_font_weight }};
+    text-transform: uppercase;
+    font-size: {{ s.heading_font_size }}px;
+    color: {{ s.heading_color }};
+    letter-spacing: {{ s.heading_letter_spacing }}px;
+    margin: 0 0 {{ s.heading_margin_bottom }}px;
+  }
+
+  .ai-mm-buttons-{{ uid }} {
+    display: flex;
+    gap: {{ s.button_gap }}px;
+    flex-wrap: wrap;
+  }
+
+  .ai-mm-button-{{ uid }} {
+    padding: {{ s.button_padding_vertical }}px {{ s.button_padding_horizontal }}px;
+    border: {{ s.button_border_width }}px solid {{ s.button_border_color }};
+    background-color: transparent;
+    color: {{ s.button_text_color }};
+    text-decoration: none;
+    font-size: {{ s.button_font_size }}px;
+    transition: all 0.2s ease;
+    border-radius: {{ s.button_border_radius }}px;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .ai-mm-button-{{ uid }}:hover {
+    background-color: {{ s.button_hover_background }};
+    color: {{ s.button_hover_text_color }};
+    border-color: {{ s.button_hover_border_color }};
+  }
+
+  @media screen and (max-width: 1199px) {
+    .ai-mm-grid-{{ uid }} {
+      grid-template-columns: repeat(3, 1fr);
+      row-gap: {{ s.section_spacing }}px;
+    }
+
+    .ai-mm-col-{{ uid }}:nth-child(3n)::after {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-mm-{{ uid }} {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-mm-{{ uid }}" {{ block.shopify_attributes }}>
+  <div class="ai-mm-trigger-{{ uid }}">
+    <a href="{{ s.nav_link | default: '#' }}">{{ s.nav_label }}</a>
+  </div>
+
+  <div class="ai-mm-panel-{{ uid }}">
+    <div class="ai-mm-content-{{ uid }}">
+      <div class="ai-mm-grid-{{ uid }}">
+        {%- comment -%} Column 1: two stacked groups {%- endcomment -%}
+        <div class="ai-mm-col-{{ uid }}">
+          <div class="ai-mm-group-{{ uid }}">
+            {% if s.col1_heading1 != blank %}
+              <h3 class="ai-mm-heading-{{ uid }}">{{ s.col1_heading1 }}</h3>
+            {% endif %}
+            <ul class="ai-mm-links-{{ uid }}">
+              {% for i in (1..4) %}
+                {%- liquid
+                  assign label_key = 'col1_link' | append: i | append: '_label'
+                  assign url_key = 'col1_link' | append: i | append: '_url'
+                -%}
+                {% if s[label_key] != blank %}
+                  <li><a href="{{ s[url_key] | default: '#' }}">{{ s[label_key] }}</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div class="ai-mm-group-{{ uid }}">
+            {% if s.col1_heading2 != blank %}
+              <h3 class="ai-mm-heading-{{ uid }}">{{ s.col1_heading2 }}</h3>
+            {% endif %}
+            <ul class="ai-mm-links-{{ uid }}">
+              {% for i in (5..8) %}
+                {%- liquid
+                  assign label_key = 'col1_link' | append: i | append: '_label'
+                  assign url_key = 'col1_link' | append: i | append: '_url'
+                -%}
+                {% if s[label_key] != blank %}
+                  <li><a href="{{ s[url_key] | default: '#' }}">{{ s[label_key] }}</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+        {%- comment -%} Column 2 {%- endcomment -%}
+        <div class="ai-mm-col-{{ uid }}">
+          {% if s.col2_heading != blank %}
+            <h3 class="ai-mm-heading-{{ uid }}">{{ s.col2_heading }}</h3>
+          {% endif %}
+          <ul class="ai-mm-links-{{ uid }}">
+            {% for i in (1..5) %}
+              {%- liquid
+                assign label_key = 'col2_link' | append: i | append: '_label'
+                assign url_key = 'col2_link' | append: i | append: '_url'
+              -%}
+              {% if s[label_key] != blank %}
+                <li><a href="{{ s[url_key] | default: '#' }}">{{ s[label_key] }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+
+        {%- comment -%} Column 3 {%- endcomment -%}
+        <div class="ai-mm-col-{{ uid }}">
+          {% if s.col3_heading != blank %}
+            <h3 class="ai-mm-heading-{{ uid }}">{{ s.col3_heading }}</h3>
+          {% endif %}
+          <ul class="ai-mm-links-{{ uid }}">
+            {% for i in (1..4) %}
+              {%- liquid
+                assign label_key = 'col3_link' | append: i | append: '_label'
+                assign url_key = 'col3_link' | append: i | append: '_url'
+              -%}
+              {% if s[label_key] != blank %}
+                <li><a href="{{ s[url_key] | default: '#' }}">{{ s[label_key] }}</a></li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+
+        {%- comment -%} Columns 4 and 5: featured images {%- endcomment -%}
+        {% for n in (1..2) %}
+          {%- liquid
+            assign image_key = 'featured_image' | append: n
+            assign image_url_key = 'featured_image' | append: n | append: '_url'
+            assign image = s[image_key]
+          -%}
+          <div class="ai-mm-col-{{ uid }}">
+            {% if s[image_url_key] != blank %}<a href="{{ s[image_url_key] }}">{% endif %}
+            {% if image != blank %}
+              <div class="ai-mm-media-{{ uid }}">
+                <img
+                  src="{{ image | image_url: width: 600 }}"
+                  srcset="{{ image | image_url: width: 400 }} 400w, {{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w"
+                  sizes="(min-width: 990px) 20vw, 100vw"
+                  alt="{{ image.alt | escape }}"
+                  loading="lazy"
+                  width="{{ image.width }}"
+                  height="{{ image.height }}"
+                >
+              </div>
+            {% else %}
+              <div class="ai-mm-placeholder-{{ uid }}">
+                {{ 'image' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+            {% if s[image_url_key] != blank %}</a>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="ai-mm-rule-{{ uid }}"></div>
+
+      {% if s.buttons_heading != blank %}
+        <h3 class="ai-mm-buttons-heading-{{ uid }}">{{ s.buttons_heading }}</h3>
+      {% endif %}
+
+      <div class="ai-mm-buttons-{{ uid }}">
+        {% for i in (1..5) %}
+          {%- liquid
+            assign label_key = 'button' | append: i | append: '_label'
+            assign url_key = 'button' | append: i | append: '_url'
+          -%}
+          {% if s[label_key] != blank %}
+            <a href="{{ s[url_key] | default: '#' }}" class="ai-mm-button-{{ uid }}">{{ s[label_key] }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

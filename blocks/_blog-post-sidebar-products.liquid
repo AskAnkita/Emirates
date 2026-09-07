@@ -1,0 +1,275 @@
+{%- liquid
+  assign bl_stts = block.settings
+  assign bl_id = block.id
+  assign text = bl_stts.text
+  assign collection = bl_stts.collection
+  assign layout = bl_stts.layout
+  assign limit = bl_stts.limit
+  assign dots = bl_stts.dots
+  assign arrows = bl_stts.arrows
+  assign scroll_reveal = settings.animations_reveal_on_scroll
+  assign columns_gap = bl_stts.columns_gap
+  assign rows_gap = bl_stts.rows_gap
+  assign collapse = bl_stts.collapse
+  if layout == 'slider'
+    assign is_slider = true
+  else
+    assign is_slider = false
+  endif
+
+  assign collapse = bl_stts.collapse
+  assign collapse_default = bl_stts.collapse_default
+  assign collapse_icon = bl_stts.collapse_icon
+  if collapse == true
+    assign element = 'accordion-custom'
+    if collapse_default == 'open'
+      assign is_open = true
+    else
+      assign is_open = false
+    endif
+  else
+    assign element = 'div'
+  endif
+-%}
+
+{% capture list_items %}
+  {% for product in collection.products limit: limit %}
+    <li id="Slide-{{ bl_id }}-{{ product.id }}-{{ forloop.index }}" class="{% if is_slider %} swiper-slide{% endif %}{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}"
+    {% if scroll_reveal %} style="--animation-order: {{ forloop.index }};"{% endif %}
+    >
+      {% content_for "block", type: "card-product-flex", id: "product-slide-item", closest.product: product %}
+    </li>
+
+    {% unless forloop.last %}
+      <!--@list/split-->
+    {% endunless %}
+
+  {% endfor %}
+{% endcapture %}
+
+{% if collection != blank %}
+<{{ element }}
+  class="blog-post__sidebar-products blog-posts__sidebar-item"
+  {% if is_open %}
+    open-by-default-on-desktop
+    open-by-default-on-mobile
+  {% endif %}
+>
+  {% if collapse %}
+    <details
+      {% if is_open %}
+        open
+      {% endif %}
+    >
+      <summary>
+  {% endif %}
+
+  {% if text != blank %}
+    <h3 class="blog-posts__sidebar-heading{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}{% if collapse %} blog-posts__sidebar-collapse-button cursor-pointer{% endif %}">
+      {{ text }}
+    </h3>
+  {%- elsif text == blank and collapse == true -%}
+    <h3 class="blog-posts__sidebar-heading blog-posts__sidebar-collapse-button cursor-pointer">
+      {{ 'content.collapse_row' | t }}
+      {% if collapse_icon != 'none' and collapse %}
+        <span class="svg-wrapper icon-caret-wrapper">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      {% endif %}
+    </h3>
+  {% endif %}
+
+  {% if collapse %}
+    {% if collapse_icon != 'none' %}
+      <span class="svg-wrapper icon-caret-wrapper">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+    {% endif %}
+    </summary>
+  {% endif %}
+
+  {% if collapse %}
+    <div class="details-content">
+  {% endif %}
+
+  {% if dots and is_slider %}
+    {% assign pagination_type = 'bullets' %}
+  {% endif %}
+
+  <div class="blog-post__sidebar-products-list">
+    {%- if is_slider -%}
+      <swiper-component
+        {%- render 'swiper-data',
+          settings: bl_stts,
+          loop: false,
+          auto_height: true,
+          slides_per_view: 1,
+          space_between: columns_gap,
+          pagination_type: pagination_type
+        -%}
+        style="
+          {% render 'swiper-style',
+            columns_mobile: 1,
+            columns_tablet: 1,
+            columns_desktop: 1,
+            columns_gap: columns_gap,
+          %}
+        "
+      >
+        <div class="swiper">
+    {%- endif -%}
+    <ul
+      id="Grid-{{ bl_id }}"
+      data-id="{{ bl_id }}"
+      class="grid grid-layout list-unstyled{% if is_slider %} swiper-wrapper grid-layout-no-js{% else %} grid-layout--1{% endif %}"
+      role="list"
+      data-products-to-show="{{ limit }}"
+      aria-label="{{ 'content.grid.name' | t }}"
+      style="--grid-desktop-horizontal-spacing: {{ columns_gap }}px; --grid-desktop-vertical-spacing: {{ rows_gap }}px;"
+    >
+      {{ list_items }}
+    </ul>
+    {%- if is_slider -%}
+      {%- if arrows -%}
+        <div class="swiper-btns-wrap">
+          {%- render 'swiper-button' -%}
+        </div>
+      {%- endif -%}
+      {%- if dots -%}
+        <div class="swiper-pagination"></div>
+      {%- endif -%}
+      </div>
+      </swiper-component>
+    {%- endif -%}
+  </div>
+
+  {% if collapse %}
+    </div>
+    </details>
+  {% endif %}
+</{{ element }}>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:names.products",
+  "tag": null,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "collapse",
+      "label": "t:settings.collapse",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "collapse_icon",
+      "label": "t:settings.collapse_icon",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "icon-caret",
+          "label": "t:options.caret"
+        }
+      ],
+      "default": "none",
+      "visible_if": "{{ block.settings.collapse == true }}"
+    },
+    {
+      "type": "select",
+      "id": "collapse_default",
+      "label": "t:settings.collapse_style",
+      "visible_if": "{{ block.settings.collapse == true }}",
+      "options": [
+        {
+          "value": "open",
+          "label": "t:settings.collapse_open"
+        },
+        {
+          "value": "close",
+          "label": "t:settings.collapse_close"
+        }
+      ],
+      "default": "close"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:settings.heading",
+      "default": "<p>FEATURED PRODUCTS</p>"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:settings.collection"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:settings.layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:options.grid"
+        },
+        {
+          "value": "slider",
+          "label": "t:options.slider"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "t:settings.limit",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "dots",
+      "label": "t:settings.dots",
+      "default": false,
+      "visible_if": "{{ block.settings.layout == 'slider' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "arrows",
+      "label": "t:settings.arrows",
+      "default": true,
+      "visible_if": "{{ block.settings.layout == 'slider' }}"
+    },
+    {
+      "type": "range",
+      "id": "columns_gap",
+      "label": "t:settings.horizontal_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "rows_gap",
+      "label": "t:settings.vertical_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.products"
+    }
+  ]
+}
+{% endschema %}

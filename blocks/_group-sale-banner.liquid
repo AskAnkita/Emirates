@@ -1,0 +1,180 @@
+<div
+  class="group-block group-block--{{ block.id }}countdown_timer{% if block.settings.inherit_color_scheme == false %} color-scheme-custom{% endif %} bg-transparent{% if block.settings.image %} background-image{% endif %}" 
+  style="
+    background-image: url({{ block.settings.image | image_url: width: 2048 }});
+    --pl:{{ block.settings.padding_left }}px;
+    --pr:{{ block.settings.padding_right }}px;
+    --pt:{{ block.settings.padding_top }}px;
+    --pb:{{ block.settings.padding_bottom }}px;
+    {% if block.settings.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: block.settings %}
+    {% endif %}
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="countdown-text-wrapper flex items-center justify-center" style="--gap: 1rem;--mb: 2rem;">
+    <span class="countdown__text inline-richtext typography-font-body font-normal">{{ block.settings.message }}</span>
+  </div>
+  <count-down class="block" data-countdown="{{ block.settings.countdown }}" data-type="sale-banner" data-hide="{{block.settings.hide_countdown_expired}}">
+    <div class="countdown countdown-border-gradient flex items-center justify-center relative overflow-hidden">
+      <span class="countdown-item inline-block v-a-top center"><span class="flex flex-column items-center justify-center countdown-digit typography-font-body font-semibold relative">0<span class="block body-sm">Days</span></span></span>
+      <span class="countdown-item inline-block v-a-top center w-auto"><span class="flex flex-column items-center justify-center countdown-digit typography-font-body font-semibold relative">0<span class="block body-sm">Hours</span></span></span>
+      <span class="countdown-item inline-block v-a-top center w-auto"><span class="flex flex-column items-center justify-center countdown-digit typography-font-body font-semibold relative">0<span class="block body-sm">Mins</span></span></span>
+      <span class="countdown-item inline-block v-a-top center w-auto"><span class="flex flex-column items-center justify-center countdown-digit typography-font-body font-semibold relative">0<span class="block body-sm">secs</span></span></span>
+    </div>
+    <div class="countdown-expired hidden body-lg inline-richtext" style="--m-t-a: 2rem;">{{ block.settings.expired_message }}</div>
+  </count-down>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.sale_banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 10,
+      "label": "t:settings.top"
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 10,
+      "label": "t:settings.right"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 10,
+      "label": "t:settings.left"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 10,
+      "label": "t:settings.left"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:settings.image"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "message",
+      "label": "t:settings.message",
+      "default": "Limited-time Offer!"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "expired_message",
+      "label": "t:settings.expired_message",
+      "default": "Limited-time Offer!"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_countdown_expired",
+      "default": false,
+      "label": "t:settings.hide_countdown_expired"
+    },
+    {
+      "type" : "text",
+      "id" : "countdown",
+      "label": "t:settings.end_date",
+      "default" : "12/31/2025 11:59:00",
+      "info": "t:info.countdown_info"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_background",
+      "label": "t:settings.background",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color_background",
+      "id": "scheme_background_gradient",
+      "label": "t:settings.background_gradient",
+      "info": "t:info.background_gradient_info",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground_heading",
+      "label": "t:settings.headings",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground",
+      "label": "t:settings.text",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary",
+      "label": "t:settings.primary_color",
+      "default": "#000F9F",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary_hover",
+      "label": "t:settings.primary_hover_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_shadow",
+      "label": "t:settings.shadow_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.sale_banner",
+      "category": "t:categories.header"
+    }
+  ]
+}
+{% endschema %}

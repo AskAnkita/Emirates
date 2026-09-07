@@ -1,0 +1,85 @@
+{%- if section.blocks.size > 0 -%}
+  <multitasking-bar
+    class="multitasking-bar fixed h-auto z-3 no-js-hidden{% if section.blocks.size == 1 %}{% if  section.blocks[0].id contains 'back_to_top' %} only-back-to-top{% endif %}{% endif %}"
+    id="multitasking-bar"
+    style="
+      --right: 0.5%;
+      --color-background: {{ section.settings.background.rgba }};
+      --color-background-rgb: {{ section.settings.background.rgb }};
+      --color-foreground: {{ section.settings.icon.rgba }};
+      --color-foreground-rgb: {{ section.settings.icon.rgb }};
+      --secondary-icon-background: {{ section.settings.secondary_background.rgba }};
+      --secondary-icon: {{ section.settings.secondary_icon.rgba }};
+    "
+  >
+    <div class="multi-t__wrap relative flex flex-column gap-xs" id="multitasking-wrap">
+      {% content_for 'blocks' %}
+
+      <span class="glider absolute flex rounded-full"></span>
+    </div>
+  </multitasking-bar>
+
+  <script src="{{ 'multitasking-bar.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.multitasking_bar",
+  "tag": "section",
+  "class": "section-multitasking-bar",
+  "limit": 1,
+  "blocks": [
+    {
+      "type": "_recently_viewed_products"
+    },
+    {
+      "type": "_social_media"
+    },
+    {
+      "type": "_back_to_top"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["custom.popup"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.colors"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "default": "#ffffff",
+      "alpha": true,
+      "label": "t:settings.background"
+    },
+    {
+      "type": "color",
+      "id": "icon",
+      "default": "#000000",
+      "alpha": true,
+      "label": "t:settings.text_icon"
+    },
+    {
+      "type": "color",
+      "id": "secondary_background",
+      "default": "#1199BB",
+      "alpha": true,
+      "label": "t:settings.background_color_active"
+    },
+    {
+      "type": "color",
+      "id": "secondary_icon",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "label": "t:settings.text_icon_active"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.multitasking_bar"
+    }
+  ]
+}
+{% endschema %}

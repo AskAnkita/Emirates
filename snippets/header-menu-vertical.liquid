@@ -1,0 +1,169 @@
+{% comment %}
+  Renders a vertical menu for the header.
+
+  Usage:
+  {% render 'header-menu-vertical' %}
+{% endcomment %}
+
+{%- liquid
+  assign button_width = bl_stts.button_width
+  assign button_divider = bl_stts.button_divider
+  assign button_inherit_color_scheme = bl_stts.inherit_color_scheme
+  assign button_style_class = 'header__vertical-menu__summary-custom'
+  assign button_border_radius = bl_stts.button_border_radius
+-%}
+
+{%- assign block_id = 'VerticalMenu' -%}
+
+<details
+  class="details--dropdown header__vertical-menu relative none lg:block w-fit"
+  style="
+    {% if button_border_radius > 0 %}
+      --border-radius: {{ button_border_radius }}px;
+    {% endif %}
+  "
+  is="dropdown-details"
+>
+  <summary
+    class="
+     details__summary
+      gap-xl
+      header__vertical-menu__summary
+      header__vertical-menu__summary--{{ button_width }}
+      {% if button_divider %}header__vertical-menu__summary--divider{% endif %}
+      {% if button_inherit_color_scheme == false %}{{ button_style_class }}{% endif %}
+      {% if button_border_radius > 0 %}header__vertical-menu__summary--radius{% endif %}
+    "
+    style="
+      {% if button_inherit_color_scheme == false %}
+          {% render 'color-scheme-style', settings: bl_stts %}
+      {% endif %}
+    "
+  >
+    <span class="svg-wrapper">
+      {{- 'icon-categories.svg' | inline_asset_content -}}
+    </span>
+    <span>{{ bl_stts.vertical_menu_title }}</span>
+    <span class="svg-wrapper">
+      {{- 'icon-caret.svg' | inline_asset_content -}}
+    </span>
+  </summary>
+
+  <nav
+    class="vertical-menu details__list absolute top-full left-0 z-100 w-full details__list global-settings-popup color-{{ bl_stts.color_scheme_vertical_menu }}"
+    tabindex="-1"
+>
+    <ul
+      class="list-unstyled relative"
+      style="--p: 20px 0;--gap-x: {{ menu_gap }}px; "
+    >
+      {% for link in bl_stts.vertical_menu.links %}
+        <li>
+          {%- if link.links != blank -%}
+            <details
+              id="Details-HeaderMenu-Vertical-{{ forloop.index }}"
+              class="details--dropdown mega-menu"
+              is="dropdown-details"
+              activate-event="hover"
+              data-index="0"
+            >
+              <section-fetcher data-section-id="{{ section.id }}" data-target-id="MegaMenu-Content-{{ section.id }}-{{ forloop.index }}-{{ block_id }}" data-activate="interaction"></section-fetcher>
+
+              <summary
+                id="HeaderMenu-Vertical-{{ link.handle }}"
+                class="
+                  details__summary
+                  list-menu__item menu__link--level-1 header__menu-item list-menu__item link focus-inset link--hover-underline
+                "
+                {%- if link.links != blank -%}
+                  aria-controls="submenu-{{ forloop.index }}"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                {%- endif -%}
+              >
+                {% liquid
+                  assign width = 20
+
+                  assign ratio = 1
+
+                  assign image_style = 'width: ' | append: width | append: 'px;' | append: ';' | append: '--media-adapt-ratio:' | append: ratio | append: ';'
+
+                  assign image_sources = 'jpg,png,webp,avif' | split: ','
+                  assign found_image = false
+                -%}
+
+                {% for ext in image_sources %}
+                  {% assign ext = ext | strip %}
+                  {% assign item_image = link.handle | downcase | replace: ' ', '-' | append: '.' | append: ext %}
+                  {% if images[item_image] != blank and found_image == false %}
+                    {% assign found_image = true %}
+                    {% assign image = images[item_image] %}
+                    <span class="icon-image" style="{{ image_style }}">
+                      <img
+                        src="{{ image | image_url: width: 100 }}"
+                        srcset="{{ image | image_url: width: 100 }} 450w, {{ image | image_url: width: 200 }} 900w"
+                        width="450"
+                        height="450"
+                        sizes="{{ sizes }}"
+                        loading="lazy"
+                        alt="{{ shop.name | escape }}"
+                      >
+                    </span>
+                  {% endif %}
+                {% endfor %}
+                <a
+                  class="text {% if link.child_active %} header__active-menu-item{% endif %}"
+                  {% if link.url != blank %}
+                    href="{{ link.url }}"
+                  {% else %}
+                    role="link" aria-disabled="true"
+                  {% endif %}
+                >
+                  {{- link.title | escape -}}
+                </a>
+                {% if icon_type == 'caret' %}
+                  <span class="svg-wrapper">
+                    {{- 'icon-caret.svg' | inline_asset_content -}}
+                  </span>
+                {% endif %}
+              </summary>
+              <div
+                class="details__list mega-menu__content z-1 motion-reduce global-settings-popup color-{{ section.settings.color_scheme_top }}"
+                tabindex="-1"
+              >
+                {%- render 'header-nav-mega',
+                  blocks: blocks,
+                  link: link,
+                  forloopIndex: forloop.index,
+                  block: block,
+                  icon_type: icon_type,
+                  keys: keys,
+                  sec_settings: section.settings,
+                  class_item_hover_reveal: class_item_hover_reveal,
+                  block_id: block_id
+                -%}
+              </div>
+            </details>
+          {%- else -%}
+            <a
+              id="HeaderMenu-Vertical-{{ link.handle }}"
+              href="{{ link.url }}"
+              class="vertical-menu__item header__menu-item link link--text focus-inset"
+              {% if link.current %}
+                aria-current="page"
+              {% endif %}
+            >
+              <span
+                {%- if link.current %}
+                  class="header__active-menu-item"
+                {% endif %}
+              >
+                {{- link.title | escape -}}
+              </span>
+            </a>
+          {%- endif -%}
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</details>

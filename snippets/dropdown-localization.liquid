@@ -1,0 +1,92 @@
+{%- if show_country or show_language -%}
+  {%- if country_style == true -%}
+    <link rel="stylesheet" href="{{ 'icon-flag.css' | asset_url }}" media="print" onload="this.media='all'">
+  {%- endif -%}
+
+  {%- assign hide_mobile = 'small-hide medium-hide' -%}
+
+  {% if localization_type == 'icon' %}
+    {%- capture icon_globe -%}
+      <svg
+        class="icon-globe icon"
+        aria-hidden="true"
+        focusable="false"
+        fill="none"
+        viewBox="0 0 50 50"
+      >
+        {%- render 'icon', icon: 'globe' -%}
+      </svg>
+    {%- endcapture -%}
+    <div class="header__column-action header__column-action--{{ localization_type }} header__icon--localization {{ hide_mobile }}">
+      <div class="header-localization country-language-localization">
+        {%- if show_language or show_country and localization.available_languages.size > 1 -%}
+          <div>
+            <h2 class="visually-hidden" id="HeaderLanguageLabel">{{ 'content.language_label' | t }}</h2>
+            {%- render 'language-country-localization',
+              localPosition: 'HeaderLanguage',
+              country_style: country_style,
+              show_language: show_language,
+              show_country: show_country,
+              icon_globe: icon_globe,
+              section_id: section_id
+            -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  {% elsif localization_type == 'sidebar' %}
+    {%- capture utility_sidebar_icon -%}
+      <svg xmlns="http://www.w3.org/2000/svg" width="34" height="16" viewBox="0 0 34 16" fill="none">
+        <path d="M34 0H0V1.96569H34V0Z" fill="currentColor"/>
+        <path d="M34 6.96875H0V8.93444H34V6.96875Z" fill="currentColor"/>
+        <path d="M34 13.9375H0V15.9032H34V13.9375Z" fill="currentColor"/>
+      </svg>
+    {%- endcapture -%}
+  
+    <side-drawer-opener
+      class="no-js-hidden header__column-action header__column-action--{{ localization_type }} header-actions {{ hide_mobile }}"
+      data-side-drawer="#Custom-Drawer"
+    >
+      <button
+        class="header__icon button relative focus-inset utility-icon--drawer
+        {{ class_icon_type }}{%  if actions_type != 'text' %} header__icon--utility{% endif %}"
+        type="button"
+        aria-haspopup="dialog"
+        aria-label="Header utility sidebar"
+        id="utility-icon-bubble"
+      >
+        <span class="svg-wrapper">
+          {{ utility_sidebar_icon }}
+        </span>
+      </button>
+    </side-drawer-opener>
+  {% else %}
+    <div class="header__column-action header__column-action--{{ localization_type }} header-localization desktop-localization-wrapper max-md:hidden">
+      {%- if show_language and localization.available_languages.size > 1 -%}
+        <localization-form class="{{ hide_mobile }}" data-prevent-hide activate-event="hover">
+          {%- form 'localization', id: 'HeaderLanguageForm', class: 'localization-form' -%}
+            <div>
+              <h2 class="visually-hidden" id="HeaderLanguageLabel">{{ 'content.language_label' | t }}</h2>
+              {%- render 'language-localization', localPosition: 'HeaderLanguage', country_style: country_style -%}
+            </div>
+          {%- endform -%}
+        </localization-form>
+      {%- endif -%}
+
+      {%- if show_language and show_country -%}
+        <span class="separator {{ hide_mobile }}">|</span>
+      {%- endif -%}
+
+      {%- if show_country and localization.available_countries.size > 1 -%}
+        <localization-form class="{{ hide_mobile }}" data-prevent-hide activate-event="hover">
+          {%- form 'localization', id: 'HeaderCountryForm', class: 'localization-form' -%}
+            <div>
+              <h2 class="visually-hidden" id="HeaderCountryLabel">{{ 'content.country_label' | t }}</h2>
+              {%- render 'country-localization', localPosition: 'HeaderCountry', country_style: country_style -%}
+            </div>
+          {%- endform -%}
+        </localization-form>
+      {% endif %}
+    </div>
+  {% endif %}
+{%- endif -%}

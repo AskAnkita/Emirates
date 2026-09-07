@@ -1,0 +1,274 @@
+.quick-add-modal .product-quick-add__media {
+  width: calc(100% - var(--minimum-touch-target, 4.5rem));
+}
+
+.quick-add-modal {
+  inset: 0;
+  background: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+
+  .product-form__buttons-wrapper {
+    grid-template-columns: 1fr;
+    margin-top: 1rem;
+  }
+
+  .scroll-trigger.scroll-trigger {
+    animation: none;
+    opacity: var(--opacity-100);
+    transform: none;
+  }
+
+  .quick-order-list__container {
+    padding-bottom: 1.5rem;
+  }
+
+  .product-form__submit {
+    min-height: 4.4rem;
+    font-size: initial;
+  }
+
+  button[type='submit'] {
+    overflow: hidden;
+    position: relative;
+  }
+
+  @media screen and (min-width: 990px) {
+    .shopify-payment-button {
+      width: 100%;
+    }
+  }
+}
+
+.quick-add-modal__content {
+  --modal-height-offset: 3.2rem;
+  padding: 1rem 0.5rem;
+  min-height: 35rem;
+}
+
+.quick-add-modal__content img {
+  max-width: 100%;
+}
+
+.quick-add-modal__content:not(.quick-add-modal__content--bulk) {
+  max-width: 47.5rem;
+  height: auto;
+  max-height: max-content;
+  width: calc(100% - 3rem);
+  @media screen and (min-width: 750px) {
+    width: 80%;
+  }
+
+  @media screen and (min-width: 990px) {
+    width: 70%;
+  }
+}
+
+/* Quick add bulk */
+.quick-add-modal--bulk .popup__inner {
+  @media screen and (max-width: 1279px) {
+    width: 100%;
+  }
+  @media screen and (min-width: 1280px) {
+    min-width: var(--popup-max-width);
+  }
+}
+
+.quick-add-modal--bulk .variant-item__image-container {
+  display: inline-flex;
+  align-items: flex-start;
+  height: 4.5rem;
+  width: 4.5rem;
+}
+
+.quick-add-modal__content-info.quick-add-modal__content-info--bulk {
+  padding-bottom: 0;
+}
+
+.quick-add-modal__content-info--bulk h3 {
+  margin-block: 0 0.5rem;
+}
+
+.quick-add-modal__content-info--bulk :is(.price, .card__information-volume-pricing-note) {
+  display: inline-block;
+}
+
+.quick-add-modal__content-info--bulk :is(.quick-add__product-media, .quick-add__product-container, .quick-add__info) {
+  width: 4.8rem;
+}
+
+.quick-add-modal__content-info--bulk-details {
+  padding-left: 1rem;
+}
+
+.quick-add-modal__content-info--bulk-details > a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.quick-add-modal__content-info--bulk .quick-add__product-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.quick-add-modal__content-info--bulk .quick-add__content-info__media {
+  width: auto;
+}
+
+.quick-add-modal__content-info {
+  --modal-padding: 1.5rem;
+  padding-inline-end: 4.4rem;
+  display: flex;
+  align-items: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--modal-padding);
+  height: 100%;
+}
+
+.quick-add-modal__content-info > * {
+  height: auto;
+  margin: 0 auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+.quick-add-modal__content-info > .quick-add-modal__content-info {
+  padding-top: 0;
+  margin-top: 2.5rem;
+}
+
+.quick-add-modal__content-info > product-info {
+  padding: 0;
+}
+
+.quick-add-modal--bulk .quick-add-modal__toggle {
+  background: var(--color-background);
+  border: 0.1rem solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  border-radius: var(--style-border-radius-50);
+  color: rgb(var(--color-foreground-rgb) / var(--opacity-55));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 1.2rem;
+  z-index: 5;
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+.quick-add-modal__toggle .icon {
+  height: auto;
+  margin: 0;
+  width: 1.8rem;
+}
+
+quick-add-modal .product:not(.featured-product) .product__view-details {
+  display: block;
+}
+
+.quick-add-modal__content--bulk .product__view-details .icon {
+  margin-left: 1.2rem;
+  display: inline-block;
+}
+
+quick-add-modal
+  :is(
+    .quick-add-hidden,
+    .product__modal-opener:not(.product__modal-opener--image)
+  ) {
+  display: none !important;
+}
+
+quick-add-modal .page-width {
+  padding: 0;
+}
+
+quick-add-modal .product-form__buttons {
+  max-width: initial;
+}
+
+quick-add-modal .product-media-container.constrain-height {
+  --viewport-offset: calc(
+    (var(--modal-height-offset) + var(--modal-padding) + var(--style-border-width-popover)) * 2
+  );
+}
+
+.quick-add-modal__content-info--bulk .quick-order-list__table .quick-order-list__table-heading--price {
+  width: 22rem;
+}
+
+@media screen and (max-width: 1024px) {
+  .quick-add-modal__content-info--bulk .quick-add__content-info__media {
+    display: flex;
+    margin: 0;
+  }
+
+  .quick-add-modal__content-info--bulk quick-order-list {
+    padding-inline: 0;
+  }
+
+  .quick-add-modal__content-info.quick-add-modal__content-info--bulk {
+    --modal-padding: 1.5rem;
+  }
+  .quick-add-modal__content-info--bulk {
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .quick-add-modal__content {
+    bottom: var(--modal-height-offset);
+  }
+
+  .quick-add-modal__content-info > * {
+    max-height: 100%;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  quick-add-modal .quick-add-modal__toggle {
+    top: 2rem;
+    right: 2rem;
+  }
+
+  .quick-add-modal__content-info--bulk .card__information-volume-pricing-note {
+    padding-left: 1.6rem;
+  }
+
+  quick-add-modal .product-media-container.constrain-height {
+    --constrained-min-height: 400px;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .quick-add-modal__content-info.quick-add-modal__content-info--bulk {
+    overflow-y: initial;
+  }
+
+  .quick-add-modal__content-info--bulk .quick-order-list__table th {
+    padding-top: 2.5rem;
+  }
+
+  .quick-add-modal__content-info--bulk thead {
+    position: sticky;
+    z-index: 3;
+    top: -0.2rem;
+    background: var(--color-background);
+  }
+  .quick-add-modal__content-info--bulk
+    :is(.quick-add__product-media, .quick-add__product-container, .quick-add__info) {
+    width: 17rem;
+  }
+
+  .quick-add-modal__content-info--bulk-details,
+  .quick-add-modal__content-info--bulk quick-order-list {
+    padding: 0 2.5rem;
+  }
+  .quick-add-modal__content-info--bulk .quick-add__info {
+    position: sticky;
+    top: 0;
+    margin-block-start: -2.5rem;
+    padding-block-start: 2.5rem;
+  }
+}

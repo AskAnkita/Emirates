@@ -1,0 +1,219 @@
+{% liquid
+  assign render_order = 'media,product-details'
+
+  assign product_has_media = true
+  if closest.product.media.size == 0
+    assign product_has_media = false
+  endif
+
+  assign product_grid_class = 'product-quick-add__grid product-information__grid'
+
+  if product_has_media == false
+    assign product_grid_class = product_grid_class | append: ' product-information--media-none'
+  else
+    assign product_grid_class = product_grid_class | append: ' product-information--media'
+  endif
+
+  if section.settings.equal_columns
+    assign product_grid_class = product_grid_class | append: ' product-information__grid--half'
+
+    if section.settings.limit_details_width
+      assign product_grid_class = product_grid_class | append: ' product-information__grid--limit-details'
+    endif
+  endif
+
+  assign page_width = section.settings.page_width
+%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div class="section">
+  <product-info
+    id="MainProduct-quick-add-{{ section.id }}"
+    class="product-information section--{{ page_width }} spacing-style color-{{ section.settings.color_scheme }} relative"
+    data-section="{{ section.id }}"
+    data-product-id="{{ closest.product.id }}"
+    data-update-url="true"
+    data-url="{{ closest.product.url }}"
+    style="{% render 'spacing-style', settings: section.settings %}"
+  >
+    {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+    {{ 'component-rating.css' | asset_url | stylesheet_tag }}
+
+    {%- if closest.product.quantity_price_breaks_configured? -%}
+      {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
+
+    <script type="application/ld+json">
+      {{ closest.product | structured_data }}
+    </script>
+
+    <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+    {%- if closest.product.quantity_price_breaks_configured? -%}
+      <script src="{{ 'show-more.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'price-per-item.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+    {%- if request.design_mode -%}
+      <script src="{{ 'theme-editor.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- assign first_3d_model = closest.product.media | where: 'media_type', 'model' | first -%}
+    {%- if first_3d_model -%}
+      <link
+        id="ModelViewerStyle"
+        rel="stylesheet"
+        href="https://cdn.shopify.com/shopifycloud/model-viewer-ui/assets/v1.0/model-viewer-ui.css"
+        media="print"
+        onload="this.media='all'"
+      >
+      <link
+        id="ModelViewerOverride"
+        rel="stylesheet"
+        href="{{ 'component-model-viewer-ui.css' | asset_url }}"
+        media="print"
+        onload="this.media='all'"
+      >
+    {%- endif -%}
+
+    {% if product_has_media %}
+      {% assign product_href = '#ProductInformation-' | append: section.id %}
+      {% render 'skip-to-content-link', href: product_href, text: 'accessibility.skip_to_product_info' %}
+    {% endif %}
+    <div
+      class="{{ product_grid_class }}"
+      data-product-grid-content
+      style="--gap: {{ section.settings.gap }}px;"
+    >
+      {% assign render_order_array = render_order | split: ',' %}
+      {% capture media %}
+        <div
+          class="product-information__media"
+          data-testid="product-information-media"
+        >
+          <div class="product-quick-add__media product-information__media--{{ section.settings.desktop_media_position }}">
+            {%- content_for 'block',
+              type: '_quick-add-product-media-gallery',
+              id: 'media-gallery',
+              closest.product: closest.product
+            -%}
+          </div>
+        </div>
+      {% endcapture %}
+
+      {% capture details %}
+        {%- content_for 'block',
+          type: '_product-details',
+          id: 'product-details',
+          closest.product: closest.product
+        -%}
+      {% endcapture %}
+
+      {% for block in render_order_array %}
+        {% if block == 'media' and product_has_media %}
+          {{ media }}
+        {% elsif block == 'product-details' %}
+          {{ details }}
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {%- if closest.product.media.size > 0 -%}
+      <script src="{{ 'media-gallery.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- content_for 'blocks' -%}
+  </product-info>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.product_information",
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "page_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "select",
+      "id": "desktop_media_position",
+      "label": "t:settings.media_position",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": []
+}
+{% endschema %}

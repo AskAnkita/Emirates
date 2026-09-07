@@ -1,0 +1,39 @@
+{% doc %}
+  Intended for use in the featured collection list section.
+
+  @param {string} labels - The labels
+  @param {string} id - The id
+  @param {string} class - The class
+  @param {string} style - The style
+
+  @example
+  {% render 'tab-header-item',
+    labels: 'Label 1, Label 2, Label 3',
+    id: 'tabs-1',
+    class: class_tabs_product_header_item,
+    style: style_tabs_header_item
+  %}
+{% enddoc %}
+
+{%- liquid
+  assign class = class | strip | strip_newlines
+  assign style = style | strip | strip_newlines
+
+  assign labels = labels | split: ','
+-%}
+
+{%- for label in labels -%}
+  {%- capture link -%}#tabs-{{ id }}-{{ forloop.index }}{%- endcapture -%}
+
+  {%- capture class_default -%}
+    {{ class }} tabs-component-panel-trigger{% if forloop.first %} --active{% endif %}
+  {%- endcapture -%}
+
+  {% render 'button',
+    link: link,
+    label: label,
+    class: class_default,
+    style: style,
+    style_class: style_class
+  %}
+{%- endfor -%}

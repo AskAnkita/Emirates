@@ -1,0 +1,31 @@
+{%- liquid
+  assign card_product = block.settings.product
+-%}
+{%- if card_product and card_product != empty -%}
+  <div class="card--block-marquee w-full">
+    {% render 'product-card-marquee', product: card_product, is_blocks: true %}
+  </div>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "t:names.product_marquee",
+    "tag": null,
+    "settings": [
+      {
+        "type": "product",
+        "id": "product",
+        "label": "t:settings.product"
+      }
+    ],
+    "presets": [
+      {
+        "name": "t:names.product_marquee",
+        "category": "t:categories.product",
+        "settings": {
+          "product": "{{ closest.product }}"
+        }
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,562 @@
+{%- liquid
+  assign mobile_columns = block.settings.mobile_columns
+  assign mobile_columns_int = mobile_columns | plus: 0
+  assign show_mobile_slider = false
+
+  if block.settings.carousel_on_mobile and block.blocks.size > mobile_columns_int
+    assign show_mobile_slider = true
+  endif
+
+  if block.settings.layout_type == 'carousel'
+    assign columns_desktop = block.settings.columns_carousel
+  else
+    assign columns_desktop = block.settings.columns
+  endif
+
+  assign columns_tablet = 2
+  if columns_desktop == 1
+    assign columns_tablet = 1
+  elsif columns_desktop >= 4
+    assign columns_tablet = 3
+  endif
+
+  assign enable_navigation = false
+  if block.settings.navigation == 'arrows-pagination' or block.settings.navigation == 'arrows'
+    assign enable_navigation = true
+  endif
+
+  assign enable_pagination = false
+  if block.settings.navigation == 'pagination' or block.settings.navigation == 'arrows-pagination'
+    assign enable_pagination = true
+  endif
+-%}
+
+{% capture list_items %}
+  {% for child_block in block.blocks %}
+    <li
+      id="Slide-{{ child_block.id }}-{{ forloop.index }}"
+      class="grid__item{% if show_mobile_slider or block.settings.layout_type == 'carousel' %} swiper-slide{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+      {% if settings.animations_reveal_on_scroll %} style="--animation-order: {{ forloop.index }};"{% endif %}
+    >
+      {% render child_block %}
+    </li>
+
+    {% unless forloop.last %}
+      <!--@list/split-->
+    {% endunless %}
+  {% endfor %}
+{% endcapture %}
+
+<div
+  class="
+    meida-withtext__column w-full block
+    {% if block.settings.inherit_color_scheme == false %}color-scheme-custom{% endif %}
+    spacing-style layout-panel-flex layout-panel-flex--column mobile-column
+  "
+
+  {% if request.visual_preview_mode %}
+    data-shopify-visual-preview
+  {% endif %}
+
+  style="
+    {% if block.settings.section_height == 'custom' %}
+      --section-min-height: {{ block.settings.section_height_custom }}svh;
+    {% elsif block.settings.section_height == 'full-screen' %}
+      --section-min-height: 100svh;
+    {% elsif block.settings.section_height != '' %}
+      --section-min-height: var(--section-height-{{ block.settings.section_height }});
+    {% endif %}
+    {% if block.settings.section_height != '' %}
+      --section-preview-height: 600px;
+    {% endif %}
+    {% render 'layout-panel-style', settings: block.settings %}
+    {% render 'spacing-style', settings: block.settings %}
+    {% if block.settings.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: block.settings %}
+    {% endif %}
+  "
+  data-testid="meida-withtext-content"
+>
+  {% case block.settings.layout_type %}
+    {% when 'grid' %}
+      <div class="collection--grid-layout size-full block">
+        {%- if show_mobile_slider -%}
+          <swiper-component
+            class="swiper-component-mobile"
+            data-swiper-mobile
+            {%- render 'swiper-data',
+              settings: block.settings,
+              loop: false,
+              slides_per_view: mobile_columns,
+              space_between: block.settings.gap
+            -%}
+            style="
+              {% render 'swiper-style',
+                columns_mobile: mobile_columns,
+                columns_tablet: columns_tablet,
+                columns_desktop: columns_desktop,
+                columns_gap: block.settings.gap,
+              %}
+            "
+          >
+            <div class="swiper">
+        {%- endif -%}
+        <ul
+          id="Grid-{{ block.id }}"
+          data-id="{{ block.id }}"
+          class="
+            grid grid-layout section-content-wrapper list-unstyled
+            {% if show_mobile_slider %} swiper-wrapper md:grid{% endif %}
+            lg:grid-layout--{{ columns_desktop }} md:grid-layout--{{ columns_tablet }} max-sm:grid-layout--{{ mobile_columns }}
+          "
+          role="list"
+          aria-label="{{ 'content.grid.name' | t }}"
+          style="
+            --grid-desktop-horizontal-spacing: {{ block.settings.gap }}px;
+            --grid-desktop-vertical-spacing: {{ block.settings.gap }}px;
+          "
+        >
+          {{- list_items -}}
+        </ul>
+        {%- if show_mobile_slider -%}
+          </div>
+          </swiper-component>
+        {%- endif -%}
+      </div>
+    {% when 'carousel' %}
+      {%- liquid
+        assign slides_per_view = mobile_columns
+        assign space_between_desktop = block.settings.gap
+        assign space_between_tablet = space_between_desktop | times: 0.75
+        assign space_between_mobile = space_between_desktop | times: 0.5
+      -%}
+      {%- capture breakpoints -%}
+          {
+            "768": { "slidesPerView": {{ columns_tablet }}, "spaceBetween": {{ space_between_tablet }} },
+            "1024": { "slidesPerView": {{ columns_tablet }}, "spaceBetween": {{ space_between_tablet }} },
+            "1400": { "slidesPerView": {{ columns_desktop }}, "spaceBetween": {{ space_between_desktop }} }
+          }
+      {%- endcapture -%}
+      <swiper-component
+        class="collection-carousel-swiper-component size-full block"
+        {%- render 'swiper-data',
+          settings: block.settings,
+          slides_per_view: slides_per_view,
+          space_between: space_between_mobile,
+          watch_slides_progress: true,
+          breakpoints: breakpoints
+        -%}
+        style="
+          {% render 'swiper-style',
+            columns_mobile: mobile_columns,
+            columns_tablet: columns_tablet,
+            columns_desktop: columns_desktop,
+            columns_gap: space_between_desktop,
+          %}
+        "
+      >
+        <div class="swiper size-full" style="--swiper-navigation-top-offset: 50%;">
+          <ul
+            id="Slider-{{ block.id }}"
+            data-id="{{ block.id }}"
+            class="
+              swiper-wrapper section-content-wrapper grid-layout-no-js list-unstyled
+              lg:grid-layout--{{ columns_desktop }} md:grid-layout--3 grid--{{ mobile_columns }}-col-mobile
+            "
+          >
+            {{ list_items }}
+          </ul>
+
+          {%- if enable_navigation -%}
+            <div class="swiper-btns-wrap small-hide">
+              {%- render 'swiper-button' -%}
+            </div>
+          {%- endif -%}
+          {%- if enable_pagination -%}
+            <div class="swiper-pagination"></div>
+          {%- endif -%}
+        </div>
+      </swiper-component>
+  {% endcase %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.columns",
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "t:options.carousel" 
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "carousel_on_mobile",
+      "label": "t:settings.carousel_on_mobile",
+      "default": false,
+      "visible_if": "{{ block.settings.layout_type != 'carousel' }}"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 4,
+      "label": "t:settings.columns",
+      "visible_if": "{{ block.settings.layout_type == 'grid' }}"
+    },
+    {
+      "type": "range",
+      "id": "columns_carousel",
+      "min": 1,
+      "max": 6,
+      "step": 0.5,
+      "default": 4,
+      "label": "t:settings.columns",
+      "visible_if": "{{ block.settings.layout_type == 'carousel' }}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "t:settings.mobile_columns",
+      "options": [
+        {
+          "value": "1.1",
+          "label": "1.1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment_flex_direction_column",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment_flex_direction_column",
+      "label": "t:settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:content.carousel",
+      "visible_if": "{{ block.settings.layout_type == 'carousel' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "t:settings.loop",
+      "default": false,
+      "visible_if": "{{ block.settings.layout_type == 'carousel'}}"
+    },
+    {
+      "type": "select",
+      "id": "navigation",
+      "label": "t:settings.navigation",
+      "visible_if": "{{ block.settings.layout_type == 'carousel' }}",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "arrows",
+          "label": "t:options.arrows"
+        },
+        {
+          "value": "pagination",
+          "label": "t:options.pagination"
+        },
+        {
+          "value": "arrows-pagination",
+          "label": "t:settings.arrows_and_pagination"
+        }
+      ],
+      "default": "arrows"
+    },
+    {
+      "type": "select",
+      "id": "pagination_type",
+      "label": "t:settings.pagination_type",
+      "visible_if": "{{ block.settings.navigation == 'pagination' or block.settings.navigation == 'arrows-pagination' }}",
+      "options": [
+        {
+          "value": "bullets",
+          "label": "t:options.dots"
+        },
+        {
+          "value": "dynamic",
+          "label": "t:options.dynamic"
+        },
+        {
+          "value": "progressbar",
+          "label": "t:options.progress"
+        },
+        {
+          "value": "fraction",
+          "label": "t:options.counter"
+        }
+      ],
+      "default": "bullets"
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "t:settings.height",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.auto"
+        },
+        {
+          "value": "small",
+          "label": "t:options.small"
+        },
+        {
+          "value": "medium",
+          "label": "t:options.medium"
+        },
+        {
+          "value": "large",
+          "label": "t:options.large"
+        },
+        {
+          "value": "full-screen",
+          "label": "t:options.full_screen"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "type": "range",
+      "id": "section_height_custom",
+      "label": "t:settings.custom_height",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 50,
+      "unit": "%",
+      "visible_if": "{{ block.settings.section_height == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_background",
+      "label": "t:settings.background",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color_background",
+      "id": "scheme_background_gradient",
+      "label": "t:settings.background_gradient",
+      "info": "t:info.background_gradient_info",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground_heading",
+      "label": "t:settings.headings",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground",
+      "label": "t:settings.text",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary",
+      "label": "t:settings.primary_color",
+      "default": "#000F9F",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary_hover",
+      "label": "t:settings.primary_hover_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_shadow",
+      "label": "t:settings.shadow_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

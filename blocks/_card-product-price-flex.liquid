@@ -1,0 +1,468 @@
+{% liquid
+  assign bl_stts = block.settings
+  assign card_product = bl_stts.product
+
+   if bl_stts.font_size contains 'heading-lg' or bl_stts.font_size contains 'heading-xl'
+    assign type = 'display'
+  elsif bl_stts.font_size contains 'heading'
+    assign type = 'heading'
+  else
+    assign type = 'body'
+  endif
+%}
+
+{%- capture text_block_classes -%}
+  {%- if bl_stts.width == '100%' -%} text-block--align-{{ bl_stts.alignment }}{% if bl_stts.max_width == 'none' %} text-block--full-width {% endif %}{% endif %}
+  {%- if bl_stts.type_preset == 'custom' -%} custom-typography
+  {%- if bl_stts.font_size != '' %} custom-font-size {% endif -%}
+  {% endif %}
+{%- endcapture -%}
+
+{%- if card_product and card_product != empty -%}
+  <div class="card--block card-information text-block {{ text_block_classes }} {{ bl_stts.alignment }} {{ bl_stts.type_preset | default: 'paragraph' }} spacing-style{% if bl_stts.product == blank and request.design_mode == false %} hidden{% endif %}" {{ block.shopify_attributes }}
+    style="
+      {%- render 'typography-style', settings: bl_stts, weight: bl_stts.font_weight -%}
+      {%- render 'spacing-style', settings: bl_stts -%}
+      --width: {{ bl_stts.width }};
+      {%- if bl_stts.width == "100%" -%}
+        --text-align: {{ bl_stts.alignment }};
+        --text-align-tablet: {{ bl_stts.alignment }};
+      {%- endif -%}
+    "
+  >
+    {% render 'price', product: card_product, price_class: '', show_compare_at_price: true %}
+    {%- if card_product.quantity_price_breaks_configured? -%}
+      {% if card_product.variants.size == 1 and quick_add == 'bulk' %}
+        {% liquid
+          assign quantity_rule = card_product.selected_or_first_available_variant.quantity_rule
+          assign has_qty_rules = false
+          if quantity_rule.increment > 1 or quantity_rule.min > 1 or quantity_rule.max != null
+            assign has_qty_rules = true
+          endif
+        %}
+        <quantity-popover>
+          <button class="card__information-volume-pricing-note card__information-volume-pricing-note--button quantity-popover__info-button--icon-only button button button--tertiary medium-hide small-hide">
+            <span class="caption">{{ 'products.product.volume_pricing.note' | t }}</span>
+          </button>
+          <button class="card__information-volume-pricing-note card__information-volume-pricing-note--button quantity-popover__info-button--icon-with-label button button--tertiary large-up-hide">
+            <span class="caption">{{ 'products.product.volume_pricing.note' | t }}</span>
+          </button>
+      {% else %}
+        <div class="card__information-volume-pricing-note">
+          <span class="caption">{{ 'products.product.volume_pricing.note' | t }}</span>
+        </div>
+      {% endif %}
+      {% if card_product.variants.size == 1 and quick_add == 'bulk' %}
+        <div
+          class="global-settings-popup quantity-popover__info"
+          tabindex="-1"
+          hidden
+          id="quantity-popover-info-{{ card_product.selected_or_first_available_variant.id }}"
+        >
+          {%- if has_qty_rules -%}
+            <div class="quantity__rules caption no-js-hidden">
+              {%- if quantity_rule.increment > 1 -%}
+                <span class="divider">
+                  {{- 'products.product.quantity.multiples_of' | t: quantity: quantity_rule.increment -}}
+                </span>
+              {%- endif -%}
+              {%- if quantity_rule.min > 1 -%}
+                <span class="divider">
+                  {{- 'products.product.quantity.min_of' | t: quantity: quantity_rule.min -}}
+                </span>
+              {%- endif -%}
+              {%- if quantity_rule.max != null -%}
+                <span class="divider">
+                  {{- 'products.product.quantity.max_of' | t: quantity: quantity_rule.max -}}
+                </span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+          <button
+            class="button-close button button--tertiary large-up-hide"
+            type="button"
+            aria-label="{{ 'accessibility.close' | t }}"
+          >
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </button>
+          {%- if card_product.selected_or_first_available_variant.quantity_price_breaks.size > 0 -%}
+            <volume-pricing class="parent-display">
+              <ul class="list-unstyled">
+                <li>
+                  <span>{{ card_product.selected_or_first_available_variant.quantity_rule.min }}+</span>
+                  {%- assign price = card_product.selected_or_first_available_variant.price | money_with_currency -%}
+                  <span>{{ 'content.each' | t: money: price }}</span>
+                </li>
+                {%- for price_break in card_product.selected_or_first_available_variant.quantity_price_breaks -%}
+                  <li>
+                    <span>
+                      {{- price_break.minimum_quantity -}}
+                      <span aria-hidden="true">+</span></span
+                    >
+                    {%- assign price = price_break.price | money_with_currency -%}
+                    <span> {{ 'content.each' | t: money: price }}</span>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </volume-pricing>
+          {%- endif -%}
+        </div>
+        </quantity-popover>
+      {% endif %}
+    {%- endif -%}
+  </div>
+{%- else -%}
+  <div class="card--block-price card-information" {{ block.shopify_attributes }}>
+    {% render 'price', show_compare_at_price: true %}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.product_price",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product"
+    },
+    {
+      "type": "header",
+      "content": "t:content.typography"
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:settings.preset",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "100%",
+          "label": "t:options.fill"
+        }
+      ],
+      "default": "fit-content"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "left",
+      "visible_if": "{{ block.settings.width != 'fit-content' }}"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:settings.font",
+      "options": [
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:options.heading"
+        }
+      ],
+      "default": "var(--font-body--family)",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        },
+        {
+          "value": "3.4rem",
+          "label": "34px"
+        },
+        {
+          "value": "3.6rem",
+          "label": "36px"
+        },
+        {
+          "value": "4.0rem",
+          "label": "40px"
+        },
+        {
+          "value": "5.0rem",
+          "label": "50px"
+        },
+        {
+          "value": "6.0rem",
+          "label": "60px"
+        },
+        {
+          "value": "7.0rem",
+          "label": "70px"
+        },
+        {
+          "value": "8.0rem",
+          "label": "80px"
+        },
+        {
+          "value": "9.0rem",
+          "label": "90px"
+        },
+        {
+          "value": "10.0rem",
+          "label": "100px"
+        },
+        {
+          "value": "12.0rem",
+          "label": "120px"
+        }
+      ],
+      "default": "1.6rem",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "t:settings.weight",
+      "options": [
+        { "value": "default", "label": "t:options.default" },
+        { "value": "400", "label": "t:options.regular" },
+        { "value": "600", "label": "t:options.semibold" },
+        { "value": "700", "label": "t:options.bold" }
+      ],
+      "default": "default",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "line_height",
+      "label": "t:settings.line_height",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "t:settings.letter_spacing",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "case",
+      "label": "t:settings.case",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:options.uppercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "t:options.capitalize"
+        }
+      ],
+      "default": "none",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_price",
+      "category": "t:categories.product",
+      "settings": {
+        "product": "{{ closest.product }}"
+      }
+    }
+  ]
+}
+{% endschema %}

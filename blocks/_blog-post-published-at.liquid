@@ -1,0 +1,13 @@
+{{- 'blogs.article.on' | t }}
+{{- article.published_at | time_tag: '%b %d, %Y' -}}
+
+{% schema %}
+{
+  "name": "t:names.blog_post_published_at",
+  "presets": [
+    {
+      "name": "t:names.blog_post_published_at"
+    }
+  ]
+}
+{% endschema %}

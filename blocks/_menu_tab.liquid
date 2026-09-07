@@ -1,0 +1,29 @@
+{%- capture link -%}#tabs-{{ id }}-{{ block.id }}{%- endcapture -%}
+
+{% render 'button',
+  link: link,
+  label: block.settings.title,
+  class: 'tabs-component-panel-trigger',
+  style_class: settings.style_class,
+  button_style: settings.button_style,
+  link_underline: settings.link_underline
+%}
+
+{% schema %}
+{
+  "name": "t:names.menu_tab",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:settings.title"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.menu_tab"
+    }
+  ]
+}
+{% endschema %}

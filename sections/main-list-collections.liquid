@@ -1,0 +1,418 @@
+{% liquid
+  if section.settings.render_type == 'custom'
+    assign section_collections = section.settings.collection_list
+    for collection in section_collections
+      assign section_collections_length = forloop.length
+    endfor
+  else
+    assign section_collections = collections
+    assign section_collections_length = section_collections.size
+  endif
+  assign max_items = section.settings.collections_to_show
+  assign show_more = section.settings.show_more | default: 'Show more'
+
+  assign columns_tablet = 2
+  if section.settings.columns == 1
+    assign columns_tablet = 1
+  elsif section.settings.columns >= 4
+    assign columns_tablet = 3
+  endif
+
+  assign columns_gap = section.settings.columns_gap
+  assign rows_gap = section.settings.rows_gap
+  assign mobile_columns_gap = columns_gap | times: 0.5
+  assign mobile_rows_gap = rows_gap | times: 0.5
+
+  if section.settings.layout_type == 'grid'
+    assign classes = 'resource-list--grid'
+    capture styles
+      echo '--resource-list-column-gap: ' | append: columns_gap | append: 'px' | append: ';'
+      echo '--resource-list-row-gap: ' | append: rows_gap | append: 'px' | append: ';'
+      echo '--resource-list-mobile-column-gap: ' | append: mobile_columns_gap | append: 'px' | append: ';'
+      echo '--resource-list-mobile-row-gap: ' | append: mobile_rows_gap | append: 'px' | append: ';'
+      echo '--resource-list-columns: repeat(' | append: section.settings.columns | append: ', 1fr);'
+      echo '--resource-list-columns-tablet: repeat(' | append: columns_tablet | append: ', 1fr);'
+      echo '--resource-list-columns-mobile: repeat(' | append: section.settings.mobile_columns | append: ', 1fr);'
+      echo '--column-count-mobile: ' | append: section.settings.mobile_columns | append: ';'
+    endcapture
+  endif
+
+  assign scroll_reveal = settings.animations_reveal_on_scroll
+%}
+
+{% capture header %}
+  <div class="section-resource-list__header">
+    {%- content_for 'block', type: '_breadcrumb', id: 'static-breadcrumb' -%}
+    {%- content_for 'block', type: 'text', id: 'static-header' -%}
+  </div>
+{% endcapture %}
+
+{% capture template_showmore %}
+  <template data-collection-card-template-showmore>
+    {% if section.settings.layout_type == 'grid' %}
+      {%- for collection in section_collections offset: max_items -%}
+        <div class="resource-list__item{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}"
+          {% if scroll_reveal %}
+            style="--animation-order: {{ forloop.index | plus: max_items }};"
+          {% endif %}
+        >
+          {% content_for 'block', type: '_collection-card', id: 'static-collection-card', closest.collection: collection %}
+        </div>
+      {%- endfor -%}
+    {% else %}
+      {%- for collection in section_collections offset: max_items -%}
+        {% liquid
+          assign current_grid_index = forloop.index0 | plus: max_items | divided_by: 10
+          assign current_item_index = forloop.index0 | plus: max_items | modulo: 10
+
+          case current_item_index
+          when 0
+            assign grid_column = '1 / span 6'
+            assign grid_row = 1
+            assign grid_row_span = 9
+          when 1
+            assign grid_column = '9 / span 4'
+            assign grid_row = 2
+            assign grid_row_span = 7
+          when 2
+            assign grid_column = '1 / span 5'
+            assign grid_row = 12
+            assign grid_row_span = 8
+          when 3
+            assign grid_column = '8 / span 5'
+            assign grid_row = 10
+            assign grid_row_span = 9
+          when 4
+            assign grid_column = '1 / span 4'
+            assign grid_row = 21
+            assign grid_row_span = 7
+          when 5
+            assign grid_column = '5 / span 4'
+            assign grid_row = 22
+            assign grid_row_span = 7
+          when 6
+            assign grid_column = '9 / span 4'
+            assign grid_row = 21
+            assign grid_row_span = 7
+          when 7
+            assign grid_column = '1 / span 4'
+            assign grid_row = 29
+            assign grid_row_span = 7
+          when 8
+            assign grid_column = '5 / span 4'
+            assign grid_row = 30
+            assign grid_row_span = 7
+          when 9
+            assign grid_column = '9 / span 4'
+            assign grid_row = 29
+            assign grid_row_span = 7
+          endcase
+
+          assign full_grid_rows = current_grid_index | times: 37
+          assign grid_row = grid_row | plus: full_grid_rows
+        %}
+        <div
+            class="editorial-collection__item editorial-collection__item-{{ forloop.index0 | modulo: 4 }} collection--current__item-{{ current_item_index }}"
+            style="grid-column: {{ grid_column }}; grid-row: {{ grid_row }} / span {{ grid_row_span }};"
+        >
+          <div class="resource-list__item{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}"{% if scroll_reveal %} style="--animation-order: {{ forloop.index | plus: max_items }};"{% endif %}>
+            {% content_for 'block', type: '_collection-card', id: 'static-collection-card', closest.collection: collection %}
+          </div>
+        </div>
+      {%- endfor -%}
+    {% endif %}
+  </template>
+
+  <show-more-grid
+    ref="collection-grid"
+    class="collection-infinite-scroll block center"
+    data-max-items="{{ max_items }}"
+  >
+    <button type="button" class="{{ section.settings.style_class }} m-x-auto">
+      <span>{{ show_more }}</span>
+    </button>
+  </show-more-grid>
+{% endcapture %}
+
+{% if section_collections == null %}
+  {% for i in (1..max_items) %}
+    {% assign section_collections = section_collections | append: ', ' %}
+  {% endfor %}
+
+  {% assign section_collections = section_collections | split: ',' %}
+{% endif %}
+
+{% capture list_items %}
+  {% for collection in section_collections limit: max_items %}
+    <div class="resource-list__item{% if scroll_reveal %} scroll-trigger animate--slide-in{% endif %}"
+      {% if scroll_reveal %}
+        style="--animation-order: {{ forloop.index }};"
+      {% endif %}
+    >
+      {% content_for 'block', type: '_collection-card', id: 'static-collection-card', closest.collection: collection %}
+    </div>
+    {% unless forloop.last %}
+      <!--@list/split-->
+    {% endunless %}
+  {% endfor %}
+{% endcapture %}
+
+{% liquid
+  assign list_items_array = list_items | strip | split: '<!--@list/split-->'
+%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+
+<div
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    color-{{ section.settings.color_scheme }}
+    section-resource-list
+    spacing-style
+    gap-style
+  "
+  style="
+    {% if section.settings.section_width == 'custom' %}
+      --page-content-width: {{ section.settings.page_width_custom | divided_by: 10 }}rem;
+      --page-width: calc(var(--page-content-width) + var(--page-margin) * 2);
+    {% endif %}
+    {% render 'spacing-style', settings: section.settings %}
+    {% render 'gap-style', value: section.settings.gap %}
+    {{ styles }}
+  "
+>
+  {{ header }}
+
+  <div class="resource-list {{ classes }}"
+    style="{{ styles }}"
+    {% if section.settings.layout_type == 'grid' %}
+      data-testid="collections-list-grid"
+    {% endif %}
+  >
+    {% case section.settings.layout_type %}
+      {% when 'grid' %}
+        {{ list_items }}
+      {% when 'editorial' %}
+        {% render 'editorial-collection-grid', items: list_items_array %}
+    {% endcase %}
+  </div>
+  {% if max_items < section_collections_length %}
+    {{ template_showmore }}
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.collection_list_page",
+  "class": "collection-list-page",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection list"
+    },
+    {
+      "type": "select",
+      "id": "render_type",
+      "label": "Show",
+      "options": [
+        {
+          "value": "all",
+          "label": "All collections"
+        },
+        {
+          "value": "custom",
+          "label": "Custom collections"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "collection_list",
+      "id": "collection_list",
+      "label": "Collections",
+      "info": "Apply to 'All collections' option"
+    },
+    {
+      "type": "header",
+      "content": "t:content.cards_layout"
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "t:settings.layout_type",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:options.grid"
+        },
+        {
+          "value": "editorial",
+          "label": "t:options.editorial"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "collections_to_show",
+      "label": "t:settings.maximum_collections_to_show",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "t:settings.columns",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 3,
+      "visible_if": "{{ section.settings.layout_type == 'grid'}}"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "t:settings.mobile_columns",
+      "options": [
+        {
+          "value": "1",
+          "label": "t:options.one_number"
+        },
+        {
+          "value": "2",
+          "label": "t:options.two_number"
+        }
+      ],
+      "default": "2",
+      "visible_if": "{{ section.settings.layout_type == 'grid'}}"
+    },
+    {
+      "type": "range",
+      "id": "columns_gap",
+      "label": "t:settings.horizontal_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "rows_gap",
+      "label": "t:settings.vertical_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "t:content.show_more"
+    },
+    {
+      "type": "text",
+      "id": "show_more",
+      "label": "t:options.text",
+      "default": "Show more"
+    },
+    {
+      "type": "select",
+      "id": "style_class",
+      "label": "t:settings.style",
+      "options": [
+        {
+          "value": "button",
+          "label": "t:options.primary"
+        },
+        {
+          "value": "button-secondary",
+          "label": "t:options.secondary"
+        }
+      ],
+      "default": "button"
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "page_width_custom",
+      "min": 1000,
+      "max": 2000,
+      "step": 10,
+      "default": 1570,
+      "unit": "px",
+      "label": "t:settings.page_width",
+      "visible_if": "{{ section.settings.section_width == 'custom' }}"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

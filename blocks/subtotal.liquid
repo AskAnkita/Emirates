@@ -1,0 +1,156 @@
+
+
+{% liquid
+  assign block_settings = block.settings
+  assign product = product | default: closest.product
+  if request.visual_preview_mode and product == blank
+    assign product = collections.all.products.first
+  endif
+
+  assign selected_variant = product.selected_or_first_available_variant
+  assign quantity_default = selected_variant.quantity_rule.min | default: 1
+  if quantity_default < 1
+    assign quantity_default = 1
+  endif
+%}
+
+{%- if product != blank and selected_variant != blank -%}
+  <div
+    class="product-form__subtotal spacing-style"
+    data-product-subtotal
+    data-section-id="{{ section.id }}"
+    data-money-format="{{ shop.money_format | escape }}"
+    data-currency-code="{{ cart.currency.iso_code | default: shop.currency }}"
+    style="{% render 'spacing-style', settings: block_settings %}"
+    {{ block.shopify_attributes }}
+  >
+    <script type="application/json" data-subtotal-variants>
+      {{ product.variants | json }}
+    </script>
+    <div class="product-form__subtotal-text">
+      <span>{{ 'content.product_subtotal' | t }}:</span>
+      <strong data-subtotal-price>
+        {{ selected_variant.price | times: quantity_default | money }}
+      </strong>
+    </div>
+  </div>
+{%- endif -%}
+
+{% javascript %}
+  (() => {
+    const initSubtotal = (subtotalNode) => {
+      if (!subtotalNode || subtotalNode.dataset.subtotalReady === 'true') return;
+      subtotalNode.dataset.subtotalReady = 'true';
+
+      const sectionId = subtotalNode.dataset.sectionId;
+      const productForm = subtotalNode.closest('product-form-component');
+      if (!productForm) return;
+
+      const subtotalPriceEl = subtotalNode.querySelector('[data-subtotal-price]');
+      const variantsDataNode = subtotalNode.querySelector('[data-subtotal-variants]');
+      if (!subtotalPriceEl || !variantsDataNode) return;
+
+      let variants = [];
+      try {
+        variants = JSON.parse(variantsDataNode.textContent || '[]');
+      } catch (error) {
+        variants = [];
+      }
+
+      const quantityInput = productForm.querySelector(`#Quantity-${sectionId}`) || productForm.querySelector('.quantity__input');
+      const variantInput = productForm.querySelector('input[name="id"]');
+      if (!quantityInput || !variantInput) return;
+
+      const formatMoney = (cents) => {
+        if (Shopify && typeof Shopify.formatMoney === 'function') {
+          return Shopify.formatMoney(cents, window.money_format || subtotalNode.dataset.moneyFormat);
+        }
+        return null;
+      };
+
+      const updateSubtotal = () => {
+        const quantity = Math.max(1, Number(quantityInput.value) || 1);
+        const selectedVariantId = String(variantInput.value || '');
+        const selectedVariant = variants.find((variant) => String(variant.id) === selectedVariantId);
+        if (!selectedVariant) return;
+
+        const formattedSubtotal = formatMoney(selectedVariant.price * quantity);
+        if (!formattedSubtotal) return;
+        subtotalPriceEl.textContent = formattedSubtotal;
+      };
+
+      updateSubtotal();
+      quantityInput.addEventListener('input', updateSubtotal);
+      quantityInput.addEventListener('change', updateSubtotal);
+      variantInput.addEventListener('change', updateSubtotal);
+
+      const variantObserver = new MutationObserver(updateSubtotal);
+      variantObserver.observe(variantInput, {
+        attributes: true,
+        attributeFilter: ['value']
+      });
+    };
+
+    const initAllSubtotals = () => {
+      document.querySelectorAll('[data-product-subtotal]').forEach(initSubtotal);
+    };
+
+    initAllSubtotals();
+    document.addEventListener('DOMContentLoaded', initAllSubtotals);
+    document.addEventListener('shopify:section:load', initAllSubtotals);
+    document.addEventListener('product-info:loaded', initAllSubtotals);
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Subtotal",
+  "tag": null,
+  "settings": [ 
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

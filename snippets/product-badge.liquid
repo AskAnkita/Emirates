@@ -1,0 +1,48 @@
+{%- capture class_badge -%}badge badge--bottom-left{%- endcapture -%}
+{%- capture id_badge -%}NoMediaStandardBadge-{{ section_id }}-{{ card_product.id }}{%- endcapture -%}
+{% comment %} {%- capture style_badge -%}--pl: {{ settings.padding_left }}px; --pr: {{ settings.padding_right }}px; --pt: {{ settings.padding_top }}px; --pb: {{ settings.padding_bottom }}px;{%- endcapture -%} {% endcomment %}
+
+{%- if new_badge -%}
+  <span
+    id="{{ id_badge }}-new"
+    class="new-badge {{ class_badge }}"
+    aria-hidden="true"
+    style="{%- render 'block-padding', settings: settings -%}"
+  >
+    {{ 'products.product.new' | t }}
+  </span>
+{%- endif -%}
+{%- if card_product.compare_at_price > card_product.price and settings.show_sale_badge -%}
+  <span
+    id="{{ id_badge }}"
+    class="sale-badge {{ class_badge }}"
+    aria-hidden="true"
+    style="{%- render 'block-padding', settings: settings -%}"
+  >
+    {{- 'products.product.on_sale' | t -}}
+  </span>
+{%- endif -%}
+{%- if card_product.available == false and settings.show_sold_out_badge -%}
+  <span
+    id="{{ id_badge }}"
+    class="sold-out-badge {{ class_badge }}"
+    aria-hidden="true"
+    style="{%- render 'block-padding', settings: settings -%}"
+  >
+    {{- 'products.product.sold_out' | t -}}
+  </span>
+{%- endif -%}
+{%- if custom_badge and settings.show_custom_badge -%}
+  <span
+    id="{{ id_badge }}-custom"
+    class="custom-badge {{ class_badge }}"
+    aria-hidden="true"
+    style="{%- render 'block-padding', settings: settings -%}"
+  >
+    {%- if custom_badge_text -%}
+      {{ custom_badge_text }}
+    {%- else -%}
+      {{ 'products.product.custom' | t }}
+    {%- endif -%}
+  </span>
+{%- endif -%}

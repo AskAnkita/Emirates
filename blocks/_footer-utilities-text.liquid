@@ -1,0 +1,56 @@
+<div
+  class="
+    footer-utilities__group footer-utilities__group--left
+    layout-panel-flex
+    layout-panel-flex--{{ block.settings.content_direction | default: 'column' }}
+  "
+  style="{% render 'layout-panel-style', settings: block.settings, scale_min: 8 %}"
+>
+  {% content_for 'block', type: '_footer-copyright', id: 'copyright' %}
+  {% content_for 'block', type: '_footer-policy-list', id: 'policy_list' %}
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.utilities_text",
+  "blocks": [{"type": "text"}],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "content_direction",
+      "label": "t:settings.content_direction",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.utilities_text"
+    }
+  ]
+}
+{% endschema %}

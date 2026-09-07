@@ -1,0 +1,172 @@
+.shopify-block:has(.azTable) {
+  width: 100%;
+}
+
+.haloAZTable {
+  display: flex;
+  letter-spacing: 0;
+  flex-flow: row nowrap;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.haloAZTable li {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: top;
+  border: 1px solid var(--color-primary-button-border);
+  border-left: none;
+  scroll-snap-align: start;
+  flex: 1;
+  transition: all 0.2s ease;
+  color: var(--color-primary-button-text);
+  min-width: 40px;
+  aspect-ratio: 1/1;
+}
+
+.haloAZTable li:first-child {
+  border-left: 1px solid var(--color-border);
+}
+
+.haloAZTable li.is-active {
+  color: var(--color-primary-button-hover-text);
+  background-color: var(--color-primary-button-hover-background);
+}
+
+.haloAZTable li a {
+  position: relative;
+  display: block;
+  font-size: var(--font-size--md);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  padding: var(--padding-xs);
+  min-width: var(--size-30);
+  transition: background-color .35s ease-in-out;
+  color: inherit;
+}
+
+.haloAZTable li.disable a {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.haloAZTable .az-group {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.brand {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  will-change: opacity, transform;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.haloAZWrapper {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.azTable__content {
+  position: relative;
+}
+
+.haloAZWrapper a {
+  color: var(--color-primary);
+}
+
+.az-group {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  margin: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+  will-change: opacity, transform, visibility;
+}
+
+.az-group.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  display: none;
+}
+
+.az-group-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  width: 100%;
+}
+
+.az-group-title {
+  width: 70px;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--color-foreground-heading);
+}
+
+@media (hover: hover) {
+  .haloAZTable li:hover a {
+    animation: jello-horizontal 0.9s both;
+  }
+  
+  .haloAZTable li a:hover {
+    color: var(--color-primary-button-hover-text);
+  }
+  
+  .haloAZTable li:hover {
+    color: var(--color-primary-button-hover-text);
+    background-color: var(--color-primary-button-hover-background);
+  }
+
+  .haloAZWrapper a:hover {
+    color: var(--color-primary-hover);
+  }
+}
+
+@media (max-width: 1024px) {
+  .az-group-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 749px) {
+  .az-group-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@keyframes jello-horizontal {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+
+  30% {
+    transform: scale3d(1.25, 0.75, 1);
+  }
+
+  40% {
+    transform: scale3d(0.75, 1.25, 1);
+  }
+
+  50% {
+    transform: scale3d(1.15, 0.85, 1);
+  }
+
+  65% {
+    transform: scale3d(0.95, 1.05, 1);
+  }
+
+  75% {
+    transform: scale3d(1.05, 0.95, 1);
+  }
+
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+}

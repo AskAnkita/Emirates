@@ -1,0 +1,87 @@
+{% doc %}
+  Intended for use in a block similar to the button block.
+
+  @param {string} link - link to render
+  @param {object} [block] - The block
+  @param {string} [style_class] - The style class
+  @param {string} [link_underline] - The link underline
+  @param {string} [link_hover_underline] - The link hover underline
+  @param {string} [link_reveal] - The link reveal
+  @param {string} [open_in_new_tab] - The open in new tab
+  @param {string} [shopify_attributes] - The shopify attributes
+  @param {string} [label] - The label
+  @param {string} [button_style] - The button style
+  @param {string} [class] - The class
+  @param {string} [style] - The style
+  @param {string} [icon] - The icon
+  @param {string} [wrap] - The wrap
+  @param {string} [font_style] - The font style
+
+  @example
+  {% render 'button', link: '/collections/all' %}
+{% enddoc %}
+
+{%- liquid
+  assign link = link | default: block.settings.link
+  assign style_class = style_class | default: block.settings.style_class
+  assign link_underline = link_underline | default: block.settings.link_underline
+  assign link_hover_underline = link_hover_underline | default: block.settings.link_hover_underline
+  assign link_reveal = link_reveal | default: block.settings.link_reveal
+  assign open_in_new_tab = open_in_new_tab | default: block.settings.open_in_new_tab
+  assign shopify_attributes = shopify_attributes | default: block.shopify_attributes
+  assign label = label | default: block.settings.label
+  assign button_style = button_style | default: block.settings.button_style
+  assign wrap = wrap | default: block.settings.wrap
+  assign font_style = font_style | default: block.settings.font_style
+-%}
+<a
+  {% if link == blank %}
+    role="link"
+    aria-disabled="true"
+  {% else %}
+    href="{{ link }}"
+  {% endif %}
+  class="
+    {{ class }}
+    size-style
+    {{ style_class }}
+    {% if link_reveal and style_class == 'link' %}link--reveal{% endif %}
+    {% if link_underline and style_class == 'link' %}link--underline{% endif %}
+    {% if link_hover_underline and style_class == 'link' and link_underline == false %}link--hover-underline{% endif %}
+    {% if button_style == 'outline' %}button--outline{% endif %}
+    {{ style_class }}--{{ block.id }}
+  "
+  style="
+    {% render 'size-style', settings: block.settings %}
+    {% render 'button-style', settings: block.settings %}
+    {{ style }}
+    {% if style_class == 'link' %}
+      {% render 'typography-style', settings: block.settings, button_link: true, font_style: font_style %}
+    {% endif %}
+  "
+  {%- if open_in_new_tab -%}
+    target="_blank"
+    rel="noopener noreferrer"
+  {%- endif -%}
+  {{ shopify_attributes }}
+  {% if link_reveal and style_class == 'link' %}
+    data-text="{{ label }}"
+  {% endif %}
+  {{ shopify_attributes }}
+>
+  {%- if style_class == 'button' -%}
+    <span class="button-overflow relative overflow-hidden" data-button-text="{{ label }}">
+      <span class="button-text-main inline-block relative z-1">
+        {{ label }}
+      </span>
+    </span>
+  {%- else -%}
+    <span class="text">{{ label }}</span>
+  {%- endif -%}
+  {% if link_reveal and style_class == 'link' %}
+    <span class="text-mask link none{% if link_hover_underline and style_class == 'link' and link_underline == false %} link--hover-underline{% endif %}" data-text="{{ label }}">{{ label }}</span>
+  {% endif %}
+  {% if icon %}
+    {{ icon }}
+  {% endif %}
+</a>

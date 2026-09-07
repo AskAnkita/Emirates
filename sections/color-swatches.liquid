@@ -1,0 +1,68 @@
+{%- style -%}
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign name = block.settings.color_swatch_name | handle
+      assign color_1 = block.settings.color_swatch_color_1
+      assign color_2 = block.settings.color_swatch_color_2
+      assign image = block.settings.color_swatch_image
+    -%}
+    {%- if name != blank -%}
+      .color-swacth-color--{{ name | downcase }} {
+        {%- if color_1 != 'rgba(0,0,0,0)' and color_2 == 'rgba(0,0,0,0)' and image == blank -%}
+          background: {{ color_1 }} !important;
+        {%- elsif color_1 == 'rgba(0,0,0,0)' and color_2 != 'rgba(0,0,0,0)' and image == blank -%}
+          background: {{ color_2 }} !important;
+        {%- elsif color_1 != 'rgba(0,0,0,0)' and color_2 != 'rgba(0,0,0,0)' and image == blank  -%}
+          background-image: linear-gradient(to bottom right, {{ color_1 }}, {{ color_1 }} 50%, {{ color_2}} 50%, {{ color_2}}) !important;
+        {%- elsif image != blank -%}
+          background-image: url({{ image | image_url: width: 44 }}) !important;
+        {%- endif -%}
+      }
+    {%- endif -%}
+  {%- endfor -%}
+{%- endstyle -%}
+
+{% schema %}
+{
+  "name": "t:names.color_swatches",
+  "class": "color-swatches-section",
+  "enabled_on": {
+    "groups": ["aside"]
+  },
+  "blocks": [
+    {
+      "name": "t:names.color_swatch",
+      "type": "color_swatch_item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "color_swatch_name",
+          "label": "t:settings.color_name"
+        },
+        {
+          "type": "color",
+          "id": "color_swatch_color_1",
+          "label": "t:settings.color_1",
+          "alpha": true
+        },
+        {
+          "type": "color",
+          "id": "color_swatch_color_2",
+          "label": "t:settings.color_2",
+          "alpha": true
+        },
+        {
+          "type": "image_picker",
+          "id": "color_swatch_image",
+          "label": "t:settings.image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.color_swatches"
+    }
+  ]
+}
+{% endschema %}

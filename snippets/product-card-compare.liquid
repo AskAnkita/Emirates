@@ -1,0 +1,210 @@
+{%- liquid
+  assign current_variant = product_card_product.selected_or_first_available_variant
+  assign variantCount = product_card_product.variants | size
+  assign product_swatch_option = settings.swatch | downcase
+  assign isColor = false
+  assign variant_img = ''
+  assign media_size = settings.product_block_image_ratio
+  for option in product_card_product.options_with_values
+    assign option_name = option.name | downcase
+    if product_swatch_option contains option_name
+      assign isColor = true
+      assign index = forloop.index0
+      assign position = forloop.index | minus: 1
+      assign variant_selected = option.selected_value
+      for variant in product_card_product.variants limit: 1
+        if variant.image != null
+          assign variant_img = variant.image
+        endif
+      endfor
+      break
+    else
+      assign position = 0
+      assign variant_selected = nil
+    endif
+  endfor
+
+  if settings.show_new_badge
+    assign new_badge = false
+    assign new_badge_type = settings.new_badge_type
+    if new_badge_type == 'auto'
+      assign date_start = card_product.created_at | date: '%s'
+      assign date_now = 'now' | date: '%s'
+      assign date_minus = date_now | minus: date_start
+      assign date_difference = date_minus | divided_by: 86400
+      assign new_badge_time = settings.new_badge_time
+      if date_difference < new_badge_time
+        assign new_badge = true
+      endif
+    else
+      for tag in card_product.tags
+        assign tag_handle = tag | handle
+        if tag_handle == 'new'
+          assign new_badge = true
+        endif
+      endfor
+    endif
+  endif
+
+  if settings.show_custom_badge
+    assign custom_badge = false
+    assign custom_badge_text = card_product.metafields.custom.custom_badge
+
+    if custom_badge_text
+      assign custom_badge = true
+    endif
+  endif
+-%}
+<tr class="compare-table-row v-a-top" data-product-compare-id="{{ product_card_product.id }}" data-compare-product-handle="{{ product_card_product.handle }}">
+  <td class="compareTable-product">
+    <div class="product-item clearfix">
+      <div class="card-wrapper">
+        <div class="card flex-column">
+          <div class="card-product{% if product_card_product.featured_media == nil %} card--text-only card--soft{% endif %}">
+            <div class="card-product__wrapper">
+              {%- liquid
+                assign ratio = 1
+                if product_card_product.featured_media and media_aspect_ratio == 'portrait'
+                  assign ratio = 0.8
+                elsif product_card_product.featured_media and media_aspect_ratio == 'adapt'
+                  assign ratio = product_card_product.featured_media.aspect_ratio
+                endif
+                if ratio == 0 or ratio == null
+                  assign ratio = 1
+                endif
+
+                assign sizes = sizes
+
+                assign widths = '165, 360, 533, 720, 940, 1066'
+
+                unless lazy_load == false
+                  assign loading = "lazy"
+                endunless
+              -%}
+              <div class="card__inner ratio" style="--ratio-percent: {{ 1 | divided_by: ratio | times: 100 }}%;">
+                <div class="card__content">
+                  <div class="card__badge absolute {{ settings.badge_position }} z-1" style="{%- render 'badge-position-style' -%}">
+                    {%- render 'product-badge'
+                      card_product: product_card_product,
+                      new_badge: new_badge,
+                      custom_badge: custom_badge,
+                      custom_badge_text: custom_badge_text,
+                      serial: serial
+                    -%}
+                  </div>
+                </div>
+                <a href="{{ product_card_product.url }}" class="media media--transparent media--hover-effect">
+                  {%- if product_card_product.featured_media -%}
+                    {%- if variant_img != blank -%}
+                      {{ variant_img | image_url: width: variant_img.width | image_tag: sizes: sizes, widths: widths, loading: 'lazy', alt: variant_img.alt, class: 'motion-reduce', loading: loading, width: variant_img.width, height: variant_img.height }}
+                    {%- else -%}
+                      {{ product_card_product.featured_media | image_url: width: product_card_product.featured_media.width | image_tag: sizes: sizes, widths: widths, loading: 'lazy', alt: product_card_product.featured_media.alt, class: 'motion-reduce', loading: loading, width: product_card_product.featured_media.width, height: product_card_product.featured_media.height }}
+                    {%- endif -%}
+
+                    {%- if product_card_product.media[1] != null and show_secondary_image -%}
+                      {{ product_card_product.media[1] | image_url: width: product_card_product.media[1].width | image_tag: sizes: sizes, widths: widths, loading: 'lazy', alt: product_card_product.featured_media.alt, class: 'motion-reduce', loading: 'lazy', width: product_card_product.media[1].width, height: product_card_product.media[1].height }}
+                    {%- endif -%}
+                  {%- else -%}
+                    {%- capture current %}{% cycle 1, 2, 3, 4 %}{% endcapture -%}
+                    {%- assign placeholder_image = 'product-apparel-' | append: current -%}
+                    {{ placeholder_image | placeholder_svg_tag: 'placeholder-svg' }}
+                  {%- endif -%}
+                </a>
+              </div>
+            </div>
+            <remove-compare-button>
+              <button type="button" class="compareTable-removeProduct minimum-touch-target-before absolute cursor-pointer rounded-full flex-center z-5" data-compare-remove data-compare-item="{{ product_card_product.id }}" aria-label="{{ 'accessibility.remove_item' | t: title: product_card_product.title | escape }}">
+                {{- 'icon-close.svg' | inline_asset_content -}}
+              </button>
+            </remove-compare-button>
+          </div>
+          <div class="card-information">
+            <div class="card-information__wrapper text-{{ settings.product_content_text_align }}">
+              <div class="card-information__group card-information__group-2">
+                {% if settings.show_vendor %}
+                  <div class="card-vendor">
+                    <span class="visually-hidden">{{ 'accessibility.vendor' | t }}</span>
+                    {{ product_card_product.vendor | link_to_vendor }}
+                  </div>
+                {% endif %}
+              </div>
+              <a class="card-title link-underline{% if settings.product_title_line_text != 'full' %} card-title-ellipsis{% endif %}{% if variant_selected != blank %} card-title-change{% endif %}" href="{{ product_card_product.url }}" data-product-title="{{ product_card_product.title | escape }}" data-product-url="{{ product_card_product.url }}">
+                <span class="text">
+                  {{ product_card_product.title | escape }}
+                  {% if variant_selected != blank %}
+                    <span data-change-title> - {{ variant_selected }}</span>
+                  {% endif %}
+                </span>
+              </a>
+              <div class="card-price">
+                {% render 'price',
+                  product: product_card_product,
+                  price_class: ''
+                %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </td>
+  {% assign class_table_item = 'compareTable-item body-s-font-size font-normal center' %}
+  <td class="{{ class_table_item }}">
+    {{ current_variant.sku }}
+  </td>
+  <td class="{{ class_table_item }} compareTable-desc">
+    {%- liquid
+      assign desc = product_card_product.description
+      assign word_number = 30
+    -%}
+    {% if product_card_product.metafields.c_f.short_description %}
+      {%- liquid
+        assign desc = product_card_product.metafields.c_f.short_description | strip_html
+        assign word_number = 100000
+      -%}
+    {% else %}
+      {% assign word_number = 30 %}
+    {% endif %}
+    {%- if desc != blank -%}
+      <div class="halo-text-format">
+        {{ desc | strip_html | truncatewords: word_number }}
+      </div>
+    {%- endif -%}
+  </td>
+  <td class="{{ class_table_item }}">
+    {%- for collection in product_card_product.collections -%}
+      <span class="compareTable-collection inline-block">{{ collection.title }}{% unless forloop.last %},{% endunless %}</span>
+    {%- endfor -%}
+  </td>
+  <td class="{{ class_table_item }}">
+    {% if current_variant.inventory_management %}
+      {%- assign first_inventory = current_variant.inventory_quantity -%}
+      {%- if first_inventory > 0 -%}
+        {{ 'products.product.inventory_in_stock' | t }}
+      {%- else -%}
+        {{ 'products.product.inventory_out_of_stock' | t }}
+      {%- endif -%}
+    {% else %}
+      {{ 'products.product.many_in_stock' | t }}
+    {% endif %}
+  </td>
+  <td class="{{ class_table_item }}">
+    {{ product_card_product.type | escape }}
+  </td>
+  <td class="{{ class_table_item }}">
+    {%- if variantCount > 1 and product_card_product.variants[0].title != 'Default Title' -%}
+      {%- for option in product_card_product.options_with_values -%}
+        <div class="compareTable-option">
+          <div class="compareTable-optionLabel font-bold capitalize v-a-top">
+            {{ option.name }}:
+          </div>
+          <div class="compareTable-optionValue inline capitalize v-a-top">
+            {%- for value in option.values -%}
+              <span class="text">{{ value }}{% unless forloop.last %}, {% endunless %}</span>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </td>
+</tr>

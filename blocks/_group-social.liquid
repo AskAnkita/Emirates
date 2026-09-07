@@ -1,0 +1,30 @@
+<div
+  class="group-block group-block--{{ block.id }} grid__item block{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+  style="--width-header-col: {{ block.settings.width_grid_item }}%;"
+  {{ block.shopify_attributes }}
+>
+  {%- render 'social-icons' -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.group_social",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "width_grid_item",
+      "min": 15,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.desktop_grid_width",
+      "info": "t:info.grid_item_info",
+      "default": 25
+    }
+  ],
+  "presets": [
+    { "name": "t:names.group_social" }
+  ]
+}
+{% endschema %}

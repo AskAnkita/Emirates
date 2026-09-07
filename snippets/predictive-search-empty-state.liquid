@@ -1,0 +1,110 @@
+{% doc %}
+  Renders the predictive search empty state
+
+  @param {number} shadow_opacity - shadow opacity for the empty state container shadow
+  @param {string} products_test_id - a playwright test id, used to differentiate empty state from 'real' search results
+  @param {boolean} [load_empty_state] - Load the empty state or not
+
+  @example
+  {% render 'predictive-search-empty-state', shadow_opacity: 0.1, products_test_id: 'empty-state' %}
+{% enddoc %}
+
+{% comment %} {%- render 'loading-spinner', class: 'predictive-search__loading-state no-js-hidden' -%} {% endcomment %}
+
+<div
+  id="predictive-search-results"
+  class="predictive-search-dropdown"
+  role="listbox"
+  aria-expanded="true"
+  style="--color-shadow: rgb(var(--color-foreground-rgb) / {{ shadow_opacity }});"
+>
+  <div class="predictive-search-results__inner">
+    {% liquid
+      assign collection = settings.empty_state_collection | default: collections.all
+      assign default_title = 'content.search_results_resource_products' | t
+      assign title = settings.empty_state_collection.title | default: default_title
+    %}
+    {%- if settings.quick_keywords != blank -%}
+      <div class="predictive-search__result-group">
+        <h6
+          id="predictive-search-products"
+          class="predictive-search__heading body-m-font-size"
+        >
+          {{ 'content.search_results_quick_keywords' | t }}
+        </h6>
+        <ul
+          class="predictive-search-results__list predictive-search-results__wrapper predictive-search-results__wrapper-queries list-unstyled flex flex-wrap"
+          role="listbox"
+          aria-labelledby="predictive-search-queries"
+        >
+          {%- assign arr_k_search = settings.quick_keywords | split: ',' -%}
+          {%- for k_search in arr_k_search -%}
+            <li class="predictive-search-results__card--query">
+              <a href="{{ routes.search_url }}?q={{ k_search }}" class="pills__pill predictive-search-results__pill link">
+                <span class="svg-wrapper">
+                  {{ 'icon-search-pill.svg' | inline_asset_content }}
+                </span>
+                <span aria-label="{{ k_search }}">{{ k_search }}</span>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+    {% if settings.search_layout == 'default' %}
+      {%- if settings.quick_links != blank -%}
+        <div class="predictive-search__result-group">
+          <h6
+            id="predictive-search-products"
+            class="predictive-search__heading body-m-font-size"
+          >
+            {{ 'content.search_results_quick_links' | t }}
+          </h6>
+          <ul
+            class="predictive-search-results__list predictive-search-results__wrapper predictive-search-results__wrapper-links list-unstyled"
+            role="listbox"
+            aria-labelledby="predictive-search-categories"
+          >
+            {%- for link in settings.quick_links.links -%}
+              <li
+                id="predictive-search-option-page-desktop-{{ forloop.index }}"
+                class="predictive-search__list-item"
+                role="option"
+                aria-selected="false"
+              >
+                <a href="{{ link.url }}" class="predictive-search__item link link--text" tabindex="-1">
+                  <div class="predictive-search__item-content predictive-search__item-content--centered">
+                    <p class="predictive-search__item-heading link--hover-underline">{{ link.title | escape }}</p>
+                  </div>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+      {%- if settings.quick_collections != blank -%}
+        {% assign products = settings.quick_collections.products %}
+        {% assign products_test_id = 'products-list-emplty-state' %}
+        {%- assign title = 'content.products' | t -%}
+
+        <div class="predictive-search__result-group">
+          {% if products.size > 0 %}
+            {% render 'predictive-search-products-list',
+              products_test_id: products_test_id,
+              title: title,
+              products: products,
+              resource_direction: resource_direction
+            %}
+          {% else %}
+            <div class="predictive-search-results__no-results">
+              <p>{{ 'content.no_products_found' | t }}</p>
+            </div>
+          {% endif %}
+        </div>
+      {%- endif -%}
+    {% else %}
+      {% render 'predictive-search-tab-empty-state' %}
+    {% endif %}
+
+  </div>
+</div>

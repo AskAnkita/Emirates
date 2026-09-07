@@ -1,0 +1,483 @@
+{% liquid
+  assign bl_stts = block.settings
+
+  capture text_block_classes
+    if bl_stts.type_preset == 'custom'
+      echo ' custom-typography '
+      if bl_stts.font_size != ''
+        echo ' custom-font-size '
+      endif
+    endif
+    if bl_stts.color != ''
+      echo ' custom-color '
+    endif
+  endcapture
+
+  assign has_size_chart = false
+  assign size_chart_type = bl_stts.size_chart_type
+
+  if size_chart_type == 'metafield'
+    if product.metafields.custom.size_chart
+      assign has_size_chart = true
+      assign size_chart_details = product.metafields.custom.size_chart
+    endif
+  elsif size_chart_type == 'page'
+    if bl_stts.size_chart_page != blank
+      assign has_size_chart = true
+      assign size_chart_heading = bl_stts.size_chart_page.title
+      assign size_chart_details = bl_stts.size_chart_page.content
+    endif
+  endif
+-%}
+
+{%- if has_size_chart -%}
+  <side-drawer-opener
+    class="popup size-chart product-popup-modal__opener--keep"
+    {{ block.shopify_attributes }}
+    data-side-drawer="#PopupModal-{{ block.id }}"
+  >
+    <button
+      id="PopupModalButton-{{ block.id }}"
+      class="button button-unstyled popup__button spacing-style"
+      type="button"
+      style="
+        {% render 'spacing-style', settings: bl_stts %}
+      "
+    >
+      {{- 'icon-size-chart.svg' | inline_asset_content -}}
+      <span
+        class="{{ bl_stts.type_preset }} {{ text_block_classes }}" style="{% render 'typography-style', settings: bl_stts, weight: bl_stts.font_weight %}"
+      >
+        {{- bl_stts.heading }}
+      </span>
+    </button>
+  </side-drawer-opener>
+
+  <side-drawer
+    class="popup__content product-popup-modal__drawer--keep drawer fixed top-0 left-0 z-10 w-screen h-full flex-center no-js-hidden"
+    element-s-popup
+    id="PopupModal-{{ block.id }}"
+    data-drawer-direction="center"
+  >
+    <div id="Drawer-Overlay-{{ block.id }}" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+    <div
+      class="popup__inner color-{{ settings.popover_color_scheme }} w-full h-auto flex flex-column global-settings-popup cus-scrollbar"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Size chart"
+      tabindex="-1"
+      style="--modal-max-width: 72rem;"
+      data-drawer-content
+    >
+      <button
+        onclick="this.closest('side-drawer').close()"
+        class="drawer__close block t-button bor-none rounded-full cursor-pointer absolute button-close-circle"
+        type="button"
+        aria-label="{{ 'accessibility.close_dialog' | t }}"
+        style="--top: 1rem; --right: 1rem;"
+      >
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </button>
+      <div class="w-full h-full overflow-auto cus-scrollbar" style="--p: 1rem;">
+        <div class="drawer__header relative center"
+          style="--p: 1.5rem 0; --mb: 2.5rem;"
+        >
+          <h5 class="drawer__heading break m-0">
+            {{ size_chart_heading | default: 'products.product.size_chart.name_popup' }}
+          </h5>
+        </div>
+        <div class="size-chart-popup-modal__content-info m-auto">
+          <picture class="size-chart-details center">
+            {%- if size_chart_details != '' -%}
+              {%- if size_chart_type == 'metafield' -%}
+                <img
+                  srcset="{{ size_chart_details }}"
+                  src="{{ size_chart_details }}"
+                  alt="{{ shop.name | escape }}"
+                  loading="lazy"
+                  width="100%"
+                  height="auto"
+                >
+              {%- elsif size_chart_type == 'page' -%}
+                {{ size_chart_details }}
+              {%- endif -%}
+            {%- endif -%}
+          </picture>
+        </div>
+      </div>
+    </div>
+  </side-drawer>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Size chart",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.text",
+      "default": "Size chart"
+    },
+    {
+      "type": "select",
+      "id": "type_preset",
+      "label": "t:settings.preset",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "t:settings.font",
+      "options": [
+        {
+          "value": "var(--font-body--family)",
+          "label": "t:options.body"
+        },
+        {
+          "value": "var(--font-subheading--family)",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "var(--font-heading--family)",
+          "label": "t:options.heading"
+        }
+      ],
+      "default": "var(--font-body--family)",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        },
+        {
+          "value": "3.4rem",
+          "label": "34px"
+        },
+        {
+          "value": "3.6rem",
+          "label": "36px"
+        },
+        {
+          "value": "4.0rem",
+          "label": "40px"
+        },
+        {
+          "value": "5.0rem",
+          "label": "50px"
+        },
+        {
+          "value": "6.0rem",
+          "label": "60px"
+        },
+        {
+          "value": "7.0rem",
+          "label": "70px"
+        },
+        {
+          "value": "8.0rem",
+          "label": "80px"
+        },
+        {
+          "value": "9.0rem",
+          "label": "90px"
+        },
+        {
+          "value": "10.0rem",
+          "label": "100px"
+        },
+        {
+          "value": "12.0rem",
+          "label": "120px"
+        }
+      ],
+      "default": "1.6rem",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "t:settings.weight",
+      "options": [
+        { "value": "default", "label": "t:options.default" },
+        { "value": "400", "label": "t:options.regular" },
+        { "value": "600", "label": "t:options.semibold" },
+        { "value": "700", "label": "t:options.bold" }
+      ],
+      "default": "default",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "line_height",
+      "label": "t:settings.line_height",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "letter_spacing",
+      "label": "t:settings.letter_spacing",
+      "options": [
+        {
+          "value": "tight",
+          "label": "t:options.tight"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.normal"
+        },
+        {
+          "value": "loose",
+          "label": "t:options.loose"
+        }
+      ],
+      "default": "normal",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "case",
+      "label": "t:settings.case",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.default"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:options.uppercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "t:options.capitalize"
+        }
+      ],
+      "default": "none",
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "wrap",
+      "label": "t:settings.wrap",
+      "options": [
+        {
+          "value": "pretty",
+          "label": "t:options.pretty"
+        },
+        {
+          "value": "balance",
+          "label": "t:options.balance"
+        },
+        {
+          "value": "nowrap",
+          "label": "t:options.none"
+        }
+      ],
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "color",
+      "label": "t:settings.color",
+      "options": [
+        {
+          "value": "var(--color-foreground)",
+          "label": "t:options.text"
+        },
+        {
+          "value": "var(--color-foreground-heading)",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "var(--color-primary)",
+          "label": "t:options.link"
+        }
+      ],
+      "default": "var(--color-foreground)"
+    },
+    {
+      "type": "header",
+      "content": "t:content.popup"
+    },
+    {
+      "type": "select",
+      "id": "size_chart_type",
+      "options": [
+        {
+          "value": "metafield",
+          "label": "t:options.metafield"
+        },
+        {
+          "value": "page",
+          "label": "t:options.page"
+        }
+      ],
+      "label": "t:settings.type",
+      "default": "page"
+    },
+    {
+      "type": "page",
+      "id": "size_chart_page",
+      "label": "t:settings.page"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Size chart",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

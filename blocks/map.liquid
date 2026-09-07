@@ -1,0 +1,26 @@
+{%- liquid
+  assign iframe_code = block.settings.iframe_code
+-%}
+
+<div class="map-embed">
+  {{ iframe_code }}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.map_embed",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "iframe_code",
+      "label": "t:settings.map_embed_iframe",
+      "info": "t:info.map_embed_iframe_info"  
+    }
+  ],
+  "presets": [
+    { "name": "t:names.map_embed", "category": "t:categories.custom" }
+  ]
+}
+{% endschema %}
+  
+

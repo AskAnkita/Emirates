@@ -1,0 +1,84 @@
+<div class="footer-utilities__group footer-utilities__group--right" {{ block.shopify_attributes }}>
+  <div
+    class="social-icons__wrapper"
+  >
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.social_media_links",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_social-link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.social_media_links",
+      "blocks": {
+        "_social-link_facebook": {
+          "type": "_social-link",
+          "settings": {
+            "link": "https://www.facebook.com"
+          }
+        },
+        "_social-link_instagram": {
+          "type": "_social-link",
+          "settings": {
+            "link": "https://www.instagram.com"
+          }
+        },
+        "_social-link_x": {
+          "type": "_social-link",
+          "settings": {
+            "link": "https://www.twitter.com"
+          }
+        },
+        "_social-link_youtube": {
+          "type": "_social-link",
+          "settings": {
+            "link": "https://www.youtube.com"
+          }
+        },
+        "_social-link_tiktok": {
+          "type": "_social-link",
+          "settings": {
+            "link": "https://www.tiktok.com"
+          }
+        },
+        "_social-link_pinterest": {
+          "type": "_social-link",
+          "settings": {
+            "link": "https://www.pinterest.com"
+          }
+        },
+        "_social-link_tumblr": {
+          "type": "_social-link",
+          "settings": {
+            "link": "https://www.tumblr.com"
+          }
+        },
+        "_social-link_snapchat": {
+          "type": "_social-link",
+          "settings": {
+            "link": "https://www.snapchat.com"
+          }
+        }
+      },
+      "block_order": [
+        "_social-link_facebook",
+        "_social-link_instagram",
+        "_social-link_x",
+        "_social-link_youtube",
+        "_social-link_tiktok",
+        "_social-link_pinterest",
+        "_social-link_tumblr",
+        "_social-link_snapchat"
+      ]
+    }
+  ]
+}
+{% endschema %}

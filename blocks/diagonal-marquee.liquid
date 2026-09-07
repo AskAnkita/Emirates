@@ -1,0 +1,158 @@
+{% style %}
+  .section-wrapper:has(.floating-marquee-wrapper) {
+    .section {
+      overflow: hidden;
+    }
+    .section-content-wrapper {
+      position: static;
+    }
+    .floating-marquee-wrapper {
+      width: var(--width-floating-marquee);
+      top: var(--top-position, unset);
+      bottom: var(--bottom-position, unset);
+      left: var(--left-position, unset);
+      right: var(--right-position, unset);
+      transform: rotate(var(--rotate));
+
+      &:not(.marquee-full) {
+        @media screen and (max-width: 1024px) {
+          width: calc(var(--width-floating-marquee) * 1.5);
+        }
+        @media screen and (max-width: 750px) {
+          width: calc(var(--width-floating-marquee) * 2);
+        }
+      }
+    }
+  }
+{% endstyle %}
+
+{% liquid
+  assign bl_stts = block.settings
+  assign position = bl_stts.position
+  assign distance = 12
+  if bl_stts.width == 100 and bl_stts.rotate == 0
+    assign distance = 0
+  endif
+%}
+
+<div class="floating-marquee-wrapper{% if bl_stts.width %} marquee-full{% endif %} absolute"
+  style="
+  {%- if position == 'top left' or position == 'top right' -%}--top-position: {{ bl_stts.top | append: 'px' }};{%- endif -%}
+  {%- if position == 'bottom left' or position == 'bottom right' -%}--bottom-position: {{ bl_stts.bottom | append: 'px' }};{%- endif -%}
+  {%- if position == 'top left' or position == 'bottom left' -%}--left-position: {{ bl_stts.left | minus: distance | append: '%' }};{%- endif -%}
+  {%- if position == 'top right' or position == 'bottom right' -%}--right-position: {{ bl_stts.right | minus: distance | append: '%' }};{%- endif -%}
+  {%- if position == 'top right' or position == 'bottom left' -%}--rotate: {{ bl_stts.rotate | append: 'deg' }};
+  {%- else -%}--rotate: {{ bl_stts.rotate | append: 'deg' | prepend: '-' }};{%- endif -%}
+  --width-floating-marquee: {{ bl_stts.width | append: '%' }};"
+>
+  {% content_for 'blocks' %}
+</div>
+
+
+{% schema %}
+{
+  "name": "Floating marquee",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_marquee"
+    }
+  ],
+  "settings": [
+    {
+      "type": "range",
+      "id": "width",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "options": [
+        {
+          "value": "top left",
+          "label": "t:options.top_left"
+        },
+        {
+          "value": "top right",
+          "label": "t:options.top_right"
+        },
+        {
+          "value": "bottom left",
+          "label": "t:options.bottom_left"
+        },
+        {
+          "value": "bottom right",
+          "label": "t:options.bottom_right"
+        }
+      ],
+      "default": "top left",
+      "label": "t:settings.position"
+    },
+    {
+      "type": "range",
+      "id": "top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12,
+      "visible_if": "{{ block.settings.position == 'top left' or block.settings.position == 'top right' }}"
+    },
+    {
+      "type": "range",
+      "id": "bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12,
+      "visible_if": "{{ block.settings.position == 'bottom left' or block.settings.position == 'bottom right' }}"
+    },
+    {
+      "type": "range",
+      "id": "left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "visible_if": "{{ block.settings.position == 'top left' or block.settings.position == 'bottom left' }}"
+    },
+    {
+      "type": "range",
+      "id": "right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "visible_if": "{{ block.settings.position == 'top right' or block.settings.position == 'bottom right' }}"
+    },
+    {
+      "type": "range",
+      "id": "rotate",
+      "label": "Rotate",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "deg",
+      "default": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "Floating marquee",
+      "category": "t:categories.decorative"
+    }
+  ]
+}
+{% endschema %}

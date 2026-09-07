@@ -1,0 +1,44 @@
+{%- doc -%}
+  Renders a checkbox input and label
+
+  @param {string} alignment - alignment of the checkbox
+  @param {string} id - input id attribute
+  @param {string} name - input name attribute
+  @param {string} value - input value attribute
+  @param {string} label - label text
+  @param {string} label_content - label content
+  @param {boolean} checked - whether the input is checked
+  @param {string} events - event attributes for the input, e.g. 'on:click="/action"'
+  @param {boolean} disabled - whether the input is disabled
+  @param {boolean} [autofocus] - whether the input should be autofocused
+  @param {string} [class] - additional class for the label
+{%- enddoc -%}
+<div
+  class="checkbox{% if alignment != blank %} {{ alignment }}{% endif %}"
+  {{ events }}
+>
+  <input
+    type="checkbox"
+    name="{{ name }}"
+    value="{{ value }}"
+    id="{{ id }}"
+    class="checkbox__input"
+    data-label='{{ label }}'
+    {% if checked %}
+      checked
+    {% endif %}
+    {% if disabled %}
+      disabled
+    {% endif %}
+    {% if autofocus %}
+      autofocus
+    {% endif %}
+  >
+  <label
+    class="checkbox__label"
+    for="{{ id }}"
+  >
+    {{ 'icon-checkmark.svg' | inline_asset_content }}
+    <span class="checkbox__label-text{% if class != blank %} {{ class }}{% endif %}">{{- label_content | default: label -}}</span>
+  </label>
+</div>

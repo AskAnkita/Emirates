@@ -1,0 +1,61 @@
+{% comment %}
+  Renders a mega_menu for the header.
+
+  Usage:
+  {% render 'header-menu' %}
+{% endcomment %}
+
+{%- liquid
+  assign menu_tab = blocks | where: 'type', 'menu_tab'
+  if menu_tab.size > 0
+    assign has_menu_tab = true
+  else
+    assign has_menu_tab = false
+  endif
+
+  assign icon_type = section.settings.icon_type
+-%}
+
+<div class="header-block header-menu grid__item flex items-center">
+  {%- liquid
+    assign vertical_menu_blocks = blocks | where: 'type', 'vertical_menu'
+
+    assign luxury_mega_menu_blocks = blocks | where: 'type', 'luxury_mega_menu'
+
+    for block in vertical_menu_blocks
+      assign bl_stts = block.settings
+      assign vertical_menu_style = bl_stts.vertical_menu_style
+    endfor
+
+    if vertical_menu_style == 'style_1'
+      render 'header-menu-vertical', blocks: blocks, bl_stts: bl_stts, menu_gap: menu_gap
+    endif
+
+    assign keys = 'highlighted_item_,new_label_,sale_label_,hot_label_'
+
+    assign block_id = 'MainMenu'
+  -%}
+  <div class="header__menu-wrapper" data-main-menu>
+    <nav class="header__inline-menu">
+      <ul
+        class="list-menu list-menu-desktop list-menu--inline{% if has_menu_tab %} header-menu--tab{% endif %}"
+        style="--gap-x: {{ menu_gap }}px;"
+        role="list"
+      >
+        {%- for link in header_settings.menu.links -%}
+          <li>
+            {%- liquid
+              assign enhancement_block = blank
+              for lux_block in luxury_mega_menu_blocks
+                if lux_block.settings.nav_label == link.title
+                  assign enhancement_block = lux_block
+                endif
+              endfor
+            -%}
+            {%- render 'luxury-mega-menu-dynamic', link: link, section_settings: section.settings, enhancement_block: enhancement_block -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </div>
+</div>

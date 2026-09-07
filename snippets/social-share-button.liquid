@@ -1,0 +1,285 @@
+<div
+  class="card-product__group-item share-button product-share"
+  style="--min-w: 4.4rem;"
+>
+  <side-drawer-opener
+    class="popup share-button__opener--keep"
+    {{ block.shopify_attributes }}
+    data-side-drawer="#ShareDrawer-{{ block.id }}"
+  >
+    <button
+      id="ShareButton-{{ block.id }}"
+      class="{% if is_product_share_button %}product-share-button__wrapper button-unstyled{% else %}button{% endif %} w-full h-full center cursor-pointer flex items-center justify-center relative leading-none"
+      type="button"
+    >
+      <span class="svg-wrapper">{{ 'icon-share-social.svg' | inline_asset_content }}</span>
+      {% if is_product_share_button %}
+        <span class="{{ text_block_classes }} hidden md:block" style="{% render 'typography-style', settings: block.settings, weight: block.settings.font_weight %}">{% if heading != blank %}{{ heading }}{% else %}{{ 'products.product.share' | t }}{% endif %}</span>
+      {% else %}
+        <span class="visually-hidden">{{ 'products.product.share' | t }}</span>
+      {% endif %}
+    </button>
+  </side-drawer-opener>
+  <side-drawer
+    class="popup__content product-popup-modal__drawer--keep share-drawer drawer fixed top-0 left-0 z-10 w-screen h-full flex justify-center no-js-hidden"
+    element-s-popup
+    id="ShareDrawer-{{ block.id }}"
+  >
+    <div id="Drawer-Overlay-{{ block.id }}" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+    <div
+      class="popup__inner color-{{ settings.popover_color_scheme }} w-full h-auto absolute-c-c flex flex-column global-settings-popup"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Share"
+      tabindex="-1"
+      style="--modal-max-width: 97rem;"
+    >
+      <button
+        onclick="this.closest('side-drawer').close()"
+        class="drawer__close block t-button bor-none rounded-full cursor-pointer absolute"
+        type="button"
+        aria-label="{{ 'accessibility.close_dialog' | t }}"
+        style="--top: 0.5rem; --right: 0.5rem;"
+      >
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </button>
+      <share-button-product class="share-button__product">
+        <div class="share-header">
+          <h2 class="share-title">
+            <span>{{ 'products.product.share' | t }}</span>
+          </h2>
+        </div>
+        <div class="wrapper-content">
+          <span class="form-label block">{{ 'content.share.copy_to_clipboard' | t }}</span>
+          <div class="share-group">
+            <div class="field">
+              <input
+                type="text"
+                class="field__input"
+                id="url"
+                value="{{ shop.url | append: product.url }}"
+                placeholder="{{ 'content.share.share_url' | t }}"
+                data-url="{{ shop.url | append: product.url }}"
+                onclick="this.select();"
+                readonly
+              >
+              <label class="field__label hiddenLabels" for="url">{{ 'content.share.share_url' | t }}</label>
+            </div>
+            <button class="button button-unstyled button-copy">
+              <span class="svg-wrapper">{{ 'icon-copy.svg' | inline_asset_content }}</span>
+              {{ 'content.share.copy_to_clipboard' | t }}
+            </button>
+          </div>
+          <span
+            id="ShareMessage-{{ product.id }}"
+            class="share-button__message hidden"
+            role="status"
+            aria-hidden="true"
+          >
+            {{ 'content.share.success_message' | t }}
+          </span>
+          <div class="share_toolbox clearfix">
+            <span class="form-label block">{{ 'products.product.share' | t }}</span>
+            {%- liquid
+              assign permalink_share = product.url | default: article.url | default: page.url
+              assign permalink_share2 = shop.url | append: permalink_share
+              assign per_link_url = permalink_share | default: permalink_share2
+              unless share_title
+                assign share_title = product.title | default: article.title | default: page.title | default: shop.name
+              endunless
+              assign per_title = share_title | url_param_escape
+              unless share_image
+                assign share_image = product.featured_image | default: settings.logo
+              endunless
+              assign per_image = share_image | image_url: width: 1024
+            -%}
+            <ul class="social-share">
+              <li class="social-share__item">
+                <a
+                  class="facebook"
+                  href="https://www.facebook.com/sharer/sharer.php?u={{ per_link_url }}"
+                  title='{{ 'content.social.facebook' | t }}'
+                  data-no-instant
+                  rel="noopener noreferrer nofollow"
+                  target="_blank"
+                >
+                  <span class="svg-wrapper">{{ 'icon-facebook.svg' | inline_asset_content }}</span>
+                </a>
+              </li>
+              <li class="social-share__item">
+                <a
+                  class="twitter"
+                  href="https://x.com/share?text={{ per_title }}&amp;url={{ per_link_url }}"
+                  title='{{ 'content.social.twitter' | t }}'
+                  data-no-instant
+                  rel="noopener noreferrer nofollow"
+                  target="_blank"
+                >
+                  <span class="svg-wrapper">{{ 'icon-twitter.svg' | inline_asset_content }}</span>
+                </a>
+              </li>
+              {%- if per_image != blank -%}
+                <li class="social-share__item">
+                  <a
+                    class="pinterest"
+                    href="http://pinterest.com/pin/create/button/?url={{ per_link_url }}&amp;media=http:{{ per_image }}&amp;description={{ per_title }}"
+                    title='{{ 'content.social.pinterest' | t }}'
+                    data-no-instant
+                    rel="noopener noreferrer nofollow"
+                    target="_blank"
+                  >
+                    <span class="svg-wrapper">{{ 'icon-pinterest.svg' | inline_asset_content }}</span>
+                  </a>
+                </li>
+                <li class="social-share__item">
+                  <a
+                    class="tumblr"
+                    href="//tumblr.com/widgets/share/tool?canonicalUrl={{ per_link_url }}"
+                    title='{{ 'content.social.tumblr' | t }}'
+                    data-no-instant
+                    rel="noopener noreferrer nofollow"
+                    data-content="http:{{ per_image }}"
+                    target="_blank"
+                  >
+                    <span class="svg-wrapper">{{ 'icon-tumblr.svg' | inline_asset_content }}</span>
+                  </a>
+                </li>
+              {%- endif -%}
+              <li class="social-share__item">
+                <a
+                  class="telegram"
+                  href="https://telegram.me/share/url?url={{ per_link_url }}"
+                  title='{{ 'content.social.telegram' | t }}'
+                  data-no-instant
+                  rel="nofollow"
+                  target="_blank"
+                >
+                  <span class="svg-wrapper">{{ 'icon-telegram.svg' | inline_asset_content }}</span>
+                </a>
+              </li>
+              <li class="social-share__item">
+                <a
+                  class="email"
+                  href="mailto:?subject={{ per_title }}&amp;body={{ per_link_url }}"
+                  title='{{ 'content.social.email' | t }}'
+                  data-no-instant
+                  rel="noopener noreferrer nofollow"
+                  target="_blank"
+                >
+                  <span class="svg-wrapper">{{ 'icon-mail.svg' | inline_asset_content }}</span>
+                </a>
+              </li>
+              <li class="social-share__item">
+                <a
+                  class="whatsapp"
+                  href="https://wa.me/?text={{ per_title }}&#x20;{{ per_link_url }}"
+                  title='{{ 'content.social.whatsapp' | t }}'
+                  data-no-instant
+                  rel="nofollow"
+                  target="_blank"
+                >
+                  <span class="svg-wrapper">{{ 'icon-whatsapp.svg' | inline_asset_content }}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </share-button-product>
+    </div>
+  </side-drawer>
+</div>
+
+{% javascript %}
+  class ShareButtonProduct extends HTMLElement {
+    constructor() {
+      super();
+
+      this.elements = {
+        shareButton: this.querySelector('button'),
+        successMessage: this.querySelector('[id^="ShareMessage"]'),
+        urlInput: this.querySelector('input'),
+        content: this.querySelector('.share-button__product'),
+        copyButton: this.querySelector('.button-copy')
+      };
+
+      if (this.elements.shareButton) {
+        this.elements.shareButton.addEventListener('click', this.toggleDetails.bind(this));
+      }
+      if (this.elements.copyButton) {
+        this.elements.copyButton.addEventListener('click', this.copyToClipboard.bind(this));
+      }
+    }
+
+    toggleDetails(event) {
+      event?.preventDefault && event.preventDefault();
+      event?.stopPropagation && event.stopPropagation();
+      if (!this.elements.urlInput) return;
+
+      const url = this.elements.urlInput.getAttribute('data-url');
+
+      this.setProductInfoTop(this.getProductInfoPosition());
+
+      if (this.elements.successMessage) {
+        this.elements.successMessage.classList.add('hidden');
+      }
+      this.elements.urlInput.setAttribute('value', url);
+      this.elements.urlInput.classList.remove('is-copy');
+    }
+
+    copyToClipboard(event) {
+      event?.preventDefault && event.preventDefault();
+      event?.stopPropagation && event.stopPropagation();
+
+      if (!this.elements.urlInput || this.elements.urlInput.classList.contains('is-copy')) return;
+
+      navigator.clipboard.writeText(this.elements.urlInput.value).then(() => {
+        if (this.elements.successMessage) {
+          this.elements.successMessage.setAttribute('aria-hidden', false);
+        }
+        this.elements.urlInput.setAttribute('value', 'Link copied to clipboard!');
+        this.elements.urlInput.classList.add('is-copy');
+
+        setTimeout(() => {
+          if (this.elements.successMessage) {
+            this.elements.successMessage.setAttribute('aria-hidden', true);
+          }
+        }, 6000);
+      });
+    }
+
+    closeDetails(event) {
+      event?.preventDefault && event.preventDefault();
+      if (!this.elements.urlInput) return;
+      const url = this.elements.urlInput.getAttribute('data-url');
+
+      if (this.elements.successMessage) {
+        this.elements.successMessage.classList.add('hidden');
+      }
+      this.elements.urlInput.setAttribute('value', url);
+      this.elements.urlInput.classList.remove('is-copy');
+      this.setProductInfoTop(0);
+    }
+
+    getProductInfoPosition() {
+      const stickyElement = document.querySelector('.productView-details');
+      if (!stickyElement || !stickyElement.parentNode) return 0;
+
+      const stickyRect = stickyElement.getBoundingClientRect();
+      const parentRect = stickyElement.parentNode.getBoundingClientRect();
+
+      const topOffset = stickyRect.top - parentRect.top;
+      return topOffset;
+    }
+
+    setProductInfoTop(top) {
+      const productDetails = document.querySelector('.productView-details');
+      if (productDetails && productDetails.style) {
+        productDetails.style.setProperty('--sticky-top', top + 'px');
+      }
+    }
+  }
+
+  if (!customElements.get('share-button-product')) {
+    customElements.define('share-button-product', ShareButtonProduct);
+  }
+{% endjavascript %}

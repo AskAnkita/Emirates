@@ -1,0 +1,59 @@
+{%- liquid
+  assign mega_menu_1 = blocks | where: 'type', 'mega_menu_1'
+  assign mega_menu_2 = blocks | where: 'type', 'mega_menu_2'
+  assign mega_menu_3 = blocks | where: 'type', 'mega_menu_3'
+
+  assign check_mega_menu_1 = false
+  assign check_mega_menu_2 = false
+  assign check_mega_menu_3 = false
+
+  assign has_mega_menu_1 = false
+  assign has_mega_menu_2 = false
+  assign has_mega_menu_3 = false
+
+  assign menu_title = link.title | escape | downcase | handle
+
+  if mega_menu_1.size > 0
+    assign check_mega_menu_1 = true
+  endif
+  for block in mega_menu_1
+    assign block_title = block.settings.menu_item | escape | downcase | handle
+    if block_title == menu_title
+      assign block = block
+      assign has_mega_menu_1 = true
+    endif
+  endfor
+
+  if mega_menu_2.size > 0
+    assign check_mega_menu_2 = true
+  endif
+  for block in mega_menu_2
+    assign block_title = block.settings.menu_item | escape | downcase | handle
+    if block_title == menu_title
+      assign block = block
+      assign has_mega_menu_2 = true
+    endif
+  endfor
+
+  if mega_menu_3.size > 0
+    assign check_mega_menu_3 = true
+  endif
+  for block in mega_menu_3
+    assign block_title = block.settings.menu_item | escape | downcase | handle
+    if block_title == menu_title
+      assign block = block
+      assign has_mega_menu_3 = true
+    endif
+  endfor
+-%}
+
+{%- if check_mega_menu_1 and has_mega_menu_1 -%}
+  {%- render 'header-mega-menu-1', forloopIndex: forloopIndex, link: link,  block: block, icon_type: icon_type, keys: keys, sec_settings: sec_settings, class_item_hover_reveal: class_item_hover_reveal, block_id: block_id -%}
+
+{%- elsif check_mega_menu_2 and has_mega_menu_2 -%}
+  {%- render 'header-mega-menu-2', forloopIndex: forloopIndex, link: link,  block: block, icon_type: icon_type, keys: keys, sec_settings: sec_settings, class_item_hover_reveal: class_item_hover_reveal, block_id: block_id -%}
+{%- elsif check_mega_menu_3 and has_mega_menu_3 -%}
+  {%- render 'header-mega-menu-3', forloopIndex: forloopIndex, link: link,  block: block, icon_type: icon_type, keys: keys, sec_settings: sec_settings, class_item_hover_reveal: class_item_hover_reveal, block_id: block_id -%}
+{%- else -%}
+  {%- render 'header-dropdown-menu', forloopIndex: forloopIndex, link: link,  icon_type: icon_type, keys: keys, sec_settings: sec_settings, class_item_hover_reveal: class_item_hover_reveal, block_id: block_id -%}
+{%- endif -%}

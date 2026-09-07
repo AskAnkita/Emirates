@@ -1,0 +1,1985 @@
+{% capture children %}
+  <div class="section-resource-list__header">
+    {%- content_for 'block', type: '_product-list-content', id: 'static-header' -%}
+  </div>
+
+  {% content_for 'block', type: '_media-gallery', id: 'static-media-gallery' %}
+
+  <div
+    class="section-resource-list__content"
+    style="--horizontal-alignment: {{ section.settings.horizontal_alignment }};"
+  >
+    {%- content_for 'blocks' -%}
+  </div>
+{% endcapture %}
+
+{% render 'section', section: section, children: children %}
+
+{% schema %}
+{
+  "name": "t:names.media_gallery",
+  "class": "section-wrapper",
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "_divider"
+    },
+    {
+      "type": "_instagram-item"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "custom.popup", "aside"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "content_direction",
+      "label": "t:settings.direction",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "select",
+      "id": "content_direction_mobile",
+      "label": "t:settings.direction_on_mobile",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.right"
+        },
+        {
+          "value": "space-between",
+          "label": "t:options.space_between"
+        }
+      ],
+      "default": "flex-start",
+      "visible_if": "{{ section.settings.content_direction == 'row' }}"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "t:settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.bottom"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.content_direction == 'row' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "align_baseline",
+      "label": "t:settings.align_baseline",
+      "default": false,
+      "visible_if": "{{ section.settings.vertical_alignment == 'flex-end' }}"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment_flex_direction_column",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "flex-start",
+      "visible_if": "{{ section.settings.content_direction != 'row' }}"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment_flex_direction_column",
+      "label": "t:settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.bottom"
+        },
+        {
+          "value": "space-between",
+          "label": "t:options.space_between"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.content_direction == 'column' }}"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "page_width_custom",
+      "min": 1000,
+      "max": 2000,
+      "step": 10,
+      "default": 1570,
+      "unit": "px",
+      "label": "t:settings.page_width",
+      "visible_if": "{{ section.settings.section_width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "t:settings.height",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.auto"
+        },
+        {
+          "value": "small",
+          "label": "t:options.small"
+        },
+        {
+          "value": "medium",
+          "label": "t:options.medium"
+        },
+        {
+          "value": "large",
+          "label": "t:options.large"
+        },
+        {
+          "value": "full-screen",
+          "label": "t:options.full_screen"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": ""
+    },
+    {
+      "type": "range",
+      "id": "section_height_custom",
+      "label": "t:settings.custom_height",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 50,
+      "unit": "%",
+      "visible_if": "{{ section.settings.section_height == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "background_media",
+      "label": "t:settings.background_media",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "image",
+          "label": "t:options.image"
+        },
+        {
+          "value": "video",
+          "label": "t:options.video"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:settings.video",
+      "visible_if": "{{ section.settings.background_media == 'video' }}"
+    },
+    {
+      "type": "select",
+      "id": "video_position",
+      "label": "t:settings.video_position",
+      "options": [
+        {
+          "value": "cover",
+          "label": "t:options.cover"
+        },
+        {
+          "value": "contain",
+          "label": "t:options.contain"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ section.settings.background_media == 'video' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "t:settings.image",
+      "visible_if": "{{ section.settings.background_media == 'image' }}"
+    },
+    {
+      "type": "select",
+      "id": "background_image_position",
+      "label": "t:settings.image_position",
+      "options": [
+        {
+          "value": "cover",
+          "label": "t:options.cover"
+        },
+        {
+          "value": "fit",
+          "label": "t:options.fit"
+        }
+      ],
+      "default": "cover",
+      "visible_if": "{{ section.settings.background_media == 'image' }}"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "t:settings.borders",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:options.solid"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "label": "t:settings.border_width",
+      "default": 1,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:settings.border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "toggle_overlay",
+      "label": "t:settings.background_overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "t:settings.overlay_color",
+      "alpha": true,
+      "default": "#00000026",
+      "visible_if": "{{ section.settings.toggle_overlay }}"
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "t:settings.overlay_style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "t:options.solid"
+        },
+        {
+          "value": "gradient",
+          "label": "t:options.gradient"
+        }
+      ],
+      "default": "solid",
+      "visible_if": "{{ section.settings.toggle_overlay }}"
+    },
+    {
+      "type": "select",
+      "id": "gradient_direction",
+      "label": "t:settings.gradient_direction",
+      "options": [
+        {
+          "value": "to top",
+          "label": "t:options.up"
+        },
+        {
+          "value": "to bottom",
+          "label": "t:options.down"
+        }
+      ],
+      "default": "to top",
+      "visible_if": "{{ section.settings.toggle_overlay and section.settings.overlay_style == 'gradient' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.media_gallery",
+      "category": "t:categories.storytelling",
+      "blocks": {
+        "static-header": {
+          "type": "_product-list-content",
+          "static": true,
+          "blocks": {
+            "text_dJHkwq": {
+              "type": "text",
+              "settings": {
+                "text": "<h2>Media gallery</h2>",
+                "width": "100%",
+                "inherit_text_alignment": false,
+                "alignment": "center",
+                "width_tablet": "fit-content"
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "text_dJHkwq"
+          ]
+        },
+        "static-media-gallery": {
+          "type": "_media-gallery",
+          "static": true,
+          "settings": {
+            "layout_type": "grid",
+            "show_view_more_icon": false,
+            "icon_more_margin_top": 10,
+            "icon_more_margin_bottom": 10,
+            "icon_more_color": "#232323",
+            "icon_more_background": "rgba(0,0,0,0)",
+            "icon_more_border": "rgba(0,0,0,0)",
+            "icon_more_size": 40,
+            "carousel_on_mobile": true,
+            "columns_grid": 5,
+            "columns_carousel": 5,
+            "mobile_columns_grid": "2",
+            "mobile_columns_carousel": 1.5,
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 12,
+            "loop": false,
+            "navigation": "arrows",
+            "pagination_type": "bullets",
+            "height": "fit",
+            "custom_height": 100,
+            "inherit_color_scheme": true,
+            "scheme_background": "#ffffff",
+            "scheme_background_gradient": "",
+            "scheme_foreground_heading": "#000000",
+            "scheme_foreground": "#000000",
+            "scheme_primary": "#000f9f",
+            "scheme_primary_hover": "#000000",
+            "scheme_border": "#e6e6e6",
+            "scheme_shadow": "#000000",
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "toggle_overlay": false,
+            "overlay_color": "#00000026",
+            "overlay_style": "solid",
+            "gradient_direction": "to top",
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "instagram_item_AjJkMK": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_RWaPAT": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_dQBgCP": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_dQBgCP"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_RWaPAT"
+              ]
+            },
+            "instagram_item_3Y8eqe": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_3HXFiR": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_YggrK3": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_YggrK3"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_3HXFiR"
+              ]
+            },
+            "instagram_item_EWAkUB": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_TxGiLb": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_Pd7nQ4": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_Pd7nQ4"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_TxGiLb"
+              ]
+            },
+            "instagram_item_Bk99GH": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_bdKawY": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_hGUbhW": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_hGUbhW"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_bdKawY"
+              ]
+            },
+            "instagram_item_AePy4n": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_NExTVd": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_DJQ8YW": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_DJQ8YW"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_NExTVd"
+              ]
+            },
+            "instagram_item_xcWX9r": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_RGNzJ9": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_GWYGDi": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_GWYGDi"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_RGNzJ9"
+              ]
+            },
+            "instagram_item_hGn4nP": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_RgJWqn": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_nEBKD8": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_nEBKD8"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_RgJWqn"
+              ]
+            },
+            "instagram_item_Ne4HtB": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_6Rfpja": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_9HNnky": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_9HNnky"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_6Rfpja"
+              ]
+            },
+            "instagram_item_bL8WWd": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_fzVjqj": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_KnMXfz": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_KnMXfz"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_fzVjqj"
+              ]
+            },
+            "instagram_item_GRXLTw": {
+              "type": "_instagram-item",
+              "settings": {
+                "background_media": "image",
+                "video_position": "cover",
+                "background_image_position": "cover",
+                "link": "",
+                "background_color": "#00312d",
+                "hide_on_mobile": false,
+                "enable_typing_content": false,
+                "image_ratio": "adapt",
+                "width": "custom",
+                "custom_width": 100,
+                "width_tablet": "custom",
+                "custom_width_tablet": 100,
+                "width_mobile": "custom",
+                "custom_width_mobile": 100,
+                "height": "fit",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "icon": "none",
+                "icon_custom": "none",
+                "svg_upload": "",
+                "icon_link": "",
+                "icon_open_in_new_tab": false,
+                "icon_button_bg_color": "#ffffff",
+                "icon_button_color": "#232323",
+                "icon_button_size": 40,
+                "icon_button_position": "right",
+                "icon_button_position_right": 20,
+                "icon_button_position_left": 20,
+                "icon_button_position_bottom": 20,
+                "hover_zoomIn": true,
+                "hover_plus_icon": true,
+                "toggle_overlay": true,
+                "overlay_color": "#0000004d",
+                "overlay_style": "solid",
+                "gradient_direction": "to top",
+                "center_button": false,
+                "center_button_text": "Shop now",
+                "center_button_link": "",
+                "style_class": "button",
+                "case": "none",
+                "link_underline": false,
+                "animation_type": "none",
+                "parallax_speed": 0.5,
+                "padding_top": 0,
+                "padding_right": 0,
+                "padding_bottom": 0,
+                "padding_left": 0
+              },
+              "blocks": {
+                "content_hover_VNLH49": {
+                  "type": "_content-hover",
+                  "name": "Content hover",
+                  "settings": {
+                    "animation_type": "reveal",
+                    "show_content_on_img": true,
+                    "content_type": "custom",
+                    "content_position_top": 0,
+                    "content_position_left": 20,
+                    "content_position_right": 0,
+                    "content_position_bottom": 20
+                  },
+                  "blocks": {
+                    "text_ACV79p": {
+                      "type": "text",
+                      "name": "t:names.text",
+                      "settings": {
+                        "text": "<p>Instagram Text</p>",
+                        "typing_text": false,
+                        "primary_text": "Welcome to our store!",
+                        "secondary_text": "Exclusive offers just for you.",
+                        "third_text": "Shop now and enjoy deals!",
+                        "highlight_text": false,
+                        "highlight_text_type": "text",
+                        "highlight_text_content": "",
+                        "highlight_text_color": "#000000",
+                        "highlight_underline_color": "#000000",
+                        "spacing_text": false,
+                        "spacing_text_content": "",
+                        "spacing_text_left": 0,
+                        "spacing_text_right": 0,
+                        "stroke_text": false,
+                        "stroke_text_content": "",
+                        "width": "fit-content",
+                        "unit": "percent",
+                        "custom_width": 100,
+                        "custom_width_pixel": 500,
+                        "inherit_text_alignment": true,
+                        "alignment": "left",
+                        "width_tablet": "fit-content",
+                        "unit_tablet": "percent",
+                        "custom_width_tablet": 100,
+                        "custom_width_tablet_pixel": 100,
+                        "inherit_text_alignment_tablet": true,
+                        "alignment_tablet": "left",
+                        "width_mobile": "fit-content",
+                        "unit_mobile": "percent",
+                        "custom_width_mobile": 100,
+                        "custom_width_mobile_pixel": 100,
+                        "inherit_text_alignment_mobile": true,
+                        "alignment_mobile": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1.6rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "color": "var(--color-foreground)",
+                        "background": false,
+                        "background_color": "#00000026",
+
+                        "enable_border": false,
+                        "enable_border_bottom": false,
+                        "border": "none",
+                        "border_width": 0,
+                        "border_width_type": "100%",
+                        "border_custom_width": 100,
+                        "border_radius": 0,
+                        "text_effect": "none",
+                        "animation_repeat": false,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_ACV79p"
+                  ]
+                }
+              },
+              "block_order": [
+                "content_hover_VNLH49"
+              ]
+            }
+          },
+          "block_order": [
+            "instagram_item_AjJkMK",
+            "instagram_item_3Y8eqe",
+            "instagram_item_EWAkUB",
+            "instagram_item_Bk99GH",
+            "instagram_item_AePy4n",
+            "instagram_item_xcWX9r",
+            "instagram_item_hGn4nP",
+            "instagram_item_Ne4HtB",
+            "instagram_item_bL8WWd",
+            "instagram_item_GRXLTw"
+          ]
+        }
+      },
+      "settings": {
+        "content_direction": "column",
+        "content_direction_mobile": "column",
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "page_width_custom": 1570,
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 80,
+        "padding-block-end": 80
+      }
+    }
+  ]
+}
+{% endschema %}

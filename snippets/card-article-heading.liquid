@@ -1,0 +1,10 @@
+<div class="card__heading">
+  <a
+    href="{{ card_article.url }}"
+    id="StandardCardNoMediaLink-{{ section_id }}-{{ card_article.id }}"
+    class="full-unstyled-link card-title-change"
+    aria-labelledby="StandardCardNoMediaLink-{{ section_id }}-{{ card_article.id }} NoMediaStandardBadge-{{ section_id }}-{{ card_article.id }}"
+  >
+    {% render 'text', fallback_text: card_article.title, block: block, is_card_heading: true %}
+  </a>
+</div>

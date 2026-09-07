@@ -1,0 +1,251 @@
+{%- capture editorial_padding -%}
+  {% assign pl = block.settings.padding_left %}
+  {% assign pt = block.settings.padding_top %}
+  {% assign pr = block.settings.padding_right %}
+  {% assign pb = block.settings.padding_bottom %}
+  --editorial-padding-top: {{ pt }}%;
+  --editorial-padding-bottom: {{ pb }}%;
+  --editorial-padding-left: {{ pl }}%;
+  --editorial-padding-right: {{ pr }}%;
+{%- endcapture -%}
+
+{%- capture editorial_padding_mb -%}
+  {% assign pl_mb = block.settings.padding_left_mb %}
+  {% assign pt_mb = block.settings.padding_top_mb %}
+  {% assign pr_mb = block.settings.padding_right_mb %}
+  {% assign pb_mb = block.settings.padding_bottom_mb %}
+  --editorial-padding-top-mb: {{ pt_mb }}%;
+  --editorial-padding-bottom-mb: {{ pb_mb }}%;
+  --editorial-padding-left-mb: {{ pl_mb }}%;
+  --editorial-padding-right-mb: {{ pr_mb }}%;
+{%- endcapture -%}
+
+{%- capture editorial_margin -%}
+  {% assign margin_top = block.settings.margin_top %}
+  {% assign margin_bottom = block.settings.margin_bottom %}
+  {% assign margin_left = block.settings.margin_left %}
+  {% assign margin_right = block.settings.margin_right %}
+  --editorial-margin-top: {{ margin_top }}%;
+  --editorial-margin-bottom: {{ margin_bottom }}%;
+  --editorial-margin-left: {{ margin_left }}%;
+  --editorial-margin-right: {{ margin_right }}%;
+{%- endcapture -%}
+
+{%- capture editorial_margin_mb -%}
+  {% assign margin_top_mb = block.settings.margin_top_mb %}
+  {% assign margin_bottom_mb = block.settings.margin_bottom_mb %}
+  {% assign margin_left_mb = block.settings.margin_left_mb %}
+  {% assign margin_right_mb = block.settings.margin_right_mb %}
+  --editorial-margin-top-mb: {{ margin_top_mb }}%;
+  --editorial-margin-bottom-mb: {{ margin_bottom_mb }}%;
+  --editorial-margin-left-mb: {{ margin_left_mb }}%;
+  --editorial-margin-right-mb: {{ margin_right_mb }}%;
+{%- endcapture -%}
+
+<div class="h-full" style="{{ editorial_margin }} {{ editorial_margin_mb }} {{ editorial_padding }} {{ editorial_padding_mb }}">
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+  {
+    "name": "Editorial Item",
+    "tag": null,
+    "blocks": [
+      {
+        "type": "@theme"
+      },
+      {
+        "type": "@app"
+      },
+      {
+        "type": "group"
+      },
+      {
+        "type": "_divider"
+      }
+    ],
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:content.padding"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "label": "t:settings.top",
+        "min": 0,
+        "max": 50,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "label": "t:settings.bottom",
+        "min": 0,
+        "max": 50,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_left",
+        "label": "t:settings.left",
+        "min": 0,
+        "max": 50,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_right",
+        "label": "t:settings.right",
+        "min": 0,
+        "max": 50,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Padding mobile"
+      },
+      {
+        "type": "range",
+        "id": "padding_top_mb",
+        "label": "t:settings.top",
+        "min": 0,
+        "max": 50,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom_mb",
+        "label": "t:settings.bottom",
+        "min": 0,
+        "max": 50,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_left_mb",
+        "label": "t:settings.left",
+        "min": 0,
+        "max": 50,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_right_mb",
+        "label": "t:settings.right",
+        "min": 0,
+        "max": 50,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "t:content.margin"
+      },
+      {
+        "type": "range",
+        "id": "margin_top",
+        "label": "t:settings.top",
+        "min": -40,
+        "max": 10,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_bottom",
+        "label": "t:settings.bottom",
+        "min": -40,
+        "max": 10,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_left",
+        "label": "t:settings.left",
+         "min": -40,
+        "max": 10,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_right",
+        "label": "t:settings.right",
+         "min": -40,
+        "max": 10,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Margin mobile"
+      },
+      {
+        "type": "range",
+        "id": "margin_top_mb",
+        "label": "t:settings.top",
+        "min": -25,
+        "max": 25,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_bottom_mb",
+        "label": "t:settings.bottom",
+        "min": -25,
+        "max": 25,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_left_mb",
+        "label": "t:settings.left",
+        "min": -25,
+        "max": 25,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_right_mb",
+        "label": "t:settings.right",
+        "min": -25,
+        "max": 25,
+        "step": 0.5,
+        "unit": "%",
+        "default": 0
+      }
+    ],
+    "presets": [
+      {
+        "name": "Editorial Item"
+      }
+    ]
+  }
+{% endschema %}

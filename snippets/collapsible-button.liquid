@@ -1,0 +1,77 @@
+{% doc %}
+  Intended for use in a block similar to the button block.
+  This snippet is used to render a collapsible button.
+  It is used in the collapsible-text block.
+
+  @param {object} [block] - The block
+  @param {string} [style_class] - The style class
+  @param {string} [link_underline] - Whether to underline the link
+  @param {string} [link_reveal] - Whether to reveal the link
+  @param {string} [open_in_new_tab] - Whether to open the link in a new tab
+  @param {string} [shopify_attributes] - The Shopify attributes
+  @param {string} [label_collapse] - The label for the collapsed state
+  @param {string} [label_expanded] - The label for the expanded state
+  @param {string} [button_style] - The button style
+  @param {string} [button_collapse] - The button for the collapsed state
+  @param {string} [button_expanded] - The button for the expanded state
+  @param {string} [margin_block_start] - The margin block start
+  @param {string} [margin_block_end] - The margin block end
+  @param {string} [margin_block_start_mobile] - The margin block start mobile
+  @param {string} [margin_block_end_mobile] - The margin block end mobile
+  @param {string} [class] - The class
+
+  @example
+  {% render 'collapsible-button'%}
+{% enddoc %}
+
+{%- liquid
+  assign style_class = style_class | default: block.settings.style_class
+  assign link_underline = link_underline | default: block.settings.link_underline
+  assign link_reveal = link_reveal | default: block.settings.link_reveal
+  assign open_in_new_tab = open_in_new_tab | default: block.settings.open_in_new_tab
+  assign shopify_attributes = shopify_attributes | default: block.shopify_attributes
+  assign label_collapse = label_collapse | default: block.settings.label
+  assign label_expanded = label_expanded | default: block.settings.label_expanded
+  assign button_style = button_style | default: block.settings.button_style
+  assign button_collapse = 'content.collapsible_text.button_collapse' | t
+  assign button_expanded = 'content.collapsible_text.button_expanded' | t
+  assign margin_block_start = margin_block_start | default: block.settings.margin_block_start
+  assign margin_block_end = margin_block_end | default: block.settings.margin_block_end
+  assign margin_block_start_mobile = margin_block_start_mobile | default: block.settings.margin_block_start_mobile
+  assign margin_block_end_mobile = margin_block_end_mobile | default: block.settings.margin_block_end_mobile
+-%}
+<button
+  class="
+    {{ class }}
+    size-style
+    {{ style_class }}
+    {% if link_reveal and style_class == 'link' %}link--reveal{% endif %}
+    {% if link_underline %}link--underline{% endif %}
+    {% if button_style == 'outline' %}button--outline{% endif %}
+    {{ style_class }}--{{ block.id }}
+  "
+  style="
+    {% render 'size-style', settings: block.settings %}
+    {% render 'button-style', settings: block.settings %}
+    --margin-block-start: {{ margin_block_start | divided_by: 10.0 }}rem;
+    --margin-block-end: {{ margin_block_end | divided_by: 10.0 }}rem;
+    --margin-block-start-mobile: {{ margin_block_start_mobile | divided_by: 10.0 }}rem;
+    --margin-block-end-mobile: {{ margin_block_end_mobile | divided_by: 10.0 }}rem;
+
+  "
+  {%- if open_in_new_tab -%}
+    target="_blank"
+    rel="noopener noreferrer"
+  {%- endif -%}
+  {{ shopify_attributes }}
+  {% if link_reveal and style_class == 'link' %}
+    data-text="{{ label_collapse | default: button_collapse }}"
+  {% endif %}
+  data-show-text="{{ label_collapse | default: button_collapse }}" data-hide-text="{{ label_expanded | default: button_expanded }}"
+  {{ shopify_attributes }}
+>
+  {{ label_collapse | default: button_collapse }}
+  {% if link_reveal and style_class == 'link' %}
+    <span class="text-mask none" data-text="{{ label_collapse | default: button_collapse }}">{{ label_collapse | default: button_collapse }}</span>
+  {% endif %}
+</button>

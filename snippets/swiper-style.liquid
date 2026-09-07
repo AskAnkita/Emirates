@@ -1,0 +1,33 @@
+{%- doc -%}
+  Show CSS variables for `swiper` component without JS.
+  @param {number} columns_desktop - The number of columns for desktop.
+  @param {number} columns_tablet - The number of columns for tablet.
+  @param {number} columns_mobile - The number of columns for mobile.
+  @param {number} columns_gap - The gap between columns.
+
+  @example
+  <swiper-component
+    style="{% render 'swiper-style', columns_desktop: 4, columns_tablet: 3, columns_mobile: 2, columns_gap: 10 %}"
+  >
+  <div class="swiper">
+    <div class="swiper-wrapper grid-layout-no-js"></div>
+  </div>
+  </swiper-component>
+{%- enddoc -%}
+
+{%- if columns_desktop -%}
+  --card-grid-per-row-desktop: {{ columns_desktop }};
+{%- endif -%}
+{%- if columns_tablet -%}
+  --card-grid-per-row-tablet: {{ columns_tablet }};
+{%- endif -%}
+{%- if columns_mobile -%}
+  --card-grid-per-row-mobile: {{ columns_mobile }};
+{%- endif -%}
+{%- if columns_gap -%}
+  {% if columns_gap contains 'px' %}
+    --card-grid-per-row-gap: {{ columns_gap }};
+  {% else %}
+    --card-grid-per-row-gap: {{ columns_gap }}px;
+  {% endif %}
+{%- endif -%}

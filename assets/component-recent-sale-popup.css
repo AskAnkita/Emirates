@@ -1,0 +1,80 @@
+.recent-sale-popup {
+  position: absolute;
+  bottom: 100%;
+  font-size: var(--font-size--sm);
+  margin-left: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  max-width: var(--max-width-desktop);
+  width: 100%;
+  border: 0.5px solid #F4F4F4;
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 750px) {
+  .recent-sale-popup {
+    bottom: calc(var(--sticky-atc-height, 0px) + 30px);
+  }
+
+  .recent-sale-popup--left {
+    left: 30px;
+  }
+
+  .recent-sale-popup--right {
+    right: 30px;
+  }
+}
+
+@media (max-width: 749px) {
+  .recent-sale-popup {
+    left: 0;
+    right: 0;
+    bottom: calc(var(--sticky-atc-height, 0px) + var(--toolbar-mobile-height, 0px) + 10px);
+    max-width: 100%;
+  }
+}
+
+.recent-sale-popup.is-show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.recent-sale-popup-content-view {
+  align-self: flex-end;
+}
+
+.recent-sale-popup-content-view .button {
+  padding: 0.5rem 1rem;
+}
+
+.recent-sale-popup-close {
+  right: var(--pr);
+  top: var(--pt);
+}
+
+.recent-sale-popup-progress {
+  height: 2px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.recent-sale-popup-progress .recent-sale-popup-progress-bar {
+  width: 0%;
+  height: 100%;
+  background-color: var(--color-foreground);
+  transition: width 1s ease;
+}
+
+.other-text {
+  color: var(--other-text-color);
+}
+
+.recent-sale-popup-content-media {
+  min-width: var(--w);
+}

@@ -1,0 +1,170 @@
+<link rel="stylesheet" href="{{ 'component-cart.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-totals.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'quantity-popover.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+<link rel="stylesheet" href="{{ 'component-discounts.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet" href="{{ 'component-cart.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'component-totals.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'component-discounts.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'quantity-popover.css' | asset_url }}">
+</noscript>
+
+<cart-items-component
+  id="main-cart"
+  class="cart-items-component color-{{ section.settings.color_scheme }} relative z-0{% if cart == empty %} is-empty{% else %} spacing{% endif %}"
+  data-section-id="{{ section.id }}"
+>
+  <div class="section-background color-{{ section.settings.color_scheme }}"></div>
+  <div
+    class="section section--main-cart color-{{ section.settings.color_scheme }} section--{{ section.settings.section_width }}"
+    style="
+      {% if section.settings.section_width == 'custom' %}
+        --page-content-width: {{ section.settings.page_width_custom | divided_by: 10 }}rem;
+        --page-width: calc(var(--page-content-width) + var(--page-margin) * 2);
+      {% endif %}
+    "
+  >
+    <div class="cart-page__title">
+      {%- content_for 'block', id: 'cart-page-title', type: '_cart-title' %}
+    </div>
+
+    {%- unless cart.empty? -%}
+      <div class="cart-page__shipping">
+        {%- content_for 'block', id: 'cart-page-message', type: '_cart-shipping' %}
+      </div>
+    {%- endunless -%}
+
+    <div class="cart-page__message">
+      {%- content_for 'block', id: 'cart-page-countdown', type: '_cart-countdown' %}
+    </div>
+
+    <div
+      class="cart-page spacing-style{% if cart.empty? %} cart-page--empty{% endif %}"
+      style="{% render 'spacing-style', settings: section.settings %}"
+    >
+      <div class="cart-page__items">
+        {%- content_for 'block', id: 'cart-page-items', type: '_cart-items' %}
+      </div>
+
+      {%- unless cart.empty? -%}
+        <div class="cart-page__summary">
+          {%- content_for 'block', id: 'cart-page-summary', type: '_cart-summary' -%}
+        </div>
+      {%- endunless -%}
+
+      <div class="cart-page__more-blocks">
+        {%- content_for 'blocks' -%}
+      </div>
+    </div>
+  </div>
+</cart-items-component>
+
+<script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "t:names.cart",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "video"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "spacer"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "page_width_custom",
+      "min": 1000,
+      "max": 2000,
+      "step": 10,
+      "default": 1570,
+      "unit": "px",
+      "label": "t:settings.page_width",
+      "visible_if": "{{ section.settings.section_width == 'custom' }}"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

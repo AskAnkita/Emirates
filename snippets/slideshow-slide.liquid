@@ -1,0 +1,46 @@
+{%- doc -%}
+  Renders a slideshow slide component.
+
+  @param {number} index - the index of the slide
+  @param {string} [children] - The content of the slideshow slide
+  @param {string} [class] - HTML class attribute of the slideshow slide
+  @param {string} [style] - HTML style attribute of the slideshow slide
+  @param {string} [attributes] - Additional HTML attributes to add to the slideshow slide
+  @param {object} [block] - The block of the slideshow slide
+  @param {boolean} [show_variant_media_grouped] - Whether to show the variant media grouped
+  @param {object} [media] - The media object
+
+  @example
+  {% render 'slideshow-slide' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign class = class | strip | strip_newlines
+  assign style = style | strip | strip_newlines
+-%}
+
+{% if children contains 'product-media' %}
+  <div
+    class="swiper-slide {{ class }}{% if show_variant_media_grouped %} filter-{{ media.alt | escape | downcase | replace: ' ', '-' | replace: '(', '-' | replace: ')', '-' }}{% endif %}"
+    {% if style != blank %}
+      style="{{ style }}"
+    {% endif %}
+    {{ attributes }}
+  >
+    <div
+      id="slide-{{ block.id }}-{{ index }}"
+      class="slideshow__slide flex relative justify-center size-full"
+      aria-hidden="{% if index == 0 %}false{% else %}true{% endif %}"
+      {{ block.shopify_attributes }}
+      {% if style != blank %}
+        style="{{ style }}"
+      {% endif %}
+    >
+      <div class="flex size-full overflow-hidden absolute">
+        <div class="slide__img-wrapper grid w-full">
+          {{ children }}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,65 @@
+{%- if request.page_type != 'cart' and settings.cart_type == 'drawer' -%}
+  <link rel="stylesheet" href="{{ 'component-cart-drawer.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ 'component-cart.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ 'component-totals.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ 'quantity-popover.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+  <link rel="stylesheet" href="{{ 'component-discounts.css' | asset_url }}" media="print" fetchpriority="low" onload="this.media='all'">
+
+  <noscript>
+    <link rel="stylesheet" href="{{ 'component-cart-drawer.css' | asset_url }}">
+    <link rel="stylesheet" href="{{ 'component-cart.css' | asset_url }}">
+    <link rel="stylesheet" href="{{ 'component-totals.css' | asset_url }}">
+    <link rel="stylesheet" href="{{ 'quantity-popover.css' | asset_url }}">
+    <link rel="stylesheet" href="{{ 'component-discounts.css' | asset_url }}">
+  </noscript>
+
+  {% liquid
+  assign section_fetch = false
+  if section.index == nil
+    assign section_fetch = true
+  endif
+%}
+  
+  {% capture cart_drawer_product_block %}
+    {% content_for 'block', id: 'cart-product', type: '_cart-product' %}
+  {% endcapture %}
+
+  {% capture cart_drawer_popular_products_block %}
+    {% content_for 'block', id: 'cart-popular-products', type: '_cart-popular-products' %}
+  {% endcapture %}
+
+  {%- render 'cart-drawer', cart_drawer_product_block: cart_drawer_product_block, cart_drawer_popular_products_block: cart_drawer_popular_products_block, section_fetch: section_fetch -%}
+
+  <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "t:names.cart_drawer",
+    "tag": "section",
+    "class": "section-cart-drawer",
+    "limit": 1,
+    "enabled_on": {
+      "groups": ["custom.popup"]
+    },
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "t:info.cart_drawer_info"
+      },
+      {
+        "type": "collection",
+        "id": "cart_drawer_collection",
+        "label": "t:settings.collection",
+        "info": "t:info.cart_drawer_empty_info"
+      },
+      {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "t:settings.color_scheme",
+        "default": "scheme-1"
+      }
+    ]
+  }
+{% endschema %}

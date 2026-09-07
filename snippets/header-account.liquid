@@ -1,0 +1,69 @@
+{%- liquid
+  assign account_type = sec_stts.account_type
+  assign account_display_type = sec_stts.account_display_type
+  assign enable_account_drawer = sec_stts.enable_account_drawer
+  assign enable_account = sec_stts.show_account
+  assign extra_class = extra_class | default: '' | strip
+-%}
+
+{% capture class_button %}
+  button focus-inset account-actions header__icon header__icon--account header__icon--{{ account_type }}{% if account_type == 'both' %} header__icon--layout-{{ account_display_type }}{% endif %}
+{% endcapture %}
+
+{%- capture account_icon -%}
+  {%- if sec_stts.enable_customer_avatar -%}
+    <account-icon class="{% if account_type == 'text' %} lg:none{% endif %}">
+      {%- if customer and customer.has_avatar? -%}
+        {{ customer | avatar }}
+      {%- else -%}
+        <span class="svg-wrapper">
+          {{- 'icon-account.svg' | inline_asset_content -}}
+        </span>
+      {%- endif -%}
+    </account-icon>
+  {%- else -%}
+    <span class="svg-wrapper{% if account_type == 'text' %} lg:none{% endif %}">
+      {{- 'icon-account.svg' | inline_asset_content -}}
+    </span>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture header_utility_custom_style -%}
+  {% if custom_header_utility %}
+    {%- render 'typography-style', settings: sec_stts, preset: 'custom', font_size: header_utility_size, font: header_utility_font, weight: header_utility_weight, line_height: header_utility_line_height, letter_spacing: header_utility_letter_spacing, case: header_utility_case, wrap: header_utility_wrap %}
+  {% endif %}
+{%- endcapture -%}
+
+{%- capture account_custom_class -%}
+  {% if custom_header_utility %} custom-typography custom-font-size{% endif %}
+{%- endcapture -%}
+
+{% capture account_text %}
+  {%- if account_type == 'text' or account_type == 'both' -%}
+    <span class="text max-md:hidden {{ account_custom_class }}" style="{{ header_utility_custom_style }}">
+      {%- liquid
+        if customer
+          echo 'customer.account_fallback' | t
+        else
+          echo 'customer.log_in' | t
+        endif
+      -%}
+    </span>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if enable_account and shop.customer_accounts_enabled -%}
+  {% if enable_account_drawer %}
+    <side-drawer-opener class="header__column-action header__column-action--{{ account_type }} account-actions{% if extra_class != blank %} {{ extra_class }}{% endif %}" data-side-drawer="#Drawer-Account">
+      <button class="{{ class_button }}{% if extra_class != blank %} {{ extra_class }}{% endif %}" type="button" aria-haspopup="dialog" aria-label="{% if customer %}{{ 'customer.account_fallback' | t }}{% else %}{{ 'customer.log_in' | t }}{% endif %}">
+        {{ account_icon }}
+        {{ account_text }}
+      </button>
+    </side-drawer-opener>
+  {% else %}
+    <a href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}" class="header__column-action header__column-action--{{ account_type }} {{ class_button }}{% if extra_class != blank %} {{ extra_class }}{% endif %}" aria-label="{%- if customer -%}{{ 'customer.account_fallback' | t }}{%- else -%}{{ 'customer.log_in' | t }}{%- endif -%}">
+      {{ account_icon }}
+      {{ account_text }}
+      </a>
+  {% endif %}
+{%- endif -%}

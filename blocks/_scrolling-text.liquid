@@ -1,0 +1,254 @@
+{% assign bl_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .parallax-scroll-{{ bl_id }} {
+    position: relative;
+    padding: {{ block.settings.section_padding }}px 0;
+    background-color: {{ block.settings.background_color }};
+    overflow: hidden;
+    min-height: 400px;
+    width: 100%;
+  }
+
+  .parallax-scroll-items-{{ bl_id }} {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;}
+
+  .parallax-scroll-items-{{ bl_id }} .parallax-scroll-list {
+    gap: 40px;
+    will-change: transform;
+    transition: transform 0.7s ease-in-out;
+    transform: translateX(0);
+  }
+
+  .parallax-scroll-items-{{ bl_id }} .parallax-scroll-list + .parallax-scroll-list {
+    margin-top: 2rem;
+  }
+
+  .parallax-scroll-item {
+    flex-shrink: 0;
+    padding: 20px 30px;
+    background-color: {{ block.settings.item_background_color }};
+    color: {{ block.settings.item_text_color }};
+    border-radius: {{ block.settings.item_border_radius }}px;
+    font-size: {{ block.settings.item_text_size }}px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgb(0 0 0 / var(--opacity-10));
+    border: 1px solid {{ block.settings.item_border_color }};
+    font-size: 11rem;
+  }
+
+  @media screen and (max-width: 749px) {
+    .parallax-scroll-{{ bl_id }} {
+      min-height: 300px;
+      padding: {{ block.settings.section_padding | times: 0.7 }}px 0;
+    }
+
+    .parallax-scroll-items-{{ bl_id }} .parallax-scroll-item {
+      padding: 15px 20px;
+      font-size: {{ block.settings.item_text_size | times: 0.9 }}px;
+    }
+
+    .parallax-scroll-items-{{ bl_id }} .parallax-scroll-list {
+      gap: 20px;
+    }
+  }
+{% endstyle %}
+
+<parallax-scroll-{{ bl_id }}
+  class="parallax-scroll-{{ bl_id }}"
+  data-speed="{{ block.settings.scroll_speed }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="parallax-scroll-items-{{ bl_id }}">
+    {% content_for 'blocks' %}
+  </div>
+</parallax-scroll-{{ bl_id }}>
+
+<script defer="defer">
+  (function() {
+    class ParallaxScroll{{ bl_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.scrollSpeed = parseFloat(this.dataset.speed) || 0.5;
+        this.lastScrollY = window.scrollY;
+        this.ticking = false;}
+
+      connectedCallback() {
+        this.lists = this.querySelectorAll('.parallax-scroll-list');
+        this.setupScrollListener();
+        this.updateTransforms();
+      }
+
+      disconnectedCallback() {
+        window.removeEventListener('scroll', this.handleScroll);
+      }
+
+      setupScrollListener() {
+        this.handleScroll = () => {
+          if (!this.ticking) {
+            requestAnimationFrame(() => {
+              this.updateTransforms();
+              this.ticking = false;
+            });
+            this.ticking = true;
+          }
+        };
+
+        window.addEventListener('scroll', theme.utils.rafThrottle(this.handleScroll.bind(this)));
+      }
+
+      updateTransforms() {
+        const rect = this.getBoundingClientRect(),
+         top = rect.top,
+         height = rect.height,
+         windowHeight = window.innerHeight;
+
+        if (rect.bottom >=0 && rect.top <= windowHeight) {
+          const scrollDelta = window.scrollY - this.lastScrollY * 0.5;
+
+          this.lists.forEach((list) => {
+            const direction = list.dataset.direction;
+            const currentTransform = this.getTransformX(list);
+
+            let newTransform;
+            if (direction === 'left') {
+              newTransform =  (scrollDelta * this.scrollSpeed);
+            } else {
+              newTransform =  (scrollDelta * this.scrollSpeed) * -1;
+            }
+
+            list.style.transform = `translateX(${newTransform}px)`;
+          });
+        }
+
+        this.lastScrollY = window.scrollY;
+      }
+
+      getTransformX(element) {
+        const style = window.getComputedStyle(element);
+        const matrix = style.transform;
+        if (matrix === 'none') return 0;
+
+        const matrixValues = matrix.match(/matrix.*\((.+)\)/)[1].split(', ');
+        return parseFloat(matrixValues[4]) || 0;
+      }
+    }
+    if (!customElements.get('parallax-scroll-{{ bl_id }}')) customElements.define('parallax-scroll-{{ bl_id }}', ParallaxScroll{{ bl_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "t:names.parallax_scroll_lists",
+  "tag": null,
+  "blocks": [{ "type": "_scrolling-row" }],
+  "settings": [
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 0.1,
+      "max": 2,
+      "step": 0.1,
+      "label": "t:settings.speed",
+      "default": 0.5
+    },
+    {
+      "type": "header",
+      "content": "t:content.content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading",
+      "default": "Parallax Scroll Effect"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:settings.description",
+      "default": "Watch the items scroll in opposite directions as you scroll the page"
+    },
+    {
+      "type": "header",
+      "content": "t:content.style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:settings.background_color",
+      "default": "#f8f9fa",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:settings.color",
+      "default": "#333333",
+      "alpha": true
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 40,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "label": "t:settings.section_padding",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "t:content.item_style"
+    },
+    {
+      "type": "color",
+      "id": "item_background_color",
+      "label": "t:settings.background_color",
+      "default": "#ffffff",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "item_text_color",
+      "label": "t:settings.color",
+      "default": "#333333",
+      "alpha": true
+    },
+    {
+      "type": "color",
+      "id": "item_border_color",
+      "label": "t:settings.borders",
+      "default": "#e0e0e0",
+      "alpha": true
+    },
+    {
+      "type": "range",
+      "id": "item_text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "item_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "t:settings.border_radius",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.parallax_scroll_lists",
+      "category": "t:categories.decorative"
+    }
+  ]
+}
+{% endschema %}

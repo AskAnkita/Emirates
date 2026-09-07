@@ -1,0 +1,22 @@
+<span class="visually-hidden">Payment methods</span>
+<ul class="list payment-icons__list list-unstyled list-position-inherit" role="list">
+  {%- for type in shop.enabled_payment_types -%}
+    <li class="payment-icons__icon">
+      {{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}
+    </li>
+  {%- endfor -%}
+</ul>
+
+{% schema %}
+{
+  "name": "t:names.payment_icons",
+  "class": "payment-icons",
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.payment_icons",
+      "category": "t:categories.decorative"
+    }
+  ]
+}
+{% endschema %}

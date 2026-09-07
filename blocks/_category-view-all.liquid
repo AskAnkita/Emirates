@@ -1,0 +1,160 @@
+{%- liquid
+  assign padding_block = block.settings.padding_block | times: 0.1 | append: 'rem'
+  assign padding_inline = block.settings.padding_inline | times: 0.1 | append: 'rem'
+-%}
+
+{% capture style %}
+  {% if block.settings.inherit_color_scheme == false %}
+    {% render 'color-scheme-style', settings: block.settings %}
+  {% endif %}
+{% endcapture %}
+
+{%- capture class -%}
+  category-item category-view-all shadow-style border-style relative overflow-hidden flex-center center link link--text
+{%- endcapture -%}
+
+<div>
+  <a 
+    href="{{ block.settings.url }}" 
+    class="{{ class }}{% if block.settings.inherit_color_scheme == false %} color-scheme-custom{% endif %}"
+    style="
+      --p: {{ padding_block }} {{ padding_inline }};
+      {{ style }}
+     "
+    {%- if block.settings.open_in_new_tab -%}
+      target="_blank"
+      rel="noopener noreferrer"
+    {%- endif -%}
+  >
+    {{- block.settings.url_label -}}
+  </a>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.category_view_all",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "url_label",
+      "label": "t:settings.label",
+      "default": "View all categories"
+    },
+    {
+      "type": "url",
+      "id": "url",
+      "label": "t:settings.link"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "t:settings.open_new_tab",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_background",
+      "label": "t:settings.background",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color_background",
+      "id": "scheme_background_gradient",
+      "label": "t:settings.background_gradient",
+      "info": "t:info.background_gradient_info",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground_heading",
+      "label": "t:settings.headings",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground",
+      "label": "t:settings.text",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary",
+      "label": "t:settings.primary_color",
+      "default": "#000F9F",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary_hover",
+      "label": "t:settings.primary_hover_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_shadow",
+      "label": "t:settings.shadow_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_block",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 45,
+      "label": "t:settings.padding_top_bottom",
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_inline",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 10,
+      "label": "t:settings.padding_left_right",
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.category_view_all",
+      "category": "t:categories.collections"
+    }
+  ]
+}
+{% endschema %}

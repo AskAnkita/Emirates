@@ -1,0 +1,34 @@
+<h2 class="footer-block__heading inline-richtext {% if block.settings.underline %} underline{% endif %}">
+  {{ block.settings.heading }}
+</h2>
+
+{% schema %}
+{
+  "name": "t:names.heading_column",
+  "tag": null,
+  "blocks": [],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:settings.menu"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "Heading column",
+      "label": "t:settings.heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "underline",
+      "label": "t:settings.show_underline_for_heading",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.heading_column"
+    }
+  ]
+}
+{% endschema %}

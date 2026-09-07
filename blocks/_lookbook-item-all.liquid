@@ -1,0 +1,338 @@
+{% liquid
+  assign columns_mobile = 1
+  assign columns_tablet = 1
+  assign columns_desktop = 1
+  assign columns_gap = 0
+
+  assign enable_navigation = false
+  if block.settings.navigation == 'arrows-pagination' or block.settings.navigation == 'arrows'
+    assign enable_navigation = true
+  endif
+
+  assign enable_pagination = false
+  if block.settings.navigation == 'pagination' or block.settings.navigation == 'arrows-pagination'
+    assign enable_pagination = true
+  endif
+
+  assign always_show_swiper_button = block.settings.always_show_swiper_button
+
+%}
+
+{% capture list_items %}
+  {% if block.settings.product_list != blank %}
+    {% for product in block.settings.product_list %}
+      <li
+        id="Slide-{{ block.id }}-{{ product.id }}-{{ forloop.index }}"
+        class="grid__item swiper-slide{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %} {{block.settings.product_list}}"
+        {% if settings.animations_reveal_on_scroll %}
+          style="--animation-order: {{ forloop.index }};"
+        {% endif %}
+      >
+        {% content_for 'block',
+          type: 'card-product-flex',
+          id: 'product-slide-item',
+          closest.product: product
+        %}
+      </li>
+
+      {% unless forloop.last %}
+        <!--@list/split-->
+      {% endunless %}
+    {% endfor %}
+  {% else %}
+    <li class="grid__item swiper-slide">
+      {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    </li>
+    <li class="grid__item swiper-slide">
+      {{ 'product-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+    </li>
+    <li class="grid__item swiper-slide">
+      {{ 'product-apparel-3' | placeholder_svg_tag: 'placeholder-svg' }}
+    </li>
+  {% endif %}
+{% endcapture %}
+
+<div
+  class="lookbook-item-all relative size-style"
+  style="{% render 'size-style', settings: block.settings %}"
+  {{ block.shopify_attributes }}
+>
+  <div
+    class="section-resource-list__content gap-style"
+    style="--horizontal-alignment: {{ section.settings.horizontal_alignment }};{%  render 'gap-style', value: block.settings.gap %}"
+  >
+    {%- content_for 'blocks' -%}
+  </div>
+
+  {%- assign slides_per_view = columns_mobile -%}
+  {%- capture breakpoints -%}
+    {
+      "768": { "slidesPerView": {{ columns_tablet }} },
+      "1024": { "slidesPerView": {{ columns_tablet }} },
+      "1400": { "slidesPerView": {{ columns_desktop }} }
+    }
+  {%- endcapture -%}
+  <swiper-component
+    class="lookbook-item-all-swiper-component full-width"
+    {%- render 'swiper-data',
+      settings: block.settings,
+      slides_per_view: slides_per_view,
+      space_between: columns_gap,
+      watch_slides_progress: true,
+      breakpoints: breakpoints
+    -%}
+    style="
+      {% render 'swiper-style',
+        columns_mobile: columns_mobile,
+        columns_tablet: columns_tablet,
+        columns_desktop: columns_desktop,
+        columns_gap: columns_gap,
+      %}"
+  >
+    <div class="swiper w-full">
+      <ul
+        id="Slider-{{ block.id }}"
+        data-id="{{ block.id }}"
+        class="swiper-wrapper grid-layout-no-js list-unstyled lg:grid-layout--{{ columns_desktop }} md:grid-layout--3 grid--{{ columns_mobile }}-col-mobile"
+      >
+        {{ list_items }}
+      </ul>
+
+      {%- if enable_pagination -%}
+        <div class="swiper-pagination"></div>
+      {%- endif -%}
+      {%- if enable_navigation -%}
+        <div class="swiper-btns-wrap small-hide swiper-btns-wrap--{{ block.settings.arrows_position }}{% if always_show_swiper_button %} always_show_swiper_button{% endif %}" style="--mt: {{ block.settings.navigation_margin_top }}px; --mb: {{ block.settings.navigation_margin_bottom }}px;">
+          {%- render 'swiper-button', show_fraction_on_arrow: block.settings.show_fraction_on_arrow -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </swiper-component>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.lookbook_item_all",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "_heading"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "spacer"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "settings": [
+    {
+      "type": "product_list",
+      "id": "product_list",
+      "label": "t:settings.product_list",
+      "limit": 10
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:content.carousel"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "t:settings.loop",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "navigation",
+      "label": "t:settings.navigation",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "arrows",
+          "label": "t:options.arrows"
+        },
+        {
+          "value": "pagination",
+          "label": "t:options.pagination"
+        },
+        {
+          "value": "arrows-pagination",
+          "label": "t:settings.arrows_and_pagination"
+        }
+      ],
+      "default": "arrows"
+    },
+    {
+      "type": "select",
+      "id": "arrows_position",
+      "label": "t:settings.arrows_position",
+      "options": [
+        {
+          "value": "inside",
+          "label": "t:options.inside_slide"
+        },
+        {
+          "value": "bottom",
+          "label": "t:options.bottom_slide"
+        },
+        {
+          "value": "bottom_inside",
+          "label": "Bottom inside slide"
+        }
+      ],
+      "default": "inside",
+      "visible_if": "{{ block.settings.navigation == 'arrows' or block.settings.navigation == 'arrows-pagination' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "always_show_swiper_button",
+      "label": "Always show swiper button",
+      "default": false,
+      "visible_if": "{{ block.settings.navigation == 'arrows' or block.settings.navigation == 'arrows-pagination' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fraction_on_arrow",
+      "label": "Show fraction on arrow",
+      "default": false,
+      "visible_if": "{{ block.settings.navigation == 'arrows' or block.settings.navigation == 'arrows-pagination' }}"
+    },
+    {
+      "type": "select",
+      "id": "pagination_type",
+      "label": "t:settings.pagination_type",
+      "visible_if": "{{ block.settings.navigation == 'pagination' or block.settings.navigation == 'arrows-pagination' }}",
+      "options": [
+        {
+          "value": "bullets",
+          "label": "t:options.dots"
+        },
+        {
+          "value": "dynamic",
+          "label": "t:options.dynamic"
+        },
+        {
+          "value": "progressbar",
+          "label": "t:options.progress"
+        },
+        {
+          "value": "fraction",
+          "label": "t:options.counter"
+        }
+      ],
+      "default": "bullets"
+    },
+    {
+      "type": "range",
+      "id": "navigation_margin_top",
+      "label": "Navigation margin top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.navigation == 'arrows' or block.settings.navigation == 'arrows-pagination' }}"
+    },
+    {
+      "type": "range",
+      "id": "navigation_margin_bottom",
+      "label": "Navigation margin bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ block.settings.navigation == 'arrows' or block.settings.navigation == 'arrows-pagination' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:settings.width_mobile",
+      "options": [
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_mobile",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.lookbook_item_all"
+    }
+  ]
+}
+{% endschema %}

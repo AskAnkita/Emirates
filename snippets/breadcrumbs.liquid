@@ -1,0 +1,325 @@
+{%- capture breadcrumb_json -%}
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "{{ 'content.breadcrumb.home' | t | escape }}",
+      "item": "{{ routes.root_url | prepend: request.host | prepend: 'https://' }}"
+    }
+    {%- assign position = 2 -%}
+    {%- if template.name contains 'collection' and collection -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'content.breadcrumb.collections' | t | escape }}",
+        "item": "{{ routes.collections_url | prepend: request.host | prepend: 'https://' }}"
+      }
+      {%- assign position = position | plus: 1 -%}
+      {%- if collection.handle -%}
+        ,{
+          "@type": "ListItem",
+          "position": {{ position }},
+          "name": "{{ collection.title | escape }}",
+          "item": "{{ collection.url | prepend: request.host | prepend: 'https://' }}"
+        }
+        {%- assign position = position | plus: 1 -%}
+      {%- endif -%}
+    {%- elsif template.name == 'product' and product -%}
+      {%- assign current_collection = collection -%}
+      {%- if current_collection == blank and product.collections.size == 1 -%}
+        {%- assign current_collection = product.collections.first -%}
+      {%- endif -%}
+      {%- if current_collection -%}
+        ,{
+          "@type": "ListItem",
+          "position": {{ position }},
+          "name": "{{ 'content.breadcrumb.collections' | t | escape }}",
+          "item": "{{ routes.collections_url | prepend: request.host | prepend: 'https://' }}"
+        }
+        {%- assign position = position | plus: 1 -%}
+        ,{
+          "@type": "ListItem",
+          "position": {{ position }},
+          "name": "{{ current_collection.title | escape }}",
+          "item": "{{ current_collection.url | prepend: request.host | prepend: 'https://' }}"
+        }
+        {%- assign position = position | plus: 1 -%}
+      {%- endif -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ product.title | escape }}",
+        "item": "{{ product.url | prepend: request.host | prepend: 'https://' }}"
+      }
+    {%- elsif template.name contains 'blog' and blog -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'content.breadcrumb.blogs' | t | escape }}",
+        "item": "{{ routes.blogs_url | prepend: request.host | prepend: 'https://' }}"
+      }
+      {%- assign position = position | plus: 1 -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ blog.title | escape }}",
+        "item": "{{ blog.url | prepend: request.host | prepend: 'https://' }}"
+      }
+      {%- assign position = position | plus: 1 -%}
+      {%- if article -%}
+        ,{
+          "@type": "ListItem",
+          "position": {{ position }},
+          "name": "{{ article.title | escape }}",
+          "item": "{{ article.url | prepend: request.host | prepend: 'https://' }}"
+        }
+      {%- endif -%}
+    {%- elsif template.name == 'search' -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'content.breadcrumb.search' | t | escape }}",
+        "item": "{{ request.url }}"
+      }
+    {%- elsif template.name == 'cart' -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'content.breadcrumb.cart' | t | escape }}",
+        "item": "{{ request.url }}"
+      }
+    {%- elsif template.name contains 'page' and page -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ page.title | escape }}",
+        "item": "{{ page.url | prepend: request.host | prepend: 'https://' }}"
+      }
+    {%- elsif template contains 'customers/login' -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'customer.account.title' | t | escape }}",
+        "item": "{{ request.url }}"
+      }
+    {%- elsif template contains 'customers/register' -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'customer.register.title' | t | escape }}",
+        "item": "{{ request.url }}"
+      }
+    {%- elsif template contains 'customers/account' -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'customer.account.title' | t | escape }}",
+        "item": "{{ request.url }}"
+      }
+    {%- elsif template contains 'customers/orders' -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'customer.orders.title' | t | escape }}",
+        "item": "{{ request.url }}"
+      }
+    {%- elsif template contains 'customers/order' -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'customer.order.title' | t | escape }}",
+        "item": "{{ request.url }}"
+      }
+    {%- elsif template contains 'customers/addresses' -%}
+      ,{
+        "@type": "ListItem",
+        "position": {{ position }},
+        "name": "{{ 'customer.addresses.title' | t | escape }}",
+        "item": "{{ request.url }}"
+      }
+    {%- endif -%}
+  ]
+}
+{%- endcapture -%}
+
+{%- liquid
+  assign fluid_font_size = settings.font_size | replace: 'rem', '' | times: 0.5 | append: 'vw'
+-%}
+
+<script type="application/ld+json">
+  {{ breadcrumb_json }}
+</script>
+
+{% capture separator %}
+  {%- case settings.separator %}
+    {% when 'slash' %}
+      {{ 'content.breadcrumb.separator' | t }}
+    {% when 'caret' %}
+    <span class="svg-wrapper">
+      {{- 'icon-caret.svg' | inline_asset_content -}}
+    </span>
+  {% endcase -%}
+{% endcapture %}
+
+{%- capture attr_item -%}
+  class="breadcrumbs__item inline-flex items-center gap-style shrink-0"
+  style="{% render 'gap-style', value: settings.gap %}"
+{%- endcapture -%}
+
+{%- capture class_link -%}
+  class="link link--hover-underline link--text"
+{%- endcapture -%}
+
+<nav class="breadcrumbs element-margin-bottom custom-font-size" role="navigation" aria-label="{{ 'content.breadcrumb.title' | t }}" style="--font-size: {{ settings.font_size }};--button-font-size-link: var(--font-size);--fluid-font-size: {{ fluid_font_size }}">
+  <ol
+    class="breadcrumbs__list list-unstyled max-sm:flex justify-{{ settings.horizontal_alignment }} items-center gap-style overflow-x-a hide-scrollbar"
+    style="{% render 'gap-style', value: settings.gap %}"
+  >
+    <li {{ attr_item }}>
+      <a
+        href="{{ routes.root_url }}"
+        title="{{ 'content.breadcrumb.home_link_title' | t }}"
+        {{ class_link }}
+      >
+        <span>{{ 'content.breadcrumb.home' | t }}</span>
+      </a>
+
+      <span class="breadcrumbs__separator">
+        {{ separator }}
+      </span>
+    </li>
+    {% assign position = 2 %}
+
+    {% if template.name contains 'collections' %}
+      <li {{ attr_item }}>
+        <span>{{ 'content.breadcrumb.collections' | t }}</span>
+      </li>
+    {% endif %}
+    {% if template.name contains 'collection' and collection %}
+      <li {{ attr_item }}>
+        <a
+          href="{{ routes.collections_url }}"
+          title="{{ 'content.breadcrumb.collections' | t }}"
+          {{ class_link }}
+        >
+          <span>{{ 'content.breadcrumb.collections' | t }}</span>
+        </a>
+        <span class="breadcrumbs__separator">
+          {{ separator }}
+        </span>
+      </li>
+      {% assign position = position | plus: 1 %}
+      {% if collection.handle %}
+        <li {{ attr_item }}>
+          <span>{{ collection.title | escape }}</span>
+        </li>
+        {% assign position = position | plus: 1 %}
+      {% endif %}
+    {% elsif template.name == 'product' and product %}
+      {% assign current_collection = collection %}
+      {% if current_collection == blank and product.collections.size == 1 %}
+        {% assign current_collection = product.collections.first %}
+      {% endif %}
+      {% if current_collection %}
+        <li {{ attr_item }}>
+          <a
+            href="{{ routes.collections_url }}"
+            title="{{ 'content.breadcrumb.collections' | t }}"
+            {{ class_link }}
+          >
+            <span>{{ 'content.breadcrumb.collections' | t }}</span>
+          </a>
+          <span class="breadcrumbs__separator">
+            {{ separator }}
+          </span>
+        </li>
+        {% assign position = position | plus: 1 %}
+        <li {{ attr_item }}>
+          <a
+            href="{{ current_collection.url }}"
+            title="{{ current_collection.title | escape }}"
+            {{ class_link }}
+          >
+            <span>{{ current_collection.title | escape }}</span>
+          </a>
+          <span class="breadcrumbs__separator">
+            {{ separator }}
+          </span>
+        </li>
+        {% assign position = position | plus: 1 %}
+      {% endif %}
+      <li {{ attr_item }}>
+        <span>{{ product.title | escape }}</span>
+      </li>
+    {% elsif template.name contains 'blog' and blog %}
+      <li {{ attr_item }}>
+        <a
+          href="{{ routes.blogs_url }}"
+          title="{{ 'content.breadcrumb.blogs' | t }}"
+          {{ class_link }}
+        >
+          <span>{{ 'content.breadcrumb.blogs' | t }}</span>
+        </a>
+        <span class="breadcrumbs__separator">
+          {{ separator }}
+        </span>
+      </li>
+      {% assign position = position | plus: 1 %}
+      <li {{ attr_item }}>
+        <a href="{{ blog.url }}" title="{{ blog.title | escape }}" {{ class_link }}>
+          <span>{{ blog.title | escape }}</span>
+        </a>
+        {% if article %}
+          <span class="breadcrumbs__separator">
+            {{ separator }}
+          </span>
+        {% endif %}
+      </li>
+      {% assign position = position | plus: 1 %}
+      {% if article %}
+        <li {{ attr_item }}>
+          <span>{{ article.title | escape }}</span>
+        </li>
+      {% endif %}
+    {% elsif template.name == 'search' %}
+      <li {{ attr_item }}>
+        <span>{{ 'content.breadcrumb.search' | t }}</span>
+      </li>
+    {% elsif template.name == 'cart' %}
+      <li {{ attr_item }}>
+        <span>{{ 'content.breadcrumb.cart' | t }}</span>
+      </li>
+    {% elsif template.name contains 'page' and page %}
+      <li {{ attr_item }}>
+        <span>{{ page.title | escape }}</span>
+      </li>
+    {% elsif template contains 'customers/login' %}
+      <li {{ attr_item }}>
+        <span>{{ 'customer.account.title' | t }}</span>
+      </li>
+    {% elsif template contains 'customers/register' %}
+      <li {{ attr_item }}>
+        <span>{{ 'customer.register.title' | t }}</span>
+      </li>
+    {% elsif template contains 'customers/account' %}
+      <li {{ attr_item }}>
+        <span>{{ 'customer.account.title' | t }}</span>
+      </li>
+    {% elsif template contains 'customers/orders' %}
+      <li {{ attr_item }}>
+        <span>{{ 'customer.orders.title' | t }}</span>
+      </li>
+    {% elsif template contains 'customers/order' %}
+      <li {{ attr_item }}>
+        <span>{{ 'customer.order.title' | t }}</span>
+      </li>
+    {% elsif template contains 'customers/addresses' %}
+      <li {{ attr_item }}>
+        <span>{{ 'customer.addresses.title' | t }}</span>
+      </li>
+    {% endif %}
+  </ol>
+</nav>

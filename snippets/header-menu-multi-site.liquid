@@ -1,0 +1,156 @@
+{% comment %}
+  Renders a megamenu for the header.
+
+  Usage:
+  {% render 'header-menu-multi-site' %}
+{% endcomment %}
+
+{%- liquid
+  if section.settings.logo_width == blank
+    assign logo_width = settings.logo_width
+    assign logo_width_mobile = settings.logo_width_mobile
+    assign logo_height = logo_width | divided_by: settings.logo.aspect_ratio | ceil
+    assign logo_height_mobile = logo_width_mobile | divided_by: settings.logo.aspect_ratio | ceil
+  else
+    assign logo_width = section.settings.logo_width
+    assign logo_width_mobile = section.settings.logo_width_mobile
+    assign logo_height = section.settings.logo_width | divided_by: settings.logo.aspect_ratio | ceil
+    assign logo_height_mobile = section.settings.logo_width_mobile | divided_by: settings.logo.aspect_ratio | ceil
+  endif
+
+  assign logo_style = '--header-logo-image-width: ' | append: logo_width | append: 'px;' | append: '--header-logo-image-width-mobile: ' | append: logo_width_mobile | append: 'px; --header-logo-image-height: ' | append: logo_height | append: 'px; --header-logo-image-height-mobile: ' | append: logo_height_mobile | append: 'px; --aspect-ratio: ' | append: settings.logo.aspect_ratio | append: ';'
+-%}
+<nav class="header__inline-menu header__inline-menu-multi-site" data-menu-page>
+  <div class="header__inline-menu-logo">
+    <template>
+      <a href="{{ url }}" class="header__heading-link inline-block link link--text focus-inset" data-logo-page aria-label="{{ shop.name }}" rel="preload" as="image">
+        <div class="header__heading-logo-wrapper w-full inline-block relative" style="{{ logo_style }}">
+          <span
+            class="header-logo__image-container header-logo__image-container--original"
+            data-testid="header-logo"
+          >
+            {%- if logo != blank -%}
+              {%- liquid
+                assign text_fallback = shop.name | escape
+              -%}
+              {% render 'image',
+                image: logo,
+                class: 'header-logo__image',
+                height: block_settings.custom_height,
+                text_fallback: text_fallback,
+                style: logo_style,
+                preload: true
+              %}
+            {%- elsif logo_svg != blank -%}
+              {{ logo_svg }}
+            {%- elsif logo_fallback != blank -%}
+              {{ logo_fallback }}
+            {%- elsif logo_fallback_svg != blank -%}
+              {{ logo_fallback_svg }}
+            {%- else -%}
+              {{ shop.name }}
+            {%- endif -%}
+          </span>
+        </div>
+      </a>
+    </template>
+  </div>
+  <div class="header__inline-menu-content">
+    <template>
+      <ul class="list-menu list-menu-desktop list-menu--inline {{block.settings.color_scheme}}" role="list" style="--gap-x: {{ menu_gap }}px;">
+        {%- for link in menu -%}
+          <li>
+            {%- if link.links != blank -%}
+              <details
+                id="Details-HeaderMenu-{{ forloopIndex }}"
+                class="details--dropdown mega-menu"
+                is="dropdown-details"
+                activate-event="hover"
+                data-index="0"
+              >
+                <summary
+                  id="HeaderMenu-{{ link.handle }}"
+                  class="
+                    details__summary
+                    list-menu__item menu__link--level-1 header__menu-item list-menu__item link focus-inset link--hover-underline
+                    {% render 'highlight-class', order: '1', keys: keys, compare: link.title, settings: section.settings %}
+                  "
+                  {%- if link.links != blank -%}
+                    aria-controls="submenu-{{ forloop.index }}"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  {%- endif -%}
+                  style="{%  render 'highlight-style', order: '1', keys: keys, compare: link.title, settings: section.settings %}"
+                >
+                  <a
+                    class="text{% if link.child_active %} header__active-menu-item{% endif %}"
+                    {% if link.url != blank %}
+                      href="{{ link.url }}"
+                    {% else %}
+                      role="link" aria-disabled="true"
+                    {% endif %}
+                  >
+                    {{- link.title | escape -}}
+                  </a>
+                  {% if icon_type == 'caret' %}
+                    <span class="svg-wrapper">
+                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                    </span>
+                  {% endif %}
+                  {% render 'highlight-label-menu',
+                    order: '1',
+                    keys: keys,
+                    compare: link.title,
+                    settings: section.settings
+                  %}
+                </summary>
+                <div
+                  class="details__list mega-menu__content z-1 motion-reduce global-settings-popup color-{{ section.settings.menu_mobile_color_scheme }}"
+                  tabindex="-1"
+                >
+                  {%- render 'header-nav-mega-multi-site',
+                    blocks: blocks,
+                    link: link,
+                    forloopIndex: forloop.index,
+                    block: block,
+                    icon_type: icon_type,
+                    keys: keys,
+                    sec_settings: section.settings,
+                    class_item_hover_reveal: class_item_hover_reveal,
+                    section_fetch: true
+                  -%}
+                </div>
+              </details>
+            {%- else -%}
+              <a
+                id="HeaderMenu-{{ link.handle }}"
+                href="{{ link.url }}"
+                class="
+                  header__menu-item list-menu__item link link--text focus-inset link--hover-underline
+                  {% render 'highlight-class', order: '1', keys: keys, compare: link.title, settings: section.settings %}
+                "
+                {% if link.current %}
+                  aria-current="page"
+                {% endif %}
+                style="{%  render 'highlight-style', order: '1', keys: keys, compare: link.title, settings: section.settings %}"
+              >
+                <span
+                  class="text{% if link.current %} header__active-menu-item{% endif %}"
+                >
+                  {{- link.title | escape -}}
+                </span>
+
+                {% render 'highlight-label-menu',
+                  order: '1',
+                  keys: keys,
+                  compare: link.title,
+                  settings: section.settings
+                %}
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </template>
+  </div>
+</nav>

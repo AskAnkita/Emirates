@@ -1,0 +1,79 @@
+{% if hidden_label != true %}
+  <span class="cart-shipping-calculator--title block font-bold" style="--mb: var(--size-18)">{{ 'content.calculator_shipping.title' | t }}</span>
+{% endif %}
+<form class="shipping-calculator-form customer" action="{{ routes.cart_url }}" method="POST" novalidate is="shipping-calculator-component">
+  <div class="grid gap-xl">
+    <country-province-component
+      class="grid gap-xl"
+      {% if shop.customer_accounts_enabled and customer and customer.default_address %}
+        data-country="{{ customer.default_address.country }}"
+        {% if customer.default_address.province != blank %}
+          data-province="{{ customer.default_address.province }}"
+        {% endif %}
+      {% endif %}
+    >
+      <div class="field">
+        <label for="ShippingCalculatorCountry-{{ block.id }}">{{ 'customer.addresses.country' | t }}</label>
+        <select
+          name="address[country]"
+          {% if shop.customer_accounts_enabled and customer and customer.default_address %}
+            data-default="{{ customer.default_address.country }}"
+          {% else %}
+            data-default="{{ form.country }}"
+          {% endif %}
+          autocomplete="country"
+          is="custom-select"
+          id="ShippingCalculatorCountry-{{ block.id }}"
+        >
+          {{- all_country_option_tags -}}
+        </select>
+        <span class="svg-wrapper">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      </div>
+      <div class="field" style="display: none">
+        <label for="ShippingCalculatorProvince-{{ block.id }}">{{ 'customer.addresses.province' | t }}</label>
+        <select
+          name="address[province]"
+          {% if shop.customer_accounts_enabled and customer and customer.default_address %}
+            data-default="{{ customer.default_address.province }}"
+          {% else %}
+            data-default="{{ form.province }}"
+          {% endif %}
+          autocomplete="address-level1"
+          is="custom-select"
+          id="ShippingCalculatorProvince-{{ block.id }}"
+        >
+        </select>
+        <span class="svg-wrapper">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      </div>
+      <div class="field">
+        <input
+          type="text"
+          id="ShippingCalculatorZip-{{ block.id }}"
+          name="address[zip]"
+          autocapitalize="characters"
+          autocomplete="postal-code"
+          placeholder=" "
+          {% if shop.customer_accounts_enabled and customer and customer.default_address %}
+            value="{{ customer.default_address.zip }}"
+          {% else %}
+            value="{{ form.zip }}"
+          {% endif %}
+          class="field__input"
+        />
+        <label for="ShippingCalculatorZip-{{ block.id }}" class="field__label">{{ 'customer.addresses.zip' | t }}</label>
+      </div>
+    </country-province-component>
+    <button class="button w-full" type="submit">
+      <span class="button-overflow relative overflow-hidden" data-button-text="{{ 'content.calculator_shipping.button' | t }}">
+        <span class="button-text-main inline-block relative z-1">
+          {{- 'content.calculator_shipping.button' | t -}}
+        </span>
+      </span>
+    </button>
+  </div>
+  <div class="results"></div>
+</form>

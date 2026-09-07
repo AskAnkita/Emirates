@@ -1,0 +1,29 @@
+<div class="card-product__group-item card-quickview">
+  <modal-opener data-modal="#QuickViewStandard">
+    <button
+      type="button"
+      title="{{ 'products.product.quick_view' | t }}"
+      class="{{ class_button }} quickview-button"
+      data-product-url="{{ card_product.url }}"
+      data-product-id="{{ card_product.id }}"
+      data-open-quick-view-popup
+      data-product-handle="{{ card_product.handle }}"
+    >
+      <span class="{{ class_text }}">
+        <span class="{{ class_text_inner }}">{{ 'products.product.quick_view' | t }}</span>
+      </span>
+      <svg
+        class="quickview-button__icon"
+        aria-hidden="true"
+        focusable="false"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        width="16"
+        height="16"
+      >
+        {% render 'icon', icon: 'eye' %}
+      </svg>
+      {%- render 'loading-spinner' -%}
+    </button>
+  </modal-opener>
+</div>

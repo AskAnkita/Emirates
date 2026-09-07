@@ -1,0 +1,1039 @@
+{% style %}
+  {%- liquid
+    assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
+    assign body_font_semibold = settings.type_body_font | font_modify: 'weight', '600'
+    assign body_font_italic = settings.type_body_font | font_modify: 'style', 'italic'
+    assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
+  %}
+
+  {{ settings.type_body_font | font_face: font_display: 'swap' }}
+  {{ body_font_bold | font_face: font_display: 'swap' }}
+  {{ body_font_semibold | font_face: font_display: 'swap' }}
+  {{ body_font_italic | font_face: font_display: 'swap' }}
+  {{ body_font_bold_italic | font_face: font_display: 'swap' }}
+
+  {% if settings.type_subheading_font != settings.type_body_font %}
+    {%- liquid
+      assign secondary_font_bold = settings.type_subheading_font | font_modify: 'weight', 'bold'
+      assign secondary_font_semibold = settings.type_subheading_font | font_modify: 'weight', '600'
+      assign secondary_font_italic = settings.type_subheading_font | font_modify: 'style', 'italic'
+      assign secondary_font_bold_italic = secondary_font_bold | font_modify: 'style', 'italic'
+    %}
+
+    {{ settings.type_subheading_font | font_face: font_display: 'swap' }}
+    {{ secondary_font_bold | font_face: font_display: 'swap' }}
+    {{ secondary_font_semibold | font_face: font_display: 'swap' }}
+    {{ secondary_font_italic | font_face: font_display: 'swap' }}
+    {{ secondary_font_bold_italic | font_face: font_display: 'swap' }}
+  {% endif %}
+
+  {% if settings.type_header_font != settings.type_body_font and settings.type_header_font != settings.type_subheading_font %}
+    {%- liquid
+      assign tertiary_font_bold = settings.type_header_font | font_modify: 'weight', 'bold'
+      assign tertiary_font_semibold = settings.type_header_font | font_modify: 'weight', '600'
+      assign tertiary_font_italic = settings.type_header_font | font_modify: 'style', 'italic'
+      assign tertiary_font_bold_italic = tertiary_font_bold | font_modify: 'style', 'italic'
+    %}
+
+    {{ settings.type_header_font | font_face: font_display: 'swap' }}
+    {{ tertiary_font_bold | font_face: font_display: 'swap' }}
+    {{ tertiary_font_semibold | font_face: font_display: 'swap' }}
+    {{ tertiary_font_italic | font_face: font_display: 'swap' }}
+    {{ tertiary_font_bold_italic | font_face: font_display: 'swap' }}
+  {% endif %}
+
+  {% for scheme in settings.color_schemes -%}
+    {% assign background_brightness = scheme.settings.background | color_brightness %}
+    {% if background_brightness < 64 %}
+      {% assign opacity_5_15 = 0.15 %}
+      {% assign opacity_10_25 = 0.25 %}
+      {% assign opacity_35_55 = 0.55 %}
+      {% assign opacity_40_60 = 0.60 %}
+      {% assign opacity_30_60 = 0.60 %}
+    {% else %}
+      {% assign opacity_5_15 = 0.05 %}
+      {% assign opacity_10_25 = 0.1 %}
+      {% assign opacity_35_55 = 0.35 %}
+      {% assign opacity_40_60 = 0.40 %}
+      {% assign opacity_30_60 = 0.30 %}
+    {% endif %}
+    {% assign scheme_classes = scheme_classes | append: ', .color-' | append: scheme.id %}
+    {% if forloop.index == 1 -%}
+      :root,
+    {%- endif %}
+    .color-{{ scheme.id }} {
+      /* Background */
+      {% if scheme.settings.background_gradient != empty %}
+        --color-background: {{ scheme.settings.background_gradient }};
+      {% else %}
+        --color-background: rgb({{ scheme.settings.background.rgba }});
+      {% endif %}
+
+      --color-background-rgb: {{ scheme.settings.background.rgb }};
+
+      /* Body */
+      --color-foreground: rgb({{ scheme.settings.foreground.rgba }});
+      --color-foreground-rgb: {{ scheme.settings.foreground.rgb }};
+
+      /* Heading */
+      --color-foreground-heading: rgb({{ scheme.settings.foreground_heading.rgba }});
+      --color-foreground-heading-rgb: {{ scheme.settings.foreground_heading.rgb }};
+
+      /* Link */
+      --color-primary: rgb({{ scheme.settings.primary.rgba }});
+      --color-primary-rgb: {{ scheme.settings.primary.rgb }};
+      --color-primary-hover: rgb({{ scheme.settings.primary_hover.rgba }});
+      --color-primary-hover-rgb: {{ scheme.settings.primary_hover.rgb }};
+
+      /* Border */
+      --color-border: rgb({{ scheme.settings.border.rgba }});
+      --color-border-rgb: {{ scheme.settings.border.rgb }};
+
+      /* Shadow */
+      --color-shadow: rgb({{ scheme.settings.shadow.rgba }});
+      --color-shadow-rgb: {{ scheme.settings.shadow.rgb }};
+
+      /* Button primary */
+      --color-primary-button-text: rgb({{ scheme.settings.primary_button_text.rgba }});
+      --color-primary-button-text-rgb: {{ scheme.settings.primary_button_text.rgb }};
+      {% if scheme.settings.primary_button_background_gradient != empty %}
+        --color-primary-button-background: {{ scheme.settings.primary_button_background_gradient }};
+      {% else %}
+        --color-primary-button-background: rgb({{ scheme.settings.primary_button_background.rgba }});
+      {% endif %}
+
+      --color-primary-button-border: rgb({{ scheme.settings.primary_button_border.rgba }});
+      --color-primary-button-hover-text: rgb({{ scheme.settings.primary_button_hover_text.rgba }});
+      {% if scheme.settings.primary_button_hover_background_gradient != empty %}
+        --color-primary-button-hover-background: {{ scheme.settings.primary_button_hover_background_gradient }};
+      {% else %}
+        --color-primary-button-hover-background: rgb({{ scheme.settings.primary_button_hover_background.rgba }});
+      {% endif %}
+
+      --color-primary-button-hover-border: rgb({{ scheme.settings.primary_button_hover_border.rgba }});
+
+      /* Button secondary */
+      --color-secondary-button-text: rgb({{ scheme.settings.secondary_button_text.rgba }});
+      --color-secondary-button-text-rgb: {{ scheme.settings.secondary_button_text.rgb }};
+      {% if scheme.settings.secondary_button_background_gradient != empty %}
+        --color-secondary-button-background: {{ scheme.settings.secondary_button_background_gradient }};
+      {% else %}
+        --color-secondary-button-background: rgb({{ scheme.settings.secondary_button_background.rgba }});
+      {% endif %}
+
+      --color-secondary-button-border: rgb({{ scheme.settings.secondary_button_border.rgba }});
+      --color-secondary-button-hover-text: rgb({{ scheme.settings.secondary_button_hover_text.rgba }});
+      {% if scheme.settings.secondary_button_hover_background_gradient != empty %}
+        --color-secondary-button-hover-background: {{ scheme.settings.secondary_button_hover_background_gradient }};
+      {% else %}
+        --color-secondary-button-hover-background: rgb({{ scheme.settings.secondary_button_hover_background.rgba }});
+      {% endif %}
+
+      --color-secondary-button-hover-border: rgb({{ scheme.settings.secondary_button_hover_border.rgba }});
+
+      /* Input */
+      --color-input-background: rgb({{ scheme.settings.input_background.rgba }});
+      --color-input-text: rgb({{ scheme.settings.input_text_color.rgba }});
+      --color-input-text-rgb: {{ scheme.settings.input_text_color.rgb }};
+      --color-input-border: rgb({{ scheme.settings.input_border_color.rgba }});
+      --color-input-border-rgb: {{ scheme.settings.input_border_color.rgb }};
+      --color-input-hover-background: rgb({{ scheme.settings.input_hover_background.rgba }});
+
+      /* Payment Terms */
+      --payment-terms-background-color: rgb({{ scheme.settings.background.rgb }});
+
+      /* Arrows */
+      --arrow-color: rgb({{ scheme.settings.arrow_color.rgba }});
+      --arrow-color-rgb: {{ scheme.settings.arrow_color.rgb }};
+      --arrow-color-hover: rgb({{ scheme.settings.arrow_color_hover.rgba }});
+      --arrow-color-hover-rgb: {{ scheme.settings.arrow_color_hover.rgb }};
+
+      {% if scheme.settings.arrow_background.alpha != 0.0 %}
+        --arrow-background: rgb({{ scheme.settings.arrow_background.rgba }});
+      {%- else -%}
+        --arrow-background: rgb(var(--color-background-rgb));
+      {% endif %}
+
+      --arrow-background-rgb: {{ scheme.settings.arrow_background.rgb }};
+      --arrow-border: rgb({{ scheme.settings.arrow_border.rgba }});
+      --arrow-background-hover: rgb({{ scheme.settings.arrow_background_hover.rgba }});
+      --arrow-background-hover-rgb: {{ scheme.settings.arrow_background_hover.rgb }};
+
+      /* Pagination */
+      --pagination-color: rgb({{ scheme.settings.pagination_color.rgba }});
+      --pagination-active-color: rgb({{ scheme.settings.pagination_active_color.rgba }});
+      --pagination-active-color-rgb: {{ scheme.settings.pagination_active_color.rgb }};
+
+      /* Opacity */
+      --opacity-5-15: {{ opacity_5_15 }};
+      --opacity-10-25: {{ opacity_10_25 }};
+      --opacity-35-55: {{ opacity_35_55 }};
+      --opacity-40-60: {{ opacity_40_60 }};
+      --opacity-30-60: {{ opacity_30_60 }};
+
+      /* Disabled */
+      --input-disabled-background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+      --input-disabled-border-color: rgb(var(--color-foreground-rgb) / var(--opacity-5-15));
+      --input-disabled-text-color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+      --color-foreground-muted: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    }
+  {% endfor %}
+  {% for scheme in settings.color_schemes -%}
+    {% assign background_brightness = scheme.settings.background | color_brightness %}
+    {% if background_brightness < 64 %}
+      {% assign opacity_5_15 = 0.15 %}
+      {% assign opacity_10_25 = 0.25 %}
+      {% assign opacity_35_55 = 0.55 %}
+      {% assign opacity_40_60 = 0.60 %}
+      {% assign opacity_30_60 = 0.60 %}
+    {% else %}
+      {% assign opacity_5_15 = 0.05 %}
+      {% assign opacity_10_25 = 0.1 %}
+      {% assign opacity_35_55 = 0.35 %}
+      {% assign opacity_40_60 = 0.40 %}
+      {% assign opacity_30_60 = 0.30 %}
+    {% endif %}
+    @media screen and (max-width: 749px){
+      {% if forloop.index == 1 -%}
+        :root,
+      {%- endif %}
+      .color-mobile-{{ scheme.id }}  {
+        /* Background */
+        {% if scheme.settings.background_gradient != empty %}
+          --color-background: {{ scheme.settings.background_gradient }};
+        {% else %}
+          --color-background: rgb({{ scheme.settings.background.rgba }});
+        {% endif %}
+
+        --color-background-rgb: {{ scheme.settings.background.rgb }};
+
+        /* Body */
+        --color-foreground: rgb({{ scheme.settings.foreground.rgba }});
+        --color-foreground-rgb: {{ scheme.settings.foreground.rgb }};
+
+        /* Heading */
+        --color-foreground-heading: rgb({{ scheme.settings.foreground_heading.rgba }});
+        --color-foreground-heading-rgb: {{ scheme.settings.foreground_heading.rgb }};
+
+        /* Link */
+        --color-primary: rgb({{ scheme.settings.primary.rgba }});
+        --color-primary-rgb: {{ scheme.settings.primary.rgb }};
+        --color-primary-hover: rgb({{ scheme.settings.primary_hover.rgba }});
+        --color-primary-hover-rgb: {{ scheme.settings.primary_hover.rgb }};
+
+        /* Border */
+        --color-border: rgb({{ scheme.settings.border.rgba }});
+        --color-border-rgb: {{ scheme.settings.border.rgb }};
+
+        /* Shadow */
+        --color-shadow: rgb({{ scheme.settings.shadow.rgba }});
+        --color-shadow-rgb: {{ scheme.settings.shadow.rgb }};
+
+        /* Button primary */
+        --color-primary-button-text: rgb({{ scheme.settings.primary_button_text.rgba }});
+        --color-primary-button-text-rgb: {{ scheme.settings.primary_button_text.rgb }};
+        {% if scheme.settings.primary_button_background_gradient != empty %}
+          --color-primary-button-background: {{ scheme.settings.primary_button_background_gradient }};
+        {% else %}
+          --color-primary-button-background: rgb({{ scheme.settings.primary_button_background.rgba }});
+        {% endif %}
+
+        --color-primary-button-border: rgb({{ scheme.settings.primary_button_border.rgba }});
+        --color-primary-button-hover-text: rgb({{ scheme.settings.primary_button_hover_text.rgba }});
+        {% if scheme.settings.primary_button_hover_background_gradient != empty %}
+          --color-primary-button-hover-background: {{ scheme.settings.primary_button_hover_background_gradient }};
+        {% else %}
+          --color-primary-button-hover-background: rgb({{ scheme.settings.primary_button_hover_background.rgba }});
+        {% endif %}
+
+        --color-primary-button-hover-border: rgb({{ scheme.settings.primary_button_hover_border.rgba }});
+
+        /* Button secondary */
+        --color-secondary-button-text: rgb({{ scheme.settings.secondary_button_text.rgba }});
+        --color-secondary-button-text-rgb: {{ scheme.settings.secondary_button_text.rgb }};
+        {% if scheme.settings.secondary_button_background_gradient != empty %}
+          --color-secondary-button-background: {{ scheme.settings.secondary_button_background_gradient }};
+        {% else %}
+          --color-secondary-button-background: rgb({{ scheme.settings.secondary_button_background.rgba }});
+        {% endif %}
+
+        --color-secondary-button-border: rgb({{ scheme.settings.secondary_button_border.rgba }});
+        --color-secondary-button-hover-text: rgb({{ scheme.settings.secondary_button_hover_text.rgba }});
+        {% if scheme.settings.secondary_button_hover_background_gradient != empty %}
+          --color-secondary-button-hover-background: {{ scheme.settings.secondary_button_hover_background_gradient }};
+        {% else %}
+          --color-secondary-button-hover-background: rgb({{ scheme.settings.secondary_button_hover_background.rgba }});
+        {% endif %}
+
+        --color-secondary-button-hover-border: rgb({{ scheme.settings.secondary_button_hover_border.rgba }});
+
+        /* Input */
+        --color-input-background: rgb({{ scheme.settings.input_background.rgba }});
+        --color-input-text: rgb({{ scheme.settings.input_text_color.rgba }});
+        --color-input-text-rgb: {{ scheme.settings.input_text_color.rgb }};
+        --color-input-border: rgb({{ scheme.settings.input_border_color.rgba }});
+        --color-input-hover-background: rgb({{ scheme.settings.input_hover_background.rgba }});
+
+        /* Payment Terms */
+        --payment-terms-background-color: rgb({{ scheme.settings.background.rgb }});
+
+        /* Arrows */
+        --arrow-color: rgb({{ scheme.settings.arrow_color.rgba }});
+        --arrow-background: rgb({{ scheme.settings.arrow_background.rgba }});
+        --arrow-border: rgb({{ scheme.settings.arrow_border.rgba }});
+
+        /* Pagination */
+        --pagination-color: rgb({{ scheme.settings.pagination_color.rgba }});
+        --pagination-active-color: rgb({{ scheme.settings.pagination_active_color.rgba }});
+
+        /* Opacity */
+        --opacity-5-15: {{ opacity_5_15 }};
+        --opacity-10-25: {{ opacity_10_25 }};
+        --opacity-35-55: {{ opacity_35_55 }};
+        --opacity-40-60: {{ opacity_40_60 }};
+        --opacity-30-60: {{ opacity_30_60 }};
+
+        /* Disabled */
+        --input-disabled-background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+        --input-disabled-border-color: rgb(var(--color-foreground-rgb) / var(--opacity-5-15));
+        --input-disabled-text-color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+        --color-foreground-muted: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+      }
+    }
+    @media screen and (min-width: 750px) and (max-width: 1024px){
+      .color-tablet-{{ scheme.id }}  {
+        /* Background */
+        {% if scheme.settings.background_gradient != empty %}
+          --color-background: {{ scheme.settings.background_gradient }};
+        {% else %}
+          --color-background: rgb({{ scheme.settings.background.rgba }});
+        {% endif %}
+
+        --color-background-rgb: {{ scheme.settings.background.rgb }};
+
+        /* Body */
+        --color-foreground: rgb({{ scheme.settings.foreground.rgba }});
+        --color-foreground-rgb: {{ scheme.settings.foreground.rgb }};
+
+        /* Heading */
+        --color-foreground-heading: rgb({{ scheme.settings.foreground_heading.rgba }});
+        --color-foreground-heading-rgb: {{ scheme.settings.foreground_heading.rgb }};
+
+        /* Link */
+        --color-primary: rgb({{ scheme.settings.primary.rgba }});
+        --color-primary-rgb: {{ scheme.settings.primary.rgb }};
+        --color-primary-hover: rgb({{ scheme.settings.primary_hover.rgba }});
+        --color-primary-hover-rgb: {{ scheme.settings.primary_hover.rgb }};
+
+        /* Border */
+        --color-border: rgb({{ scheme.settings.border.rgba }});
+        --color-border-rgb: {{ scheme.settings.border.rgb }};
+
+        /* Shadow */
+        --color-shadow: rgb({{ scheme.settings.shadow.rgba }});
+        --color-shadow-rgb: {{ scheme.settings.shadow.rgb }};
+
+        /* Button primary */
+        --color-primary-button-text: rgb({{ scheme.settings.primary_button_text.rgba }});
+        --color-primary-button-text-rgb: {{ scheme.settings.primary_button_text.rgb }};
+        {% if scheme.settings.primary_button_background_gradient != empty %}
+          --color-primary-button-background: {{ scheme.settings.primary_button_background_gradient }};
+        {% else %}
+          --color-primary-button-background: rgb({{ scheme.settings.primary_button_background.rgba }});
+        {% endif %}
+
+        --color-primary-button-border: rgb({{ scheme.settings.primary_button_border.rgba }});
+        --color-primary-button-hover-text: rgb({{ scheme.settings.primary_button_hover_text.rgba }});
+        {% if scheme.settings.primary_button_hover_background_gradient != empty %}
+          --color-primary-button-hover-background: {{ scheme.settings.primary_button_hover_background_gradient }};
+        {% else %}
+          --color-primary-button-hover-background: rgb({{ scheme.settings.primary_button_hover_background.rgba }});
+        {% endif %}
+
+        --color-primary-button-hover-border: rgb({{ scheme.settings.primary_button_hover_border.rgba }});
+
+        /* Button secondary */
+        --color-secondary-button-text: rgb({{ scheme.settings.secondary_button_text.rgba }});
+        --color-secondary-button-text-rgb: {{ scheme.settings.secondary_button_text.rgb }};
+        {% if scheme.settings.secondary_button_background_gradient != empty %}
+          --color-secondary-button-background: {{ scheme.settings.secondary_button_background_gradient }};
+        {% else %}
+          --color-secondary-button-background: rgb({{ scheme.settings.secondary_button_background.rgba }});
+        {% endif %}
+
+        --color-secondary-button-border: rgb({{ scheme.settings.secondary_button_border.rgba }});
+        --color-secondary-button-hover-text: rgb({{ scheme.settings.secondary_button_hover_text.rgba }});
+        {% if scheme.settings.secondary_button_hover_background_gradient != empty %}
+          --color-secondary-button-hover-background: {{ scheme.settings.secondary_button_hover_background_gradient }};
+        {% else %}
+          --color-secondary-button-hover-background: rgb({{ scheme.settings.secondary_button_hover_background.rgba }});
+        {% endif %}
+
+        --color-secondary-button-hover-border: rgb({{ scheme.settings.secondary_button_hover_border.rgba }});
+
+        /* Input */
+        --color-input-background: rgb({{ scheme.settings.input_background.rgba }});
+        --color-input-text: rgb({{ scheme.settings.input_text_color.rgba }});
+        --color-input-text-rgb: {{ scheme.settings.input_text_color.rgb }};
+        --color-input-border: rgb({{ scheme.settings.input_border_color.rgba }});
+        --color-input-hover-background: rgb({{ scheme.settings.input_hover_background.rgba }});
+
+        /* Payment Terms */
+        --payment-terms-background-color: rgb({{ scheme.settings.background.rgb }});
+
+        /* Arrows */
+        --arrow-color: rgb({{ scheme.settings.arrow_color.rgba }});
+        --arrow-background: rgb({{ scheme.settings.arrow_background.rgba }});
+        --arrow-border: rgb({{ scheme.settings.arrow_border.rgba }});
+
+        /* Pagination */
+        --pagination-color: rgb({{ scheme.settings.pagination_color.rgba }});
+        --pagination-active-color: rgb({{ scheme.settings.pagination_active_color.rgba }});
+
+        /* Opacity */
+        --opacity-5-15: {{ opacity_5_15 }};
+        --opacity-10-25: {{ opacity_10_25 }};
+        --opacity-35-55: {{ opacity_35_55 }};
+        --opacity-40-60: {{ opacity_40_60 }};
+        --opacity-30-60: {{ opacity_30_60 }};
+
+        /* Disabled */
+        --input-disabled-background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+        --input-disabled-border-color: rgb(var(--color-foreground-rgb) / var(--opacity-5-15));
+        --input-disabled-text-color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+        --color-foreground-muted: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+      }
+    }
+  {% endfor %}
+
+  {{ scheme_classes | prepend: 'body' }} {
+    color: var(--color-foreground);
+    background: var(--color-background);
+  }
+
+  :root {
+    /* Hot stock */
+    --color-hot-stock: rgb({{ settings.hot_stock_color.rgba }});
+
+    /* Badges */
+    --color-sale-badge-foreground: rgb({{ settings.sale_badge_color.rgba }});
+    --color-sale-badge-background: rgb({{ settings.sale_badge_background.rgba }});
+    {% assign sale_badge_background = settings.sale_badge_background.rgb | strip %}
+    --color-sale-badge-border:
+      {% if sale_badge_background == '255 255 255' %}
+        rgb({{ settings.sale_badge_color.rgba }})
+      {% else %}
+        rgb({{ settings.sale_badge_background.rgba }})
+      {% endif %};
+
+    --color-sold-out-badge-foreground: rgb({{ settings.sold_out_badge_color.rgba }});
+    --color-sold-out-badge-background: rgb({{ settings.sold_out_badge_background.rgba }});
+    {% assign sold_out_badge_background = settings.sold_out_badge_background.rgb | strip %}
+    --color-sold-out-badge-border:
+      {% if sold_out_badge_background == '255 255 255' %}
+        rgb({{ settings.sold_out_badge_color.rgba }})
+      {% else %}
+        rgb({{ settings.sold_out_badge_background.rgba }})
+      {% endif %};
+
+    --color-new-badge-foreground: rgb({{ settings.new_badge_color.rgba }});
+    --color-new-badge-background: rgb({{ settings.new_badge_background.rgba }});
+    {% assign new_badge_background = settings.new_badge_background.rgb | strip %}
+    --color-new-badge-border:
+      {% if new_badge_background == '255 255 255' %}
+        rgb({{ settings.new_badge_color.rgba }})
+      {% else %}
+        rgb({{ settings.new_badge_background.rgba }})
+      {% endif %};
+
+    --color-custom-badge-foreground: rgb({{ settings.custom_badge_color.rgba }});
+    --color-custom-badge-background: rgb({{ settings.custom_badge_background.rgba }});
+    {% assign custom_badge_background = settings.custom_badge_background.rgb | strip %}
+    --color-custom-badge-border:
+      {% if custom_badge_background == '255 255 255' %}
+        rgb({{ settings.custom_badge_color.rgba }})
+      {% else %}
+        rgb({{ settings.custom_badge_background.rgba }})
+      {% endif %};
+
+    /* Product card actions */
+    --wishtlist-button-color: {{ settings.wishlist_icon }};
+    --wishtlist-button-background: {{ settings.wishlist_background }};
+    --quickview-button-color: {{ settings.quick_view_icon }};
+    --quickview-button-background: {{ settings.quick_view_background }};
+    --compare-button-color: {{ settings.compare_icon }};
+    --compare-button-background: {{ settings.compare_background }};
+
+    /* Product prices */
+    --default-price-color: {{ settings.default_price }};
+    --default-compare-color: {{ settings.compare_price }};
+    --default-sale-color: {{ settings.sale_price }};
+
+    /* Arrows */
+    --arrow-width: {{ settings.arrows_width | divided_by: 10.0 }}rem;
+    --arrow-height: {{ settings.arrows_height | divided_by: 10.0 }}rem;
+    --arrow-icon-size: {{ settings.arrows_icon_size | divided_by: 10.0 }}rem;
+    --arrow-radius: {{ settings.arrows_radius | divided_by: 10.0 }}rem;
+    --arrow-border-thickness: {{ settings.arrows_border_thickness | divided_by: 10.0 }}rem;
+
+   /* Section Heights */
+    --section-height-small: 24rem;
+    --section-height-medium: 40rem;
+    --section-height-large: 55rem;
+
+    @media screen and (min-width: 40em) {
+      --section-height-small: 40svh;
+      --section-height-medium: 55svh;
+      --section-height-large: 70svh;
+    }
+
+    @media screen and (min-width: 60em) {
+      --section-height-small: 50svh;
+      --section-height-medium: 65svh;
+      --section-height-large: 80svh;
+    }
+
+    /* Line height / Leading */
+    --body-3xl-font-size: 2.8rem;   /* 28px */
+    --body-2xl-font-size: 2.4rem;   /* 24px */
+    --body-xl-font-size: 2.0rem;    /* 20px */
+    --body-l-font-size: 1.8rem;     /* 18px */
+    --body-m-font-size: 1.6rem;     /* 16px */
+    --body-s-font-size: 1.4rem;     /* 14px */
+    --body-xs-font-size: 1.2rem;    /* 12px */
+    --body-xxs-font-size: 1.0rem;   /* 10px */
+
+    --body-3xl-line-height: 4.2rem; /* 42px */
+    --body-2xl-line-height: 3.6rem; /* 36px */
+    --body-xl-line-height: 3.0rem;  /* 30px */
+    --body-l-line-height: 2.6rem;   /* 26px */
+    --body-m-line-height: 2.4rem;   /* 24px */
+    --body-s-line-height: 2rem;     /* 20px */
+    --body-xs-line-height: 1.8rem;  /* 18px */
+    --body-xxs-line-height: 1.4rem; /* 14px */
+
+    --line-height: 1;
+
+    --line-height--display-tight: 1;
+    --line-height--display-normal: 1.1;
+    --line-height--display-loose: 1.2;
+
+    --line-height--heading-tight: 1.15;
+    --line-height--heading-normal: 1.25;
+    --line-height--heading-loose: 1.35;
+
+    --line-height--body-tight: 1.2;
+    --line-height--body-normal: 1.4;
+    --line-height--body-loose: 1.6;
+
+    /* Typography presets */
+    {%- liquid
+      assign font_sizes = "paragraph, h1, h2, h3, h4, h5, h6" | split: ", "
+      assign fluid_size_cutoff = 4.8
+      assign absolute_font_size_min = 1.0
+
+      assign font_size_values = ''
+      for font_size in font_sizes
+        assign size_setting = 'type_size_[font_size]' | replace: '[font_size]', font_size
+        assign size_setting_value = settings[size_setting] | replace: 'rem', '' | times: 1
+
+        if size_setting_value < 10
+          assign size_setting_value = '[size_setting_value]' | replace: '[size_setting_value]', size_setting_value
+        endif
+
+        assign font_size_values = font_size_values | append: '[size_setting_value],' | replace: '[size_setting_value]', size_setting_value
+      endfor
+
+      assign font_size_values = font_size_values | split: ',' | uniq | sort_natural
+
+      for font_size in font_sizes
+        assign size_setting = 'type_size_[font_size]' | replace: '[font_size]', font_size
+        assign font_size_value = settings[size_setting] | replace: 'rem', '' | times: 1
+        assign font_size_string = '[font_size_value]' | replace: '[font_size_value]', font_size_value
+        assign index = font_size_values | find_index: font_size_string
+
+        if font_size_value >= fluid_size_cutoff
+          assign fluid_font_size_min = font_size_value
+
+          if index == 0
+            assign fluid_font_size_min = absolute_font_size_min
+          else
+            assign next_font_size_index = index | minus: 1
+            assign next_font_size_value = font_size_values[next_font_size_index]
+            assign next_font_size_value_number = next_font_size_value | times: 1
+
+            if next_font_size_value_number < fluid_size_cutoff
+              assign fluid_font_size_min = next_font_size_value_number | times: 0.75
+              if font_size_value < fluid_font_size_min
+                assign fluid_font_size_min = font_size_value
+              endif
+            else
+              assign fluid_font_size_min = next_font_size_value | times: 1
+            endif
+          endif
+
+          assign fluid_size = font_size_value| times: 1.6
+
+          echo '--font-size--[font_size]: clamp([fluid_font_size_min]rem, [fluid_size]vw, [font_size_value]rem);' | replace: '[font_size]', font_size | replace: '[fluid_font_size_min]', fluid_font_size_min | replace: '[fluid_size]', fluid_size | replace: '[font_size_value]', font_size_value
+        else
+          echo '--font-size--[font_size]: [font_size_value]rem;' | replace: '[font_size]', font_size | replace: '[font_size_value]', font_size_value
+          if font_size == 'paragraph'
+            echo '--font-size--[font_size]-md: calc([font_size_value]rem + 0.2rem);' | replace: '[font_size]', font_size | replace: '[font_size_value]', font_size_value
+            echo '--font-size--[font_size]-sm: clamp(1rem, calc([font_size_value]rem - 0.2rem), [font_size_value]rem);' | replace: '[font_size]', font_size | replace: '[font_size_value]', font_size_value
+          endif
+        endif
+      endfor
+
+      assign type_presets = "paragraph, h1, h2, h3, h4, h5, h6" | split: ", "
+
+      for preset_name in type_presets
+        assign preset_size = '--font-size--[preset_name]' | replace: '[preset_name]', preset_name
+        assign preset_line_height = 'type_line_height_[preset_name]' | replace: '[preset_name]', preset_name
+
+        if preset_name == 'paragraph'
+          assign preset_font = '--font-body--family'
+          assign preset_style = '--font-body--style'
+          assign preset_weight = '400'
+          assign preset_case = '--font-body--case'
+          assign preset_letter_spacing = 'body-normal'
+
+          echo '--font-[preset_name]--weight: [preset_weight];' | replace: '[preset_name]', preset_name | replace: '[preset_weight]', preset_weight
+          echo '--font-[preset_name]--letter-spacing: var(--letter-spacing--[preset_letter_spacing]);' | replace: '[preset_name]', preset_name | replace: '[preset_letter_spacing]', preset_letter_spacing
+        else
+          assign preset_font_id = 'type_font_[preset_name]' | replace: '[preset_name]', preset_name
+          assign preset_font = '--font-[preset_font]--family' | replace: '[preset_font]', settings[preset_font_id]
+          assign preset_style = '--font-[preset_font]--style' | replace: '[preset_font]', settings[preset_font_id]
+          assign preset_weight = '--font-[preset_font]--weight' | replace: '[preset_font]', settings[preset_font_id]
+          assign preset_case = 'type_text_transform_[preset_name]' | replace: '[preset_name]', preset_name
+          assign preset_letter_spacing = 'type_letter_spacing_[preset_name]' | replace: '[preset_name]', preset_name
+
+          echo '--font-[preset_name]--weight: var([preset_weight]);' | replace: '[preset_name]', preset_name | replace: '[preset_weight]', preset_weight
+          echo '--font-[preset_name]--letter-spacing: var(--letter-spacing--[preset_letter_spacing]);' | replace: '[preset_name]', preset_name | replace: '[preset_letter_spacing]', settings[preset_letter_spacing]
+        endif
+
+        echo '--font-[preset_name]--size: var([preset_size]);' | replace: '[preset_name]', preset_name | replace: '[preset_size]', preset_size
+        echo '--font-[preset_name]--family: var([preset_font]);' | replace: '[preset_name]', preset_name | replace: '[preset_font]', preset_font
+        echo '--font-[preset_name]--style: var([preset_style]);' | replace: '[preset_name]', preset_name | replace: '[preset_style]', preset_style
+        echo '--font-[preset_name]--case: [preset_case];' | replace: '[preset_name]', preset_name | replace: '[preset_case]', settings[preset_case]
+        echo '--font-[preset_name]--line-height: var(--line-height--[preset_line_height]);' | replace: '[preset_name]', preset_name | replace: '[preset_line_height]', settings[preset_line_height]
+      endfor
+    -%}
+
+    /* Letter-spacing / Tracking */
+    --letter-spacing--display-tight: -0.03em; /* -0.3px */
+    --letter-spacing--display-normal: 0;      /* 0px */
+    --letter-spacing--display-loose: 0.03em;  /* 0.3px */
+
+    --letter-spacing--heading-tight: -0.03em; /* -0.3px */
+    --letter-spacing--heading-normal: 0;      /* 0px */
+    --letter-spacing--heading-loose: 0.03em;  /* 0.3px */
+
+    --letter-spacing--body-tight: -0.03em; /* -0.3px */
+    --letter-spacing--body-normal: 0;      /* 0px */
+    --letter-spacing--body-loose: 0.03em;  /* 0.3px */
+
+    /* Text transform */
+    --text-transform--none: none;
+    --text-transform--uppercase: uppercase;
+    --text-transform--capitalize: capitalize;
+
+    /* Font body */
+    --font-body--family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    --font-body--style: {{ settings.type_body_font.style }};
+    --font-body--weight: {{ settings.type_body_font.weight }};
+    --font-body--size: {{ settings.type_size_paragraph }};
+    --font-body--line-height: var(--line-height--{{ settings.type_line_height_paragraph }});
+
+    /* Font subheading */
+    --font-subheading--family: {{ settings.type_subheading_font.family }}, {{ settings.type_subheading_font.fallback_families }};
+    --font-subheading--style: {{ settings.type_subheading_font.style }};
+    --font-subheading--weight: {{ settings.type_subheading_font.weight }};
+
+    /* Font heading */
+    --font-heading--family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+    --font-heading--style: {{ settings.type_header_font.style }};
+    --font-heading--weight: {{ settings.type_header_font.weight }};
+
+    /* Font size */
+    --font-size--3xs: 1.0rem;    /* 10px */
+    --font-size--2xs: 1.2rem;    /* 12px */
+    --font-size--xs: 1.3rem;     /* 13px */
+    --font-size--sm: 1.4rem;     /* 14px */
+    --font-size--md: 1.6rem;     /* 16px */
+    --font-size--lg: 1.8rem;     /* 18px */
+    --font-size--xl: 2rem;       /* 20px */
+    --font-size--2xl: 2.4rem;    /* 24px */
+    --font-size--3xl: 3.2rem;    /* 32px */
+    --font-size--4xl: 4rem;      /* 40px */
+    --font-size--5xl: 4.8rem;    /* 48px */
+    --font-size--6xl: 5.6rem;    /* 56px */
+
+    /* Margin sizes */
+    --font-h1--spacing: 0.25em; /* 2.5px */
+    --font-h2--spacing: 0.25em; /* 2.5px */
+    --font-h3--spacing: 0.25em; /* 2.5px */
+    --font-h4--spacing: 0.25em; /* 2.5px */
+    --font-h5--spacing: 0.25em; /* 2.5px */
+    --font-h6--spacing: 0.25em; /* 2.5px */
+    --font-paragraph--spacing: 0; /* 0px */
+
+    /* Page layout */
+    --page-margin: 1rem; /* 10px */
+    --page-content-width: {{ settings.page_width | divided_by: 10 }}rem;
+    --page-width: calc(var(--page-content-width) + var(--page-margin) * 2);
+    --sidebar-width: 25rem; /* 250px */
+    --side-cart-width: 34rem; /* 340px */
+    --narrow-content-width: 36rem; /* 360px */
+    --normal-content-width: 42rem; /* 420px */
+    --wide-content-width: 46rem; /* 460px */
+    --narrow-page-width: 90rem; /* 900px */
+    --normal-page-width: 120rem; /* 1200px */
+    --wide-page-width: 150rem; /* 1500px */
+
+    /* Product card */
+    --product-card-image-padding: {{ settings.card_image_padding | divided_by: 10.0 }}rem;
+    --product-card-corner-radius: {{ settings.card_corner_radius | divided_by: 10.0 }}rem;
+    --product-card-border-width: {{ settings.card_border_thickness | divided_by: 10.0 }}rem;
+    --product-card-shadow-horizontal-offset: {{ settings.card_shadow_horizontal_offset | divided_by: 10.0 }}rem;
+    --product-card-shadow-vertical-offset: {{ settings.card_shadow_vertical_offset | divided_by: 10.0 }}rem;
+    --product-card-shadow-blur-radius: {{ settings.card_shadow_blur | divided_by: 10.0 }}rem;
+
+    /* Badge */
+    --badge-corner-radius: {{ settings.badge_corner_radius | divided_by: 10.0 }}rem;
+
+    /* Grid */
+    --grid-desktop-vertical-spacing: {{ settings.spacing_grid_vertical | divided_by: 10.0 }}rem;
+    --grid-desktop-horizontal-spacing: {{ settings.spacing_grid_horizontal | divided_by: 10.0 }}rem;
+    --grid-mobile-vertical-spacing: {{ settings.spacing_grid_vertical | divided_by: 20.0 }}rem;
+    --grid-mobile-horizontal-spacing: {{ settings.spacing_grid_horizontal | divided_by: 20.0 }}rem;
+
+    /* Borders */
+    --style-border-width: 1px;
+    --style-border-radius-xs: 0.2rem;
+    --style-border-radius-sm: 0.6rem;
+    --style-border-radius-md: 0.8rem;
+    --style-border-radius-50: 50%;
+    --style-border-radius-lg: 1rem;
+    --style-border-radius-buttons-primary: {{ settings.button_border_radius_primary | divided_by: 10.0 }}rem;
+    --style-border-radius-buttons-secondary: {{ settings.button_border_radius_secondary | divided_by: 10.0 }}rem;
+    --style-border-width-primary: {{ settings.primary_button_border_width | divided_by: 10.0 }}rem;
+    --style-border-width-secondary: {{ settings.secondary_button_border_width | divided_by: 10.0 }}rem;
+
+    /* Buttons */
+    --button-font-family-primary: var(--font-{{ settings.button_type_font_primary }}--family);
+    --button-font-family-secondary: var(--font-{{ settings.button_type_font_secondary }}--family);
+    --button-font-size-primary: {{ settings.button_type_size_primary }};
+    --button-font-size-secondary: {{ settings.button_type_size_secondary }};
+    --button-font-weight-primary: {{ settings.button_font_weight_primary }};
+    --button-font-weight-secondary: {{ settings.button_font_weight_secondary }};
+    --button-text-case-primary: {{ settings.button_text_case_primary }};
+    --button-text-case-secondary: {{ settings.button_text_case_secondary }};
+
+    --buttons-shadow-horizontal-offset: {{ settings.buttons_shadow_horizontal_offset | divided_by: 10.0 }}rem;
+    --buttons-shadow-vertical-offset: {{ settings.buttons_shadow_vertical_offset | divided_by: 10.0 }}rem;
+    --buttons-shadow-blur-radius: {{ settings.buttons_shadow_blur | divided_by: 10.0 }}rem;
+    --button-padding-vertical: {{ settings.buttons_padding_vertical | divided_by: 10.0 }}rem;
+    --button-padding-vertical-mobile: {{ settings.buttons_padding_vertical_mobile | divided_by: 10.0 }}rem;
+    --button-padding-horizontal: {{ settings.buttons_padding_horizontal | divided_by: 10.0 }}rem;
+    --button-padding-horizontal-mobile: {{ settings.buttons_padding_horizontal_mobile | divided_by: 10.0 }}rem;
+    --minimum-touch-target: 4.5rem;  /* 45px */
+    --button-size: var(--minimum-touch-target);
+
+    /* Focus */
+    --focus-outline-width: 0.09375rem;  /* 0.9375px */
+    --focus-outline-offset: 0.2em;      /* 2px */
+
+    /* Icons */
+    --icon-size-2xs: 0.8rem;  /* 8px */
+    --icon-size-xs: 1.2rem;   /* 12px */
+    --icon-size-sm: 1.6rem;   /* 16px */
+    --icon-size-md: 2rem;     /* 20px */
+    --icon-size-lg: 2.4rem;   /* 24px */
+    --icon-size-xl: 3.2rem;   /* 32px */
+    --icon-stroke-width: {% if settings.icon_stroke == 'thin' %}1px{% elsif settings.icon_stroke == 'heavy' %}2px{% else %}1.5px{% endif %}; /* 1px, 2px, 1.5px */
+
+    /* Inputs */
+    --inputs-radius: {{ settings.inputs_radius | divided_by: 10.0 }}rem;
+    --inputs-border-width: {{ settings.inputs_border_thickness | divided_by: 10.0 }}rem;
+    --inputs-shadow-horizontal-offset: {{ settings.inputs_shadow_horizontal_offset | divided_by: 10.0 }}rem;
+    --inputs-shadow-vertical-offset: {{ settings.inputs_shadow_vertical_offset | divided_by: 10.0 }}rem;
+    --inputs-shadow-blur-radius: {{ settings.inputs_shadow_blur | divided_by: 10.0 }}rem;
+    --inputs-radius-outset: {% if settings.inputs_radius > 0 %}{{ settings.inputs_radius | plus: settings.inputs_border_thickness }}{% else %}0{% endif %}px;
+
+    /* Variant pills */
+    --variant-pills-radius: {{ settings.variant_pills_radius | divided_by: 10.0 }}rem;
+    --variant-pills-border-width: {{ settings.variant_pills_border_thickness | divided_by: 10.0 }}rem;
+    --variant-pills-shadow-horizontal-offset: {{ settings.variant_pills_shadow_horizontal_offset | divided_by: 10.0 }}rem;
+    --variant-pills-shadow-vertical-offset: {{ settings.variant_pills_shadow_vertical_offset | divided_by: 10.0 }}rem;
+    --variant-pills-shadow-blur-radius: {{ settings.variant_pills_shadow_blur | divided_by: 10.0 }}rem;
+
+    /* Swatch input */
+    --swatch-input--size: {{ settings.variant_swatch_size | times: 0.1 }}rem;
+
+    /* Localization */
+    --localization-radius: {{ settings.inputs_radius | divided_by: 10.0 }}rem;
+    --localization-border-width: 0.1rem; /* 1px */
+    --localization-corner-radius: 1rem;  /* 10px */
+    --localization-shadow: 0 1rem 2rem rgb(40 40 40 / var(--opacity-8));
+
+    /* Popover */
+    --modal-max-width: 90dvw;
+    --modal-max-height: 90dvh;
+    --style-border-width-popover: {{ settings.popover_border_width | divided_by: 10.0 }}rem;
+    --style-border-radius-popover: {{ settings.popover_border_radius | divided_by: 10.0 }}rem;
+    --style-border-popover: var(--style-border-width-popover) {{ settings.popover_border }} rgb(var(--color-border-rgb) / {{ settings.popover_border_opacity }}%);
+    {% if settings.popover_drop_shadow %}
+      --style-shadow-popover: 0 0.4rem 2rem rgb(var(--color-shadow-rgb) / var(--opacity-15));
+      --style-shadow-popup-effect: #ffffff1a 0 0.8rem 2.4rem, #fff3 0 1.6rem 5.6rem, #fff3 0 2.4rem 8rem;
+    {% endif %}
+
+    /* Quantity */
+    --quantity-color-background: var(--color-foreground-rgb);
+    --quantity-radius: {{ settings.inputs_radius | divided_by: 10.0 }}rem;
+    --quantity-border-width: 0.1rem; /* 1px */
+    --quantity-shadow: none;
+
+    /* Size */
+    --size-1: 0.1rem;   /* 1px */
+    --size-2: 0.2rem;   /* 2px */
+    --size-3: 0.3rem;   /* 3px */
+    --size-4: 0.4rem;   /* 4px */
+    --size-5: 0.5rem;   /* 5px */
+    --size-6: 0.6rem;   /* 6px */
+    --size-7: 0.7rem;   /* 7px */
+    --size-8: 0.8rem;   /* 8px */
+    --size-9: 0.9rem;   /* 9px */
+    --size-10: 1rem;    /* 10px */
+    --size-11: 1.1rem;  /* 11px */
+    --size-12: 1.2rem;  /* 12px */
+    --size-13: 1.3rem;  /* 13px */
+    --size-14: 1.4rem;  /* 14px */
+    --size-15: 1.5rem;  /* 15px */
+    --size-16: 1.6rem;  /* 16px */
+    --size-17: 1.7rem;  /* 17px */
+    --size-18: 1.8rem;  /* 18px */
+    --size-19: 1.9rem;  /* 19px */
+    --size-20: 2rem;    /* 20px */
+    --size-21: 2.1rem;  /* 21px */
+    --size-22: 2.2rem;  /* 22px */
+    --size-23: 2.3rem;  /* 23px */
+    --size-24: 2.4rem;  /* 24px */
+    --size-25: 2.5rem;  /* 25px */
+    --size-26: 2.6rem;  /* 26px */
+    --size-27: 2.7rem;  /* 27px */
+    --size-28: 2.8rem;  /* 28px */
+    --size-29: 2.9rem;  /* 29px */
+    --size-30: 3rem;    /* 30px */
+    --size-31: 3.1rem;  /* 31px */
+    --size-32: 3.2rem;  /* 32px */
+    --size-33: 3.3rem;  /* 33px */
+    --size-34: 3.4rem;  /* 34px */
+    --size-35: 3.5rem;  /* 35px */
+    --size-36: 3.6rem;  /* 36px */
+    --size-37: 3.7rem;  /* 37px */
+    --size-38: 3.8rem;  /* 38px */
+    --size-39: 3.9rem;  /* 39px */
+    --size-40: 4rem;    /* 40px */
+    --size-41: 4.1rem;  /* 41px */
+    --size-42: 4.2rem;  /* 42px */
+    --size-43: 4.3rem;  /* 43px */
+    --size-44: 4.4rem;  /* 44px */
+    --size-45: 4.5rem;  /* 45px */
+    --size-46: 4.6rem;  /* 46px */
+    --size-47: 4.7rem;  /* 47px */
+    --size-48: 4.8rem;  /* 48px */
+
+    /* Spacing */
+    --padding-3xs: 0.2rem;   /* 2px */
+    --padding-2xs: 0.4rem;   /* 4px */
+    --padding-xs: 0.8rem;    /* 8px */
+    --padding-sm: 1rem;      /* 10px */
+    --padding-md: 1.2rem;    /* 12px */
+    --padding-lg: 1.6rem;    /* 16px */
+    --padding-xl: 2rem;      /* 20px */
+    --padding-2xl: 2.4rem;   /* 24px */
+    --padding-3xl: 2.8rem;   /* 28px */
+    --padding-4xl: 3.2rem;   /* 32px */
+    --padding-5xl: 4.8rem;   /* 48px */
+    --padding-6xl: 6.4rem;   /* 64px */
+
+    --gap-3xs: 0.125rem;   /* 1.25px */
+    --gap-2xs: 0.3rem;     /* 3px */
+    --gap-xs: 0.5rem;      /* 5px */
+    --gap-sm: 0.7rem;      /* 7px */
+    --gap-md: 0.9rem;      /* 9px */
+    --gap-lg: 1rem;        /* 10px */
+    --gap-xl: 1.5rem;      /* 15px */
+    --gap-2xl: 2rem;       /* 20px */
+    --gap-3xl: 2.5rem;     /* 25px */
+    --gap-4xl: 3rem;       /* 30px */
+
+    --margin-3xs: 0.2rem;   /* 2px */
+    --margin-2xs: 0.4rem;   /* 4px */
+    --margin-xs: 0.8rem;    /* 8px */
+    --margin-sm: 1rem;      /* 10px */
+    --margin-md: 1.2rem;    /* 12px */
+    --margin-lg: 1.6rem;    /* 16px */
+    --margin-xl: 2rem;      /* 20px */
+    --margin-2xl: 2.4rem;   /* 24px */
+    --margin-3xl: 2.8rem;   /* 28px */
+    --margin-4xl: 3.2rem;   /* 32px */
+    --margin-5xl: 4.8rem;   /* 48px */
+    --margin-6xl: 8rem;     /* 80px */
+
+    --spacing-sections-desktop: {{ settings.spacing_sections | divided_by: 10.0 }}rem;
+    --spacing-sections-mobile: {% if settings.spacing_sections < 24 %}{{ settings.spacing_sections }}{% else %}{{ settings.spacing_sections | times: 0.7 | round | at_least: 20 }}{% endif %}px;
+    --spacing-scale-sm: 0.5;
+    --spacing-scale-md: 0.7;
+    --spacing-scale-default: 1.0;
+
+    /** Z-Index / Layering */
+    --layer-section-background: -2;
+    --layer-lowest: -1;
+    --layer-raised: 2;
+    --layer-base: 0;
+    --layer-flat: 1;
+    --layer-heightened: 4;
+    --layer-sticky: 8;
+    --layer-window-overlay: 10;
+    --layer-header-menu: 12;
+    --layer-overlay: 16;
+    --layer-menu-drawer: 18;
+    --layer-sidebar: 19;
+    --layer-temporary: 20;
+
+    /* Animation */
+    --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+    --ease-out-quad: cubic-bezier(0.32, 0.72, 0, 1);
+    --ease-out-smooth: cubic-bezier(0.61, 0.22, 0.23, 1);
+    --animation-speed-fast: 0.0625s;
+    --animation-speed: 0.125s;
+    --animation-speed-slow: 0.2s;
+    --animation-speed-slowest: 0.35s;
+    --animation-speed-medium: 0.15s;
+    --animation-easing: ease-in-out;
+    --animation-slideshow-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    --drawer-animation-speed: 0.2s;
+    --animation-values-slow: var(--animation-speed-slow) var(--animation-easing);
+    --animation-slowest-smooth: var(--animation-speed-slowest) var(--ease-out-smooth);
+    --animation-values: var(--animation-speed) var(--animation-easing);
+    --animation-values-fast: var(--animation-speed-fast) var(--animation-easing);
+    --animation-values-allow-discrete: var(--animation-speed) var(--animation-easing) allow-discrete;
+    --animation-timing-hover: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --animation-timing-active: cubic-bezier(0.5, 0, 0.75, 0);
+    --animation-timing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --animation-timing-default: cubic-bezier(0, 0, 0.2, 1);
+    --animation-timing-fade-in: cubic-bezier(0.16, 1, 0.3, 1);
+    --animation-timing-fade-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* multi-level-category */
+    --color-label-multiLevel-categories: {{ settings.color_filter_label }};
+    --bg-label-multiLevel-categories: {{ settings.bg_filter_label }};
+    --color-button-multiLevel-categories: {{ settings.text_button_filter_color }};
+    --bg-button-multiLevel-categories: {% if settings.bg_gradient_button_filter_color != blank %}{{ settings.bg_gradient_button_filter_color }}{% else %}{{ settings.bg_button_filter_color }}{% endif %};
+    --border-button-multiLevel-categories: {{ settings.border_button_filter_color }};
+    --hover-color-button-multiLevel-categories: {{ settings.hover_text_button_filter_color }};
+    --hover-bg-button-multiLevel-categories: {% if settings.hover_bg_gradient_button_filter_color != blank %}{{ settings.hover_bg_gradient_button_filter_color }}{% else %}{{ settings.hover_bg_button_filter_color }}{% endif %};
+
+    /* Opacity */
+    --opacity-0: 0;
+    --opacity-1: 0.01;
+    --opacity-4: 0.04;
+    --opacity-8: 0.08;
+    --opacity-10: 0.1;
+    --opacity-15: 0.15;
+    --opacity-20: 0.2;
+    --opacity-25: 0.25;
+    --opacity-30: 0.3;
+    --opacity-35: 0.35;
+    --opacity-40: 0.4;
+    --opacity-45: 0.45;
+    --opacity-50: 0.5;
+    --opacity-55: 0.55;
+    --opacity-60: 0.6;
+    --opacity-65: 0.65;
+    --opacity-70: 0.7;
+    --opacity-75: 0.75;
+    --opacity-80: 0.8;
+    --opacity-85: 0.85;
+    --opacity-90: 0.9;
+    --opacity-95: 0.95;
+    --opacity-100: 1;
+    --opacity-subdued-text: var(--opacity-70);
+
+    /* Colors */
+    --color-black: #000000;
+    --color-black-rgb: 0 0 0;
+    --color-white: #ffffff;
+    --color-white-rgb: 255 255 255;
+    --color-success-text: #28a745;
+    --color-success-background: #d4edda;
+    --color-error-text: #dc3545;
+    --color-error-background: #f8d7da;
+    --color-info-text: #17a2b8;
+    --color-info-background: #d1ecf1;
+    --color-warning-text: #5c4425;
+    --color-warning-background: #fbf8e5;
+    --bg-light-gray: #fafafa;
+    --bg-medium-gray: #cccccc;
+    --bg-dark-gray: #333333;
+    --color-error-strikethrough: #e95144;
+    --color-new-arrivals: #427AE8;
+    --color-hot: #E85342;
+
+    {%- if settings.show_calculator_free_shipping_message -%}
+        --free-shipping-height : {{ settings.calculator_free_shipping_message_height | append: 'px' }};
+        --free-shipping-border-radius : {{ settings.calculator_free_shipping_message_border_radius | append: 'px' }};
+        --free-shipping-color : {{ settings.calculator_free_shipping_message_color }};
+         --free-shipping-bg : {{ settings.calculator_free_shipping_message_bg }};
+         --free-shipping-bg-1: {{ settings.calculator_free_shipping_message_bg_1 }};
+         --free-shipping-bg-2: {{ settings.calculator_free_shipping_message_bg_2 }};
+         --free-shipping-bg-3: {{ settings.calculator_free_shipping_message_bg_3 }};
+         --free-shipping-bg-4: {{ settings.calculator_free_shipping_message_bg_4 }};
+         --free-shipping-min-height : {{ settings.product_action_font_size | times: 1.5 | plus: settings.calculator_free_shipping_message_height | plus: 10 | append: 'px' }};
+    {%- endif -%}
+  }
+
+  @media screen and (min-width: 750px) {
+    :root {
+      --page-margin: 4rem;
+    }
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  html {
+    box-sizing: border-box;
+    font-size: 62.5%;
+    height: 100%;
+  }
+
+  body {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-columns: 100%;
+    min-height: auto;
+    margin: 0;
+    font-size: var(--font-body--size);
+    line-height: var(--font-body--line-height);
+    font-family: var(--font-body--family);
+    font-style: var(--font-body--style);
+    font-weight: var(--font-body--weight);
+  }
+{% endstyle %}
+
+{% comment %}theme-check-disable AssetPreload{% endcomment %}
+  {%- unless settings.type_body_font.system? -%}
+    <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
+  {%- endunless -%}
+  {%- unless settings.type_subheading_font.system? -%}
+    <link rel="preload" as="font" href="{{ settings.type_subheading_font | font_url }}" type="font/woff2" crossorigin>
+  {%- endunless -%}
+  {%- unless settings.type_header_font.system? -%}
+    <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
+  {%- endunless -%}
+{% comment %}theme-check-enable AssetPreload{% endcomment %}

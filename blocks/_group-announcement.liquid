@@ -1,0 +1,204 @@
+<div
+  class="
+    group-block w-full
+    group-block--{{ block.id }}
+    {% if block.settings.inherit_color_scheme == false %} color-scheme-custom{% endif %}
+    {% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}
+  "
+  style="
+    --width-header-col: {{ block.settings.width_grid_item }}%;
+    {% if block.settings.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: block.settings %}
+    {% endif %}
+  "
+  {{ block.shopify_attributes }}
+>
+  {% if block.blocks.size > 1 %}
+    <swiper-component
+      class="announcement-bar"
+      role="region"
+      aria-roledescription="{{ 'content.carousel' | t }}"
+      aria-label="{{ 'content.announcement_bar' | t }}"
+      {%- render 'swiper-data',
+        settings: block.settings,
+        slides_per_view: 1,
+        space_between: block.settings.gap,
+        watch_slides_progress: true,
+        autoplay: block.settings.autoplay,
+        effect: 'fade',
+        autoplay_speed: block.settings.autoplay_speed
+      -%}
+      style="
+        {% render 'swiper-style',
+          columns_mobile: 1,
+          columns_tablet: 1,
+          columns_desktop: 1,
+          columns_gap: 0,
+        %}
+      "
+    >
+  {% else %}
+    <div class="announcement-bar">
+  {% endif %}
+      <div class="announcement-bar-slider swiper">
+        <div
+          class="swiper-wrapper grid grid-layout grid-layout--1 list-unstyled"
+          id="Slider-{{ block.id }}"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {% content_for 'blocks' %}
+        </div>
+
+    {% if block.blocks.size > 1 %}
+        {%- render 'swiper-button' -%}
+      </div>
+    </swiper-component>
+    {% else %}
+      </div>
+    </div>
+    {% endif %}
+
+    {%- if request.design_mode and block.blocks.size > 0 -%}
+      <script src="{{ 'theme-editor.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.group_announcement",
+  "tag": null,
+  "blocks": [{ "type": "@app" }, { "type": "_announcement-text" }],
+  "settings": [
+    {
+      "type": "range",
+      "id": "width_grid_item",
+      "min": 15,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.desktop_grid_width",
+      "info": "t:info.grid_item_info",
+      "default": 25
+    },
+    {
+      "type": "header",
+      "content": "t:content.announcements"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "t:settings.auto_rotate_announcements",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "t:settings.change_every",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_background",
+      "label": "t:settings.background",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color_background",
+      "id": "scheme_background_gradient",
+      "label": "t:settings.background_gradient",
+      "info": "t:info.background_gradient_info",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground_heading",
+      "label": "t:settings.headings",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground",
+      "label": "t:settings.text",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary",
+      "label": "t:settings.primary_color",
+      "default": "#000F9F",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary_hover",
+      "label": "t:settings.primary_hover_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_shadow",
+      "label": "t:settings.shadow_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.group_announcement",
+      "category": "t:categories.header",
+      "settings": {
+        "width_grid_item": 33
+      },
+      "blocks": [
+        {
+          "type": "_announcement-text",
+          "settings": {
+            "text": "Welcome to our store"
+          }
+        },
+        {
+          "type": "_announcement-text",
+          "settings": {
+            "text": "Welcome to our store"
+          }
+        },
+        {
+          "type": "_announcement-text",
+          "settings": {
+            "text": "Welcome to our store"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

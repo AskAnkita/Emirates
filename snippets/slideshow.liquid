@@ -1,0 +1,123 @@
+{%- doc -%}
+  Renders a slideshow component.
+
+  @param {object} [settings] - the settings of the slideshow component
+  @param {object[]} slides - the slides of the slideshow
+  @param {string} [arrows_position] - The position of the arrows, defaults to 'bottom'
+  @param {string} [class] - The class of the slideshow component
+  @param {string} [controls] - The controls of the slideshow component
+  @param {string} [thumbnail_position] - The position of the thumbnails, defaults to 'bottom'
+  @param {string} [thumbnail_direction] - The direction of the thumbnails, defaults to 'horizontal'
+  @param {number} [thumbnail_width] - The width of the thumbnails, defaults to 70px
+  @param {string} [video_dialog_html] - The video dialog html
+  @param {object} [selected_product] - The product of the card
+  @param {boolean} [new_badge] - The new badge of the product
+  @param {boolean} [custom_badge] - The custom badge of the product
+  @param {string} [custom_badge_text] - The custom badge text of the product
+  @param {string} [class_badge] - The class of the badge
+  @param {boolean} [show_variant_media_grouped] - Whether to show the variant media grouped
+
+  @example
+  {% render 'slideshow', slides: slides, ref: 'mobileSlideshow' %}
+{%- enddoc -%}
+
+{%- liquid
+
+  assign enable_navigation = false
+  if settings.navigation == 'arrows-pagination' or settings.navigation == 'arrows'
+    assign enable_navigation = true
+  endif
+
+  assign enable_pagination = false
+  if settings.navigation == 'pagination' or settings.navigation == 'arrows-pagination'
+    assign enable_pagination = true
+  endif
+  assign only_pagination = false
+  if settings.navigation == 'pagination'
+    assign only_pagination = true
+    assign pagination_position = settings.pagination_position
+  endif
+
+  assign pagination_type = settings.pagination_type
+  assign arrows_position = settings.arrows_position
+  assign dot_style = settings.dot_style
+  assign dot_appearance = settings.dot_appearance
+  assign dot_background = settings.dot_background
+  assign dot_border_radius = settings.dot_border_radius
+  assign swiper_buttons_gap = settings.swiper_buttons_gap
+-%}
+
+<swiper-component
+  class="swiper__container relative {{ class }}{% if show_variant_media_grouped %} has-variant-image-grouped{% endif %}"
+  {%- render 'swiper-data',
+    settings: settings,
+    space_between: 5,
+    parallax: true,
+    speed: 800,
+    thumbnail_position: thumbnail_position,
+    thumbnail_direction: thumbnail_direction
+  -%}
+  style="
+  {% if thumbnail_width %}
+    --thumbnail-width: {{ thumbnail_width }}px;
+  {% endif %}
+  "
+>
+  <div class="swiper swiper-main">
+    <div class="swiper-wrapper swiper__slides w-full">
+      {{ slides }}
+    </div>
+    <div class="swiper-actions{% if enable_navigation %} swiper-actions--{{ arrows_position }}{% endif %} w-full">
+      {%- capture pagi_class -%}
+        swiper-pagination
+        swiper-pagination--{{ dot_style }}
+        {% if only_pagination %} swiper-pagination-pos--{{ pagination_position }}{% endif %}
+        {% if pagination_type == 'fraction' %} body-2xl-font-size{% endif %}
+      {%- endcapture -%}
+
+      {% if dot_appearance %}
+        {%- capture pagi_style -%}
+          style="--bg-color: {{ dot_background }}; --corner-radius: {{ dot_border_radius }}px; --p: 0.4rem;"
+        {%- endcapture -%}
+      {% endif %}
+
+      {%- capture pagi_html -%}
+        <div class="{{ pagi_class }}" {{ pagi_style }}></div>
+      {%- endcapture -%}
+
+      {%- capture buttons_styles -%}
+        {%- assign min = 10 -%}
+        {%- assign gap = swiper_buttons_gap -%}
+        {%- assign gap_vw = gap | times: 0.1 -%}
+        {%- if gap > min -%}
+          style="--button-gap: clamp({{ min }}px, {{ gap_vw }}vw, {{ gap }}px);"
+        {%- else -%}
+          style="--button-gap: {{ gap }}px;"
+        {%- endif -%}
+      {%- endcapture -%}
+
+      <div
+        class="swiper-btns-wrap{% if enable_navigation %} {{ arrows_position }}{% if arrows_position == 'bottom_right' %} page-width{% endif %}{% endif %}"
+        {{ buttons_styles }}
+      >
+        {% if enable_navigation %}
+          {%- render 'swiper-button' -%}
+        {% endif %}
+
+        {% if enable_pagination %}
+          {{ pagi_html }}
+        {% endif %}
+      </div>
+    </div>
+    {{ video_dialog_html }}
+    <div class="card__badge absolute z-1{% if class_badge %} {{ class_badge }}{% endif %}" style="{%- render 'badge-position-style' -%}">
+      {%- render 'product-badge',
+        card_product: selected_product,
+        new_badge: new_badge,
+        custom_badge: custom_badge,
+        custom_badge_text: custom_badge_text
+      -%}
+    </div>
+  </div>
+  {{ controls }}
+</swiper-component>

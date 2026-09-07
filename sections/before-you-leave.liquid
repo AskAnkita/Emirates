@@ -1,0 +1,137 @@
+{% liquid
+  assign section_fetch = false
+  if section.index == nil
+    assign section_fetch = true
+  endif
+%}
+
+<before-you-leave
+  data-expire-minutes="{{ section.settings.popup_expire_minutes }}"
+  data-section-fetch="{{ section_fetch }}"
+>
+  <div
+    class="modal--popup fixed top-0 left-0 z-9 w-screen h-full flex-center no-js-hidden"
+    id="before-you-leave-popup"
+  >
+    <div id="Modal-Overlay-{{ section.id }}" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+    <div class="popup__inner w-auto color-{{ section.settings.color_scheme }} cus-scrollbar">
+      <button
+        type="button"
+        class="popup__close button-close-circle minimum-touch-target-before"
+        aria-label="{{ 'accessibility.close_dialog' | t }}"
+      >
+        <span class="svg-wrapper">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+        <span class="visually-hidden">{{ 'accessibility.close_dialog' | t }}</span>
+      </button>
+      <section-fetcher
+        data-section-id="{{ section.id }}"
+        data-target-id="BeforeYouLeave-Content-{{ section.id }}"
+        data-activate="interaction"
+      ></section-fetcher>
+      {%- unless section_fetch -%}
+        <div class="section-resource-list" id="BeforeYouLeave-Content-{{ section.id }}">
+        </div>
+      {%- else -%}
+        <div class="section-resource-list" id="BeforeYouLeave-Content-{{ section.id }}">
+          {% content_for 'block', type: '_before-you-leave-group', id: 'before-you-leave-group' %}
+        </div>
+      {%- endunless -%}
+    </div>
+  </div>
+</before-you-leave>
+
+<script src="{{ 'before-you-leave.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "t:names.before_you_leave",
+  "tag": "section",
+  "class": "section-before-you-leave",
+  "limit": 1,
+  "enabled_on": {
+    "groups": ["custom.popup"]
+  },
+  "settings": [
+		{
+			"type": "range",
+			"id": "popup_expire_minutes",
+			"max": 100,
+			"min": 1,
+			"step": 1,
+			"unit": "min",
+			"label": "t:settings.show_after_minutes",
+			"default": 1
+		},
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.before_you_leave",
+      "blocks": {
+        "before-you-leave-group": {
+          "type": "_before-you-leave-group",
+          "name": "t:names.group",
+          "static": true,
+          "settings": {
+            "gap": 0
+          },
+          "blocks": {
+            "banner": {
+              "type": "_before-you-leave-banner",
+              "name": "t:names.media_banner",
+            },
+            "content": {
+              "type": "_before-you-leave-content",
+              "name": "t:names.content",
+              "settings": {
+                "horizontal_alignment_flex_direction_column": "center",
+                "gap": 24,
+                "padding-block-start": 12,
+                "padding-block-end": 12,
+                "padding-inline-start": 12,
+                "padding-inline-end": 12
+              },
+              "blocks": {
+                "heading": {
+                  "type": "text",
+                  "settings": {
+                    "text": "<h2>Before you leave</h2>"
+                  }
+                },
+                "text": {
+                  "type": "text",
+                },
+                "promotion_code": {
+                  "type": "_input_promotion_code",
+                  "settings": {
+                    "promotion_popup_discount_code_text": "EXAMPLECODE"
+                  }
+                },
+                "button": {
+                  "type": "button",
+                  "settings": {
+                    "label": "Continue shopping"
+                  }
+                }
+              },
+              "block_order": ["heading", "text", "promotion_code", "button"]
+            }
+          },
+          "block_order": ["banner", "content"]
+        }
+      }
+    }
+  ]
+}
+{% endschema %}

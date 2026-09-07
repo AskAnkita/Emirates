@@ -1,0 +1,95 @@
+{%- doc -%}
+  Renders a cart discount form.
+
+  @param {string} section.id - The section ID
+  @param {boolean} hidden_label - Whether to hide the label
+{%- enddoc -%}
+
+{% liquid
+  assign discount_codes = cart.cart_level_discount_applications | where: 'type', 'discount_code' | map: 'title'
+  for item in cart.items
+    for allocation in item.line_level_discount_allocations
+      if allocation.discount_application.type == 'discount_code'
+        assign discount_codes = item.line_level_discount_allocations | slice: forloop.index0 | map: 'discount_application' | map: 'title' | concat: discount_codes
+      endif
+    endfor
+  endfor
+
+  assign discount_codes = discount_codes | uniq
+%}
+
+<cart-discount-component
+  data-section-id="{{ section.id }}"
+>
+  <div class="cart-discount__content">
+    {% if hidden_label != true %}
+      <span class="cart-discount__content-title block font-bold" style="--mb: var(--size-9)">{{ 'content.coupon_code' | t }}</span>
+    {% endif %}
+    <form
+      class="cart-discount__form customer"
+      autocomplete="off"
+    >
+      <div class="field">
+        <input
+          id="cart-discount"
+          class="cart-discount__input field__input"
+          type="text"
+          name="discount"
+          placeholder=" "
+          required
+          autocomplete="off"
+        >
+        <label for="cart-discount" class="field__label">{{ 'content.discount_code' | t }}</label>
+      </div>
+      <button
+        type="submit"
+        class="button button--primary cart-discount__button"
+      >
+        {%- render 'loading-spinner' -%}
+        <span class="button-overflow relative overflow-hidden" data-button-text="{{ 'actions.apply' | t }}">
+          <span class="button-text-main inline-block relative z-1">
+            {{- 'actions.apply' | t -}}
+          </span>
+        </span>
+      </button>
+    </form>
+  </div>
+  <div
+    class="cart-discount__error hidden"
+    role="alert"
+  >
+    <div class="alertBox alertBox--error">
+      <span class="svg-wrapper">
+        {{- 'icon-error.svg' | inline_asset_content -}}
+      </span>
+      <div class="cart-discount__error-text cart-primary-typography cart-discount__error-discount-code hidden">
+        {{ 'content.discount_code_error' | t }}
+      </div>
+      <div class="cart-discount__error-text cart-primary-typography cart-discount__error-shipping hidden">
+        {{ 'content.shipping_discount_error' | t }}
+      </div>
+    </div>
+  </div>
+  <ul class="cart-discount__codes">
+    {% for discount_code in discount_codes %}
+      <li
+        class="cart-discount__pill"
+        data-discount-code="{{ discount_code }}"
+        aria-label="{{ 'accessibility.discount_applied' | t: code: discount_code }}"
+      >
+        <p class="cart-discount__pill-code">
+          {{ discount_code }}
+        </p>
+        <button
+          type="button"
+          class="cart-discount__pill-remove button-unstyled"
+          aria-label="{{ 'actions.remove_discount' | t: code: discount_code }}"
+        >
+          <span class="svg-wrapper pointer-events-none icon-remove">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </li>
+    {% endfor %}
+  </ul>
+</cart-discount-component>

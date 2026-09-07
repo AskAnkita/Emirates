@@ -1,0 +1,307 @@
+{%- liquid
+  assign sec_stts = section.settings
+  assign page_width = sec_stts.page_width
+  assign color_scheme = sec_stts.color_scheme
+  assign color_scheme_image = sec_stts.color_scheme_image
+  assign section_height = sec_stts.section_height
+  assign collection_image = sec_stts.collection_image
+  assign image_overlay_opacity = sec_stts.image_overlay_opacity
+  assign scroll_reveal = settings.animations_reveal_on_scroll
+  assign alignment = sec_stts.alignment
+  assign vertical_alignment = sec_stts.vertical_alignment
+  assign content_stacked = sec_stts.content_stacked
+-%}
+
+{% capture children %}
+  {% content_for 'blocks' %}
+{% endcapture %}
+<div class="spacing-style" style="{% render 'spacing-style', settings: sec_stts %}">
+  <div
+    class="
+      relative z-0 spacing
+      section
+      section--{{ page_width }}
+      section--height-{{ section_height }}
+      {% if content_stacked %} section--content-stacked{% endif %}
+    "
+    id="collection-hero-{{ section.id }}"
+  >
+    <div class="collection-hero{% if collection_image %} collection-hero--with-image color-{{ color_scheme_image }}{% else %} color-{{ color_scheme }}{% endif %}">
+      {%- if collection_image -%}
+        {{ 'section-media-banner.css' | asset_url | stylesheet_tag }}
+        {%- style -%}
+          .collection-hero__image-wrapper.banner__media:after {
+            opacity: {{ image_overlay_opacity | divided_by: 100.0 }};
+            background: var(--color-background);
+          }
+
+          #collection-hero-{{ section.id }}.section--content-stacked .banner {
+            flex-direction: column;
+          }
+
+          #collection-hero-{{ section.id }}.section--content-stacked .banner__media {
+            position: relative;
+          }
+        {%- endstyle -%}
+
+        <div
+          class="collection-hero__inner banner h-full{% if scroll_reveal %} scroll-trigger animate--fade-in{% endif %}"
+        >
+          {%- liquid
+            assign loading = 'lazy'
+            assign fetch_priority = 'auto'
+            if section.index == 1
+              assign loading = 'eager'
+              assign fetch_priority = 'high'
+            endif
+            assign image_height = collection_image.width | divided_by: collection_image.aspect_ratio
+          -%}
+          {% style %}
+            {%- liquid
+              assign ratio = collection_image.aspect_ratio
+            -%}
+
+            {% if section_height == 'adapt' %}
+              #collection-hero-{{ section.id }}:not(.section--content-stacked)  {
+                aspect-ratio: {{ ratio }};
+              }
+            {% endif %}
+
+            {% if content_stacked %}
+              #collection-hero-{{ section.id }}.section--content-stacked .banner__media {
+                aspect-ratio: {{ ratio }};
+              }
+            {% endif %}
+          {% endstyle %}
+          <div class="collection-hero__image-wrapper banner__media media">
+            {%- render 'image',
+              image: collection_image,
+              height: image_height,
+              fetch_priority: fetch_priority,
+              loading: loading,
+              sizes: '100vw',
+              class: 'banner__media-image'
+            -%}
+          </div>
+          <div
+            class="
+              collection__text-wrapper
+              relative flex w-full z-2
+              justify-{{ alignment | replace: 'left', 'start' | replace: 'right', 'end' }}
+              items-{{ vertical_alignment | replace: 'flex-', '' | replace: 'flex-', '' }}
+              {% if scroll_reveal %} scroll-trigger animate--fade-in{% endif %}
+            "
+          >
+            <div class="collection-hero__text-wrapper w-full flex flex-column items-{{ alignment | replace: 'left', 'start' | replace: 'right', 'end' }}{% if vertical_alignment == 'between' %} justify-between h-full{% endif %}">
+              {{ children }}
+            </div>
+          </div>
+        </div>
+      {%- else -%}
+        <div class="collection-hero__inner{% if scroll_reveal %} scroll-trigger animate--fade-in{% endif %}">
+          <div
+            class="collection-hero__text-wrapper"
+          >
+            {{ children }}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+{% schema %}
+{
+  "name": "t:names.collection_banner",
+  "class": "section-wrapper",
+  "blocks": [
+    {
+      "type": "text"
+    },
+    {
+      "type": "_breadcrumb"
+    },
+    {
+      "type": "_sub-collection"
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.collection_content"
+    },
+    {
+      "type": "header",
+      "content": "t:content.section_layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "content_stacked",
+      "label": "t:options.stack",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "page_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:options.adapt_to_image"
+        },
+        {
+          "value": "small",
+          "label": "t:options.small"
+        },
+        {
+          "value": "medium",
+          "label": "t:options.medium"
+        },
+        {
+          "value": "large",
+          "label": "t:options.large"
+        },
+        {
+          "value": "full-screen",
+          "label": "t:options.full_screen"
+        }
+      ],
+      "default": "medium",
+      "label": "t:settings.section_height"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "t:settings.position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.top"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.bottom"
+        },
+        {
+          "value": "between",
+          "label": "t:options.space_between"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.collection_image"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_image",
+      "label": "Collection image"
+    },
+    {
+      "type": "range",
+      "id": "image_overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "t:settings.image_overlay_opacity",
+      "default": 40
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme_image",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

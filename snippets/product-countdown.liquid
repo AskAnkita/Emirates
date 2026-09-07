@@ -1,0 +1,130 @@
+{%- if type == 'card' -%}
+  {%- capture styles -%}
+    {% if settings.countdown_background_gradient != blank %}
+      --bg-color: {{ settings.countdown_background_gradient }};
+    {% else %}
+    --bg-color: {{ settings.countdown_background_color }};
+    {% endif %}
+    --fg-color: {{ settings.countdown_text_color }};
+    --p: .8rem 1.2rem;
+    --border-width: {{ settings.countdown_border_width }}px;
+    --border-style: {{ settings.countdown_border }};
+    --border-color: {{ settings.countdown_border_color }};
+    --border-radius: {{ settings.countdown_border_radius }}px;
+  {%- endcapture -%}
+
+  {%- capture number_html -%}
+    <span class="num animate-shimmer">
+      <span>00<span>D</span></span>
+    </span>
+    <span class="num animate-shimmer">
+      <span>00<span>H</span></span>
+    </span>
+    <span class="num animate-shimmer">
+      <span>00<span>M</span></span>
+    </span>
+    <span class="num animate-shimmer">
+      <span>00<span>S</span></span>
+    </span>
+  {%- endcapture -%}
+  <div class="card-countdown-wrapper body-s-font-size w-fit m-x-auto border-style" style="{{ styles }}" >
+    {%- if countdown_type == 'all_product' -%}
+      <div class="card-countdown countdown_{{ product.id }} style-{{ countdown_style }}" data-countdown-id="{{ product.id }}" data-countdown="{{ countdown_time }}">
+        {{ number_html }}
+      </div>
+    {%- elsif countdown_type == 'collection_product' -%}
+      {%- liquid
+        assign has_countdown = false
+        if countdown_collection != blank
+          for collection in product.collections
+            assign collection_handle = collection.handle
+            if collection_handle == countdown_collection
+              assign has_countdown = true
+            endif
+          endfor
+        endif
+      -%}
+      {%- if has_countdown -%}
+        <div class="card-countdown countdown_{{ product.id }} style-{{ countdown_style }} w-fit m-x-auto" data-countdown-id="{{ product.id }}" data-countdown="{{ countdown_time }}">
+          {{ number_html }}
+        </div>
+      {%- endif -%}
+    {%- else -%}
+      {%- if product.metafields.c_f.countdown -%}
+        {% assign countdown_type = product.metafields.c_f.countdown %}
+        <div class="card-countdown countdown_{{ product.id }} style-{{ countdown_style }} w-fit m-x-auto" data-countdown-id="{{ product.id }}" data-countdown="{{ countdown_type }}">
+          {{ number_html }}
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+{%- elsif type == 'product' -%}
+  {%- capture styles -%}
+    {% if settings.countdown_background_gradient != blank %}
+      --countdown-background-color: {{ settings.countdown_background_gradient }};
+    {% else %}
+    --countdown-background-color: {{ settings.countdown_background_color }};
+    {% endif %}
+    --countdown-text-color: {{ settings.countdown_text_color }};
+    --countdown-border-width: {{ settings.countdown_border_width }}px;
+    --countdown-border-style: {{ settings.countdown_border }};
+    --countdown-border-color: {{ settings.countdown_border_color }};
+    --countdown-border-radius: {{ settings.countdown_border_radius }}px;
+  {%- endcapture -%}
+
+  {%- capture number_html -%}
+    <div class="product-countdown-bar font-medium">
+      <span class="product-countdown-num loading"><span>00</span></span>
+      <span class="divider">:</span>
+      <span class="product-countdown-num loading"><span>00</span></span>
+      <span class="divider">:</span>
+      <span class="product-countdown-num loading"><span>00</span></span>
+      <span class="divider">:</span>
+      <span class="product-countdown-num loading"><span>00</span></span>
+    </div>
+    <div class="product-countdown-labels">
+      <span class="product-countdown-label">{{ 'content.days' | t }}</span>
+      <span class="divider">:</span>
+      <span class="product-countdown-label">{{ 'content.hours' | t }}</span>
+      <span class="divider">:</span>
+      <span class="product-countdown-label">{{ 'content.mins' | t }}</span>
+      <span class="divider">:</span>
+      <span class="product-countdown-label">{{ 'content.secs' | t }}</span>
+    </div>
+  {%- endcapture -%}
+
+  <div
+    class="product-countdown-wrapper"
+    style="{{ styles }}"
+  >
+  {%- if countdown_type == 'all_product' -%}
+    <div class="product-countdown countdown_{{ product.id }} style-{{ countdown_style }}" data-countdown-id="{{ product.id }}" data-countdown="{{ countdown_time }}">
+      {{ number_html }}
+    </div>
+  {%- elsif countdown_type == 'collection_product' -%}
+    {%- liquid
+      assign has_countdown = false
+      if countdown_collection != blank
+        for collection in product.collections
+          assign collection_handle = collection.handle
+          if collection_handle == countdown_collection
+            assign has_countdown = true
+          endif
+        endfor
+      endif
+    -%}
+    {%- if has_countdown -%}
+      <div class="product-countdown countdown_{{ product.id }} style-{{ countdown_style }}" data-countdown-id="{{ product.id }}" data-countdown="{{ countdown_time }}">
+        {{ number_html }}
+      </div>
+    {%- endif -%}
+  {%- else -%}
+    {%- if product.metafields.c_f.countdown -%}
+      {% assign countdown_type = product.metafields.c_f.countdown %}
+      <div class="product-countdown countdown_{{ product.id }} style-{{ countdown_style }}" data-countdown-id="{{ product.id }}" data-countdown="{{ countdown_type }}">
+        {{ number_html }}
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+  </div>
+{%- endif -%}

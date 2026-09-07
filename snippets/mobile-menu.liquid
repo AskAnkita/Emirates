@@ -1,0 +1,35 @@
+{% comment %}
+  Renders a mobile menu.
+
+  Accepts:
+  - header_settings: {Object}
+  - blocks: {Array}
+
+  Usage:
+  {% render 'mobile-menu', header_settings: header_settings, blocks: blocks %}
+{% endcomment %}
+
+<side-drawer-opener
+  class="lg:none header__icon--menu"
+  data-side-drawer="#Drawer-Menu"
+>
+  <button
+    class="header__icon header__icon--menu header__icon--icon header__icon--summary button flex items-center justify-center "
+    type="button"
+    aria-haspopup="dialog"
+    aria-label="{{ 'content.menu' | t }}"
+  >
+    {% comment %} <span class="icon-hamburger-custom">
+      <span class="icon-hamburger-custom__line"></span>
+      <span class="icon-hamburger-custom__line"></span>
+      <span class="icon-hamburger-custom__line"></span>
+    </span> {% endcomment %}
+    <span class="svg-wrapper">
+      {{- 'icon-hamburger.svg' | inline_asset_content -}}
+    </span>
+  </button>
+</side-drawer-opener>
+
+{% if settings.enable_multi_tab_layout_mobile == false %}
+  {% render 'header-drawer', color_scheme: section.settings.menu_mobile_color_scheme, section_id: section_id %}
+{% endif %}

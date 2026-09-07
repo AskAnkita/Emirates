@@ -1,0 +1,55 @@
+{%- doc -%}
+  Search block (theme block).
+
+  @param {object} block - Theme block object
+{%- enddoc -%}
+
+{%- liquid
+  assign bl_stts = block.settings
+  assign placeholder = bl_stts.placeholder
+  assign input_id = 'Search-Block-' | append: block.id
+-%}
+
+<div
+  class="search-block w-full spacing-style"
+  style="
+    {% render 'spacing-style', settings: bl_stts %}
+    --search-heading-color: {{ bl_stts.heading_color }};
+    --search-bar-bg: {{ bl_stts.bar_background }};
+    --search-bar-text: {{ bl_stts.bar_text_color }};
+    --search-placeholder-color: {{ bl_stts.placeholder_color }};
+    --search-icon-color: {{ bl_stts.icon_color }};
+    --search-icon-circle-color: {{ bl_stts.icon_circle_color }};
+    --search-bar-max-width: {{ bl_stts.max_width }}px;
+    --search-bar-height: {{ bl_stts.bar_height }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="search-block__form">
+    <search-form class="search-block__search-form">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search search-block__search">
+        <div class="search-block__field">
+          <input
+            class="search-block__input"
+            id="{{ input_id }}"
+            type="search"
+            name="q"
+            value="{{ search.terms | default: '' | escape }}"
+            placeholder="{{ placeholder | escape }}"
+          >
+
+          <input type="hidden" name="options[prefix]" value="last">
+          {%- unless bl_stts.result_type == 'all' -%}
+            <input type="hidden" name="type" value="{{ bl_stts.result_type }}">
+          {%- endunless -%}
+
+          <button type="submit" class="search-block__button button button-unstyled" aria-label="{{ 'content.search' | t }}">
+            <span class="svg-wrapper">
+              {{- 'icon-search.svg' | inline_asset_content -}}
+            </span>
+          </button>
+        </div>
+      </form>
+    </search-form>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+{%- if settings.badge_position == 'top left' or settings.badge_position == 'top right' -%}
+  --badge-top: {{ settings.badge_top }}px;
+{%- endif -%}
+{%- if settings.badge_position == 'bottom left' or settings.badge_position == 'bottom right' -%}
+  --badge-bottom: {{ settings.badge_bottom }}px;
+{%- endif -%}
+{%- if settings.badge_position == 'top left' or settings.badge_position == 'bottom left' -%}
+  --badge-left: {{ settings.badge_left }}px;
+{%- endif -%}
+{%- if settings.badge_position == 'top right' or settings.badge_position == 'bottom right' -%}
+  --badge-right: {{ settings.badge_right }}px;
+{%- endif -%}

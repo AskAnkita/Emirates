@@ -1,0 +1,157 @@
+{%- doc -%}
+  This snippet is used to render the product grid on collection and search pages.
+
+  @param {object} section - The section object
+  @param {object} paginate - Pagination object
+  @param {object} products - Array of product objects
+  @param {string} [title] - Header of the collection or search results
+  @param {string} children - List or grid of product cards
+{%- enddoc -%}
+
+{% capture product_card_size %}
+  {% render 'util-product-grid-card-size' section: section %}
+{% endcapture %}
+{% assign product_card_size = product_card_size | strip %}
+
+{% case section.settings.product_card_size %}
+  {% when 'small' %}
+    {% assign columns_desktop = 5 %}
+  {% when 'medium' %}
+    {% assign columns_desktop = 4 %}
+  {% when 'large' %}
+    {% assign columns_desktop = 3 %}
+  {% when 'extra-large' %}
+    {% assign columns_desktop = 2 %}
+  {% when 'extra-extra-large' %}
+    {% assign columns_desktop = 1 %}
+{% endcase %}
+
+{%- style -%}
+  @media (min-width: 750px) {
+    {% case section.settings.layout_type %}
+      {% when 'grid' %}
+        .template-collection:not(:has(.switcher-grid)) .product-grid:is(.product-grid--grid) {
+          --product-grid-columns-desktop: repeat(auto-fill, minmax({{ product_card_size }}, 1fr));
+        }
+
+        .template-collection:has(.switcher-grid) .product-grid:is(.product-grid--grid:not([data-view])) {
+          --product-grid-columns-desktop: repeat(auto-fill, minmax(calc(100% / {{ columns_desktop | plus: 1 }}), 1fr));
+        }
+      {% when 'organic' %}
+        {% assign large_span = 2 %}
+        {% assign row_cycle = 3 %}
+        {% assign product_cycle = row_cycle | times: 2 %}
+        {% assign right_large_start_col = 3 %}
+        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) .product-grid__item:nth-child({{ product_cycle }}n + 1) {
+          grid-column: 1 / span {{ large_span }};
+        }
+
+        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) .product-grid__item:nth-child({{ product_cycle }}n + 2),
+        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) .product-grid__item:nth-child({{ product_cycle }}n + 5) {
+          align-self: end;
+        }
+
+        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) .product-grid__item:nth-child({{ product_cycle }}n + {{ product_cycle }}) {
+          grid-column: {{ right_large_start_col }} / span {{ large_span }};
+        }
+
+        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) {
+          --product-grid-columns-desktop: repeat(4, 1fr);
+        }
+    {% endcase %}
+
+    {% case section.settings.product_card_size %}
+      {% when 'extra-large' or 'large' %}
+        @container product-grid (max-width: calc({{ product_card_size }} * 3 + {{ section.settings.columns_gap_horizontal }}px * 2)) {
+          .product-grid:is(.product-grid--grid) {
+            --product-grid-columns-desktop: repeat(2, 1fr);
+          }
+        }
+    {% endcase %}
+
+    .product-grid--{{ section.id }}:is([product-grid-view='zoom-out']) {
+      --product-grid-columns-desktop: repeat(auto-fill, minmax(6.25rem, 1fr));
+    }
+
+    .product-grid--{{ section.id }}:is([product-grid-view='zoom-out']) .product-grid-view-zoom-out--details {
+      display: block;
+    }
+
+    .product-grid--{{ section.id }}:is([product-grid-view='zoom-out']) .product-grid__card {
+      padding-inline-start: var(--zoom-out-padding-inline-start, 0);
+      padding-inline-end: var(--zoom-out-padding-inline-end, 0);
+      padding-block-start: var(--zoom-out-padding-block-start, 0);
+      padding-block-end: var(--zoom-out-padding-block-end, 0);
+    }
+  }
+{%- endstyle -%}
+
+<div id="ResultsList">
+  <div
+    style="
+      grid-column: var(--full-width);
+      --product-grid-gap-mobile: {{ section.settings.columns_gap_vertical | at_most: 12 }}px {{ section.settings.columns_gap_horizontal | at_most: 12 }}px;
+      --product-grid-gap-desktop: {{ section.settings.columns_gap_vertical }}px {{ section.settings.columns_gap_horizontal }}px;
+      container-type: inline-size;
+      container-name: product-grid;
+    "
+  >
+    {% if products.size == 0 %}
+      <div class="main-collection-grid__empty">
+        <h2 class="main-collection-grid__empty-title h2">
+          {{ 'content.no_products_found' | t }}
+        </h2>
+        <p>
+          {{ 'content.use_fewer_filters_html' | t: link: collection.url, class: 'main-collection-grid__empty-link' }}
+        </p>
+      </div>
+    {% else %}
+      <span ref="viewMorePrevious"></span>
+
+      {% if title %}
+        <h4 class="main-collection-grid__title">{{ title }}</h4>
+      {% endif %}
+      <ul
+        class="product-grid list-unstyled grid-layout product-grid--{{ section.id }} product-grid--{{ section.settings.layout_type }} {% if section.settings.mobile_product_card_size == 'large' %} product-grid-mobile--large{% endif %}"
+        product-grid-view="default"
+        ref="grid"
+        role="list"
+        data-last-page="{{ paginate.pages }}"
+        data-current-page="{{ paginate.current_page }}"
+        data-total-pages="{{ paginate.pages }}"
+        data-page-size="{{ paginate.page_size }}"
+        data-total-items="{{ paginate.items }}"
+        data-infinite-scroll="true"
+        id="product-grid"
+        data-id="{{ section.id }}"
+        data-view="{{ columns_desktop }}"
+      >
+        {{ children }}
+      </ul>
+      <span ref="viewMoreNext"></span>
+    {% endif %}
+  </div>
+</div>
+
+{% unless request.design_mode %}
+  <script>
+    (() => {
+      const grid = document.querySelector('.product-grid');
+
+      if (grid) {
+        const currentDevice = window.innerWidth >= 750 ? 'desktop' : 'mobile';
+        const storedLayout = sessionStorage.getItem(`product-grid-view-${currentDevice}`);
+
+        if (storedLayout) {
+          const options = document.querySelectorAll(`input[type="radio"][name="grid"]`);
+
+          grid.setAttribute('product-grid-view', storedLayout);
+
+          for (const option of options) {
+            option.checked = option.value === storedLayout;
+          }
+        }
+      }
+    })();
+  </script>
+{% endunless %}

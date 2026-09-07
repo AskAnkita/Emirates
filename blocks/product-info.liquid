@@ -1,0 +1,209 @@
+{%- liquid
+  assign bl_stts = block.settings
+  assign product_resource = closest.product
+  assign current_variant = product_resource.selected_or_first_available_variant
+  assign show_vendor = bl_stts.show_vendor
+  assign show_sku = bl_stts.show_sku
+  assign show_barcode = bl_stts.show_barcode
+  assign show_availability = bl_stts.show_availability
+  assign show_product_type = bl_stts.show_product_type
+-%}
+
+<product-info-list
+  class="spacing-style"
+  data-block-id="{{ block.id }}"
+  data-product-id="{{ product_resource.id }}"
+  style="
+    {% render 'spacing-style', settings: bl_stts %}
+  "
+  {{ block.shopify_attributes }}
+>
+  <div 
+    class="product-info-list flex flex-column"
+    style="
+      {% render 'gap-style', value: bl_stts.gap %}
+    "
+  >
+    {%- if show_vendor -%}
+      <div class="product-info-item">
+        <span class="product-info-name">
+          {{ 'products.product.info.vendor' | t }}
+        </span>
+        <span class="product-info-value">{{ product_resource.vendor | link_to_vendor }}</span>
+      </div>
+    {%- endif -%}
+    {%- if show_sku -%}
+      <div class="product-info-item" data-sku {% unless current_variant.sku != blank %} style="display: none;"{% endunless %}>
+        <span class="product-info-name">
+          {{ 'products.product.info.sku' | t }}
+        </span>
+        <span class="product-info-value">{{ current_variant.sku }}</span>
+      </div>
+    {%- endif -%}
+    {%- if show_barcode -%}
+      <div class="product-info-item" data-barcode {% unless current_variant.barcode != blank %} style="display: none;"{% endunless %}>
+        <span class="product-info-name">
+          {{ 'products.product.info.barcode' | t }}
+        </span>
+        <span class="product-info-value">{{ current_variant.barcode }}</span>
+      </div>
+    {%- endif -%}
+    {%- if show_availability -%}
+      <div class="product-info-item" data-inventory data-stock-level="{{ bl_stts.stock_level_display }}">
+        <span class="product-info-name">
+          {{ 'products.product.info.availability' | t }}
+        </span>
+        <span class="product-info-value">
+          {% if current_variant.inventory_policy == 'continue' %}
+            {{ 'products.product.pre_order' | t }}
+          {% elsif current_variant.inventory_management %}
+            {%- assign first_inventory = current_variant.inventory_quantity -%}
+            {%- if first_inventory > 0 -%}
+              {% if bl_stts.stock_level_display == 'show' %}{{ first_inventory }} {% endif %}
+              {{ 'products.product.inventory_in_stock' | t }}
+            {%- else -%}
+              {{ 'products.product.inventory_out_of_stock' | t }}
+            {%- endif -%}
+          {% else %}
+            {{ 'products.product.many_in_stock' | t }}
+          {% endif %}
+        </span>
+      </div>
+    {%- endif -%}
+    {%- if show_product_type and product_resource.type != blank -%}
+      <div class="product-info-item">
+        <span class="product-info-name">
+          Gemstone Quality:
+        </span>
+        <span class="product-info-value">
+          {{ product_resource.type | escape }}
+        </span>
+      </div>
+    {%- endif -%}
+  </div>
+</product-info-list>
+
+{% schema %}
+  {
+    "name": "t:names.product_info",
+    "tag": null,
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_vendor",
+        "label": "t:settings.show_vendor",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_sku",
+        "label": "t:settings.show_sku",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_barcode",
+        "label": "t:settings.show_barcode",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_availability",
+        "label": "t:settings.show_availability",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "stock_level_display",
+        "label": "t:settings.stock_level",
+        "options": [
+          {
+            "value": "none",
+            "label": "t:options.none"
+          },
+          {
+            "value": "show",
+            "label": "t:options.show"
+          }
+        ],
+        "default": "none",
+        "visible_if": "{{ block.settings.show_availability == true }}"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_product_type",
+        "label": "t:settings.show_product_type",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "gap",
+        "label": "t:settings.gap",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 10
+      },
+      {
+        "type": "header",
+        "content": "t:content.padding"
+      },
+      {
+        "type": "range",
+        "id": "padding-block-start",
+        "label": "t:settings.top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding-block-end",
+        "label": "t:settings.bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding-inline-start",
+        "label": "t:settings.left",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding-inline-end",
+        "label": "t:settings.right",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "default": 0
+      }
+    ],
+    "presets": [
+      {
+        "name": "t:names.product_info",
+        "category": "t:categories.product",
+        "settings": {
+          "show_vendor": true,
+          "show_sku": true,
+          "show_barcode": true,
+          "show_availability": true,
+          "stock_level_display": "none",
+          "show_product_type": true
+        }
+      }
+    ]
+  }
+  {% endschema %}
+  

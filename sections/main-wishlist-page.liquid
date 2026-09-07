@@ -1,0 +1,174 @@
+{% comment %} REWRITE WITH TWO-SPACE INDENTATION {% endcomment %}
+{%- liquid
+  assign sec_stts = section.settings
+  assign default_layout_desktop = sec_stts.columns_desktop
+  assign section_width = sec_stts.section_width
+  assign color_scheme = sec_stts.color_scheme
+-%}
+
+<div
+  data-section-id="{{ section.id }}"
+  data-section-type="wishlist"
+  id="WishlistSection-{{ section.id }}"
+  data-section="{{ section.id }}"
+  class="section section-{{ section_width }} color-{{ color_scheme }} spacing-style"
+  style="{% render 'spacing-style', settings: section.settings %}"
+>
+  <div class="wishlist-container">
+    <div class="section-global__header">
+      {%- content_for 'blocks'-%}
+    </div>
+    <div class="page-margin wishlist-content">
+      <div class="wishlist-table-wrapper">
+        <div class="product-listing" data-wishlist-container>
+          {% render 'switcher-grid',
+            columns_desktop: default_layout_desktop,
+            filter_type: 'horizontal',
+            style: 'style-1',
+            enable_hover_reveal: true,
+            heading_label_case: 'uppercase',
+            heading_label_font_size: '1.2rem'
+            text_label_case: 'uppercase',
+            text_label_font_size: '1.2rem'
+          %}
+          <wishlist-view class="wishlist-items-container product-grid-container">
+            <div
+              class="wishlist-items-display grid-layout product-grid product-grid--{{ section.id }} product-grid--grid"
+              data-wishlist-items-grid-display
+              data-view="{{ default_layout_desktop }}"
+            ></div>
+          </wishlist-view>
+        </div>
+      </div>
+      <div
+        class="wishlist-footer pagination-right"
+        data-wishlist-footer
+      >
+        <a
+          class="wishlist-share link link-underline"
+          href="mailto:?subject= {{ page.title | strip_html }}&amp;body="
+          data-wishlist-share
+        >
+          <div class="mail-icon-container">
+            <svg
+              class="mail-icon"
+              aria-hidden="true"
+              focusable="false"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              stroke="none"
+            >
+              {%- render 'icon', icon: 'mail' -%}
+            </svg>
+          </div>
+          <span class="text">{{ 'content.share_wishlist_via_email' | t }}</span>
+        </a>
+        <ul class="pagination__list list-unstyled" role="list" id="wishlist-paginate"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- style -%}
+  .wishlist-content-text {
+    margin-bottom: 2rem;
+  }
+
+  #WishlistSection-{{ section.id }} .wishlist-footer .wishlist-share {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+{%- endstyle -%}
+
+{% schema %}
+{
+  "name": "t:names.wishlist",
+  "disabled_on": {
+    "groups": ["header", "footer", "custom.popup", "aside"]
+  },
+  "blocks": [
+    {
+      "type": "_breadcrumb"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 4,
+      "label": "t:settings.number_of_columns_on_desktop"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ]
+}
+{% endschema %}

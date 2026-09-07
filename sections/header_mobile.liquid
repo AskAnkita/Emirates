@@ -1,0 +1,244 @@
+{% if settings.enable_multi_tab_layout_mobile %}
+
+  <link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
+
+  {%- liquid
+    if localization.available_countries.size > 1 and section.settings.show_country or section.settings.show_language and localization.available_languages.size > 1
+      assign localization_forms = true
+    endif
+
+    assign section_fetch = false
+    if section.index == nil
+      assign section_fetch = true
+    endif
+  -%}
+
+  <side-drawer
+    class="drawer__container drawer drawer--menu drawer--menu-multi-tab fixed top-0 left-0 w-screen h-full z-9 flex no-js-hidden"
+    id="Drawer-Menu"
+    data-drawer-direction="left"
+  >
+    <div id="Drawer-Overlay-Menu" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+    <div class="side-drawer" data-drawer-content data-breakpoint="tablet">
+      <div
+        class="drawer__inner d-flex flex-column h-full"
+        role="dialog"
+        aria-modal="true"
+        aria-label="{{ 'accessibility.menu' | t }}"
+        tabindex="-1"
+      >
+        <div class="drawer__header flex justify-between items-center relative" style="--p: var(--padding-xs) var(--padding-lg);">
+          <button
+            class="drawer__close block t-button bor-none cursor-pointer"
+            type="button"
+            onclick="this.closest('side-drawer').close()"
+            aria-label="{{ 'accessibility.close_dialog' | t }}"
+          >
+            <span class="svg-wrapper">
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </span>
+          </button>
+        </div>
+        <div class="drawer__wrapper menu-drawer relative h-full motion-reduce color-{{ section.settings.menu_color_scheme }}">
+          <div class="header-mobile mobile--multi-tab">
+            <section-fetcher
+              data-section-id="{{ section.id }}"
+              data-target-id="SiteNavMobile-Content-{{ section.id }}"
+              data-activate="interaction"
+            ></section-fetcher>
+            {%- unless section_fetch -%}
+              <div class="section-resource-list" id="SiteNavMobile-Content-{{ section.id }}">
+              </div>
+            {%- else -%}
+              <div class="section-resource-list" id="SiteNavMobile-Content-{{ section.id }}">
+                <header-mobile-tabs>
+                  <div class="section-resource-list__header">
+                    {%- content_for 'block', type: '_menu_tab_headings', id: 'static-menu-tab-heading' -%}
+                  </div>
+                  <div class="section-resource-list__content">
+                    {%- content_for 'block', type: '_menu_tab_contents', id: 'static-menu-tab-content' -%}
+                    {%- render 'menu-drawer-utility', sec_settings: section.settings -%}
+                  </div>
+                </header-mobile-tabs>
+              </div>
+            {%- endunless -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </side-drawer>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:names.header_mobile_multi_tab",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "blocks": [
+    {
+      "type": "_menu_tab_headings"
+    },
+    {
+      "type": "_menu_tab_contents"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.media_level_1"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_level_1",
+      "label": "t:settings.show_icons_beside_menu_items",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "circle",
+          "label": "t:options.circle"
+        },
+        {
+          "value": "rectangle",
+          "label": "t:options.rectangle"
+        }
+      ],
+      "default": "circle",
+      "visible_if": "{{ section.settings.show_image_level_1 == true }}"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.width",
+      "default": 24,
+      "visible_if": "{{ section.settings.show_image_level_1 == true }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.media_sub_menu_items"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_sub_menu",
+      "label": "t:settings.show_images_below_sub_menu_items",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "sub_media_type",
+      "label": "t:settings.type",
+      "options": [
+        {
+          "value": "circle",
+          "label": "t:options.circle"
+        },
+        {
+          "value": "rectangle",
+          "label": "t:options.rectangle"
+        }
+      ],
+      "default": "rectangle",
+      "visible_if": "{{ section.settings.show_image_sub_menu == true }}"
+    },
+    {
+      "type": "range",
+      "id": "media_width_sub_menu",
+      "min": 20,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.width",
+      "default": 50,
+      "visible_if": "{{ section.settings.show_image_sub_menu == true }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.localization"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country",
+      "label": "t:settings.country_region",
+      "info": "t:info.manage_countries_regions",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "country_selector_style",
+      "label": "t:settings.flag",
+      "default": true,
+      "visible_if": "{{ section.settings.show_country }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language",
+      "label": "t:settings.language_selector",
+      "info": "t:info.manage_languages",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "localization_font",
+      "label": "t:settings.font",
+      "options": [
+        {
+          "value": "heading",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "subheading",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "body",
+          "label": "t:options.body"
+        }
+      ],
+      "default": "heading",
+      "visible_if": "{{ section.settings.show_country or section.settings.show_language }}"
+    },
+    {
+      "type": "select",
+      "id": "localization_font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "1rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        }
+      ],
+      "default": "1rem"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.header_mobile_multi_tab"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,25 @@
+/* Individual slides */
+.slideshow__slide[aria-hidden="true"] {
+  order: 0;
+}
+
+.slideshow__slide:has(.placeholder-svg) {
+  min-height: 100vh;
+}
+/* Slide content */
+.slide__content > * {
+  max-height: 100%;
+}
+
+.slide__image-container svg {
+  width: 100%;
+}
+
+.slide__image-container img {
+  object-fit: cover;
+  height: 100%;
+}
+/* multi cate */
+.slideshow--multicate .swiper-pagination {
+  --swiper-pagination-bottom: 1rem;
+}

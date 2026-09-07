@@ -1,0 +1,139 @@
+{{ 'component-compare-color.css' | asset_url | stylesheet_tag }}
+
+<div class="spacing-style"
+  style="{% render 'spacing-style', settings: block.settings %}">
+  <div class="halo-compare-colors-swatch">
+    {%- liquid
+      assign product_swatch_option = settings.swatch | downcase
+      for option in product.options_with_values
+        assign option_name = option.name | downcase
+        if product_swatch_option contains option_name
+          assign index = forloop.index0
+          break
+        endif
+      endfor
+      assign variantCount = product.variants | size
+      assign swatch_type = settings.swatch_type
+      assign colorList = '|'
+      assign color = ''
+    -%}
+    {%- if variantCount > 1 and product.variants.first.title != 'Default Title' -%}
+      <ul class="compare-colors-list list-unstyled left flex flex-wrap items-center justify-start">
+        {%- for color in product.options_with_values[index].values -%}
+            {%- liquid
+              assign enable_variant_image = false
+              assign variant = color.variant
+              case swatch_type
+                when 'variant_image'
+                  assign background_image = variant.image.src | image_url: width: '40x'
+                  if variant.image
+                    assign enable_variant_image = true
+                  endif
+                when 'color'
+                  assign background_image = color | handle | append: '.png' | file_url
+                  assign enable_variant_image = true
+                when 'metaobjects'
+                  assign metaobject_color = color.swatch.color
+                  assign metaobject_image = color.swatch.image
+                  assign has_metaobject = false
+                  assign has_image = false
+
+                  if metaobject_image != blank
+                    assign background_image = metaobject_image | image_url: width: '120x'
+                    assign enable_variant_image = true
+                    assign has_metaobject = true
+                    assign has_image = true
+                  elsif metaobject_color != blank
+                    assign background_color = metaobject_color
+                    assign enable_variant_image = true
+                    assign has_metaobject = true
+                  elsif variant.image
+                    assign background_image = variant.image.src | image_url: width: '120x'
+                    assign enable_variant_image = true
+                  endif
+              endcase
+            -%}
+            <li class="swatch-item cursor-pointer relative">
+              <div class="swatch-wrapper">
+                <span
+                  {% if enable_variant_image %}
+                    class="swatch color-swacth-color--{{ color | handle }} block max-w-full"
+                    style="{%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                    {%- if has_metaobject -%}--swatch--background-color: {{ background_color }};{%- endif -%}
+                    {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}"
+                    data-title="{{ color }}"
+                    data-value="{{ color | handle }}"
+                    data-variant-id="{{ variant.id }}"
+                    data-variant-img="{{ variant.image.src | image_url: width: '800x' }}"
+                  {% else %}
+                    class="swatch color-swacth-color--{{ color | handle }} block max-w-full swatch--unavailable"
+                  {% endif %}
+                ></span>
+                <span class="tooltip center absolute bottom-full  left-0  z-1 whitespace-nowrap capitalize text-sm">{{ color | escape }}</span>
+              </div>
+            </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+  <div class="halo-compare-colors-image left clearfix" id="sortTableList"></div>
+</div>
+
+<script src="{{ 'halo-compare-color.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "t:names.product_color_comparison_content",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.link_padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_color_comparison_content"
+    }
+  ]
+}
+{% endschema %}

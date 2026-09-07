@@ -1,0 +1,127 @@
+.halo-compareProduct {
+  top: auto;
+  bottom: 13.0rem;
+  right: -999rem;
+  pointer-events: auto;
+  opacity: var(--opacity-0);
+  visibility: hidden;
+}
+
+.halo-compareProduct .button  {
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 .3rem .7rem 0 rgb(0 0 0 / var(--opacity-20));
+}
+
+.compareTable {
+  border: .1rem solid #e6e6e6;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.compareTable td,
+.compareTable th {
+  border: .1rem solid #e6e6e6;
+  border-spacing: 0;
+}
+
+.compareTable-heading {
+  padding: 1.7rem 1.5rem 1.3rem 1.5rem;
+}
+
+.compareTable-product {
+  padding: 3.0rem;
+  min-width: 25.0rem;
+}
+
+.compareTable-product .card {
+  overflow: inherit;
+}
+
+.product-card-layout-08 .compareTable-product .card-product {
+  overflow: visible;
+}
+
+.compareTable-item {
+  padding: 1.25rem 1rem;
+  min-width: 15.0rem;
+}
+
+.compareTable-item.compareTable-desc {
+  min-width: 25.0rem;
+}
+
+.compareTable-removeProduct {
+  top: -2rem;
+  right: -2rem;
+  width: 4rem;
+  height: 4rem;
+}
+
+.compareTable-removeProduct svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--bg-white);
+  stroke: transparent;
+  padding: 0.3rem;
+}
+
+.compareTable-option + .compareTable-option {
+  margin-top: 1.2rem;
+}
+
+.halo-compare-product-popup .halo-popup-wrapper {
+  padding: 2.2rem 0 0 0;
+}
+
+.halo-compare-product-popup .halo-popup-content {
+  margin-block-start: 2rem;
+}
+
+.halo-compare-product-popup .halo-popup-wrapper .halo-compare-product-content {
+  padding-top: 0;
+}
+
+.card-product__group-item.card-compare {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .halo-compareProduct.is-show {
+    position: fixed;
+    right: 3.0rem;
+    opacity: var(--opacity-100);
+    visibility: visible;
+    pointer-events: auto;
+
+    .button {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .countPill {
+      font-size: var(--font-size--2xs);
+      font-weight: 400;
+      color: var(--color-white);
+      background-color: var(--color-black);
+      padding: .2rem .5rem;
+      border-radius: 50%;
+      height: 2.0rem;
+      min-width: 2.0rem;
+    }
+  }
+
+  .card-product__group-item.card-compare {
+    display: block;
+  }
+
+  .compareTable-product .card {
+    row-gap: 15px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .halo-compareProduct {
+    display: none;
+  }
+}

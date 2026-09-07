@@ -1,0 +1,578 @@
+{%- liquid
+  assign padding_top = block.settings.padding_top
+  assign padding_bottom = block.settings.padding_bottom
+  assign padding_left = block.settings.padding_left
+  assign padding_right = block.settings.padding_right
+  assign gap = block.settings.gap
+  assign font_size = block.settings.font_size
+  assign tab_title_weight = block.settings.tab_title_weight
+
+  assign content_direction = block.settings.content_direction
+  assign content_direction_mobile = block.settings.content_direction_mobile
+
+  assign alignment = block.settings.alignment
+  assign alignment_mb = block.settings.alignment_mb
+
+  assign accordion_gap = block.settings.accordion_gap
+  assign accordion_bg = block.settings.accordion_bg
+  assign accordion_pl = block.settings.accordion_pl
+  assign accordion_pr = block.settings.accordion_pr
+  assign accordion_pt = block.settings.accordion_pt
+  assign accordion_pb = block.settings.accordion_pb
+-%}
+
+{%- capture style -%}
+  style="
+    --alignment: {{ alignment }};
+    --alignment-mb: {{ alignment_mb }};
+    --pt: {{ padding_top }}px;
+    --pb: {{ padding_bottom }}px;
+    --pl: {{ padding_left }}px;
+    --pr: {{ padding_right }}px;
+    --gap-x: {{ gap }}px;
+    --gap-y: {{ gap }}px;
+    --font-size: {{ font_size }};
+    --tab-title-weight: {{ tab_title_weight }};
+    --flex-direction: {{ content_direction }};
+    --flex-direction-mobile: {{ content_direction_mobile }};
+  "
+  {%- endcapture -%}
+
+{%- capture accordion_attr -%}
+style="
+  --gap-x: {{ gap }}px;
+  --accordion-gap: {{ accordion_gap }}px;
+  --accordion-bg: {{ accordion_bg }};
+  --accordion-pl: {{ accordion_pl }}px;
+  --accordion-pr: {{ accordion_pr }}px;
+  --accordion-pt: {{ accordion_pt }}px;
+  --accordion-pb: {{ accordion_pb }}px;
+"
+{%- endcapture -%}
+
+{{ 'product-tabs.css' | asset_url | stylesheet_tag }}
+
+{% capture list_items %}
+  {% for child_block in block.blocks %}
+    {% render child_block %}
+
+    {% unless forloop.last %}
+      <!--@list/split-->
+    {% endunless %}
+  {% endfor %}
+
+  {% render 'global-popup' %}
+
+  {% render 'global-sidebar', drawer_direction: 'right' %}
+{% endcapture %}
+
+<div class="block-product-tabs w-full color-{{ block.settings.color_scheme }}" {{ style }}>
+  {%- if block.blocks.size > 0 -%}
+    <div class="tabs-content tabs-content--{{ block.settings.content_direction }} tabs-content-mobile--{{ block.settings.content_direction_mobile }} style-accordion" {{ accordion_attr }}>
+      {{ list_items }}
+    </div>
+  {%- endif -%}
+</div>
+
+{% javascript %}
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabTitles = document.querySelectorAll('.tab-title');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    if (tabTitles.length && tabContents.length && tabTitles.length === tabContents.length) {
+      tabTitles.forEach((title, i) => {
+        title.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (title.classList.contains('is-active')) return;
+          tabTitles.forEach(t => t.classList.remove('is-active'));
+          tabContents.forEach(c => c.classList.remove('is-active'));
+          title.classList.add('is-active');
+          setTimeout(() => {
+            const content = tabContents[i];
+            content.classList.add('is-animating');
+            content.classList.add('is-active');
+            content.addEventListener('transitionend', function handler() {
+              content.classList.remove('is-animating');
+              content.removeEventListener('transitionend', handler);
+            });
+          }, 10);
+        });
+      });
+    }
+
+    const toggleLinks = document.querySelectorAll('.toggle-link');
+
+    toggleLinks.forEach(toggleLink => {
+      toggleLink.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const toggleTitle = toggleLink.closest('.toggle-title');
+        if (!toggleTitle) return;
+
+        const tabTitleText = document.querySelectorAll('.tab-title-text');
+        if (tabTitleText.length > 0) {
+          tabTitleText.forEach(text => {
+            text.textContent = toggleLink.textContent;
+          });
+        }
+
+        const viewContentType = toggleTitle.dataset.viewContent;
+        const content = toggleTitle.nextElementSibling;
+        if (!content) return;
+
+        switch (viewContentType) {
+          case 'sidebar': {
+            const drawerContent = document.querySelector('#Global-Drawer .drawer__wrapper');
+            if (drawerContent) {
+              drawerContent.innerHTML = '';
+              drawerContent.appendChild(content.cloneNode(true));
+              renderVideo();
+            }
+            break;
+          }
+          case 'popup': {
+            const popupContent = document.querySelector('.popup-content-wrapper');
+            if (popupContent) {
+              popupContent.innerHTML = '';
+              popupContent.appendChild(content.cloneNode(true));
+              renderVideo();
+            }
+            break;
+          }
+          default:
+            toggleTitle.classList.toggle('is-open');
+        }
+      });
+    });
+    const modalTemplate = `
+      <side-drawer
+        class="popup__content video-modal drawer fixed top-0 left-0 z-9 w-screen h-full flex justify-center no-js-hidden"
+        element-s-popup=""
+        id="PopupModal-AZDFEMWdKNDFCVHdoM__popup_link_desc_video"
+        data-moved="true"
+      >
+        <div
+          id="Drawer-Overlay-AZDFEMWdKNDFCVHdoM__popup_link_desc_video"
+          class="drawer__overlay fixed inset-0 cursor-pointer"
+          style="transform: translateX(0px)"
+        ></div>
+        <div
+          class="popup__inner color-scheme-1 popup__inner--video w-auto h-full absolute-c-c flex flex-column global-settings-popup"
+        >
+          <div
+            class="popup__inner--content relative w-full h-full overflow-auto cus-scrollbar"
+          >
+            <div class="video-modal__content-block">Video</div>
+            <button
+              onclick="this.closest('side-drawer').close()"
+              class="button button-unstyled close-button popup__close minimum-touch-target-before drawer__close block t-button bor-none rounded-full cursor-pointer absolute"
+              type="button"
+              aria-label="Close dialog"
+              style="--top: 0.3rem; --right: 0.3rem"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                class="icon icon-close"
+                viewBox="0 0 18 17"
+              >
+                <path
+                  fill="currentColor"
+                  d="M.865 15.978a.5.5 0 0 0 .707.707l7.433-7.431 7.579 7.282a.501.501 0 0 0 .846-.37.5.5 0 0 0-.153-.351L9.712 8.546l7.417-7.416a.5.5 0 1 0-.707-.708L8.991 7.853 1.413.573a.5.5 0 1 0-.693.72l7.563 7.268z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </side-drawer>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalTemplate);
+
+    function renderVideo() {
+      const videoOpenPopups = document.querySelectorAll('.video-open-popup');
+    
+      if (videoOpenPopups.length > 0) {
+        videoOpenPopups.forEach(videoOpenPopup => {
+          videoOpenPopup.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const videoId = videoOpenPopup.dataset.videoId;
+            const videoWrapper = document.querySelector('.video-modal__content-block');
+
+            const youtubeIframe = `
+            <iframe width="100%" src="https://www.youtube.com/embed/${videoId}?si=6yJ56P_BJEG5d2Uq" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            `;
+
+            videoWrapper.innerHTML = youtubeIframe;
+          });
+        });
+      }
+    }
+    renderVideo();
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:names.product_tabs",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "_product-tabs-description"
+    },
+    {
+      "type": "_product-tabs-review"
+    },
+    {
+      "type": "_product-tabs-html"
+    },
+    {
+      "type": "_product-tabs-liquid"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.accordion_settings"
+    },
+    {
+      "type": "range",
+      "id": "accordion_gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "accordion_bg",
+      "label": "t:settings.background",
+      "default": "transparent"
+    },
+    {
+      "type": "range",
+      "id": "accordion_pl",
+      "label": "t:settings.padding_left",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "accordion_pr",
+      "label": "t:settings.padding_right",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "accordion_pt",
+      "label": "t:settings.padding_top",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "accordion_pb",
+      "label": "t:settings.padding_bottom",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "t:settings.layout"
+    },
+    {
+      "type": "select",
+      "id": "content_direction",
+      "label": "t:settings.direction",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "select",
+      "id": "content_direction_mobile",
+      "label": "t:settings.direction_on_mobile",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "select",
+      "id": "alignment_mb",
+      "label": "t:settings.mobile_alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.spacing_between_tabs",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "",
+          "label": "t:options.default"
+        },
+        {
+          "value": "1.0rem",
+          "label": "10px"
+        },
+        {
+          "value": "1.2rem",
+          "label": "12px"
+        },
+        {
+          "value": "1.4rem",
+          "label": "14px"
+        },
+        {
+          "value": "1.6rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.8rem",
+          "label": "18px"
+        },
+        {
+          "value": "2.0rem",
+          "label": "20px"
+        },
+        {
+          "value": "2.2rem",
+          "label": "22px"
+        },
+        {
+          "value": "2.4rem",
+          "label": "24px"
+        },
+        {
+          "value": "2.6rem",
+          "label": "26px"
+        },
+        {
+          "value": "2.8rem",
+          "label": "28px"
+        },
+        {
+          "value": "3.0rem",
+          "label": "30px"
+        },
+        {
+          "value": "3.2rem",
+          "label": "32px"
+        },
+        {
+          "value": "3.4rem",
+          "label": "34px"
+        },
+        {
+          "value": "3.6rem",
+          "label": "36px"
+        },
+        {
+          "value": "4.0rem",
+          "label": "40px"
+        }
+      ],
+      "default": "1.6rem"
+    },
+    {
+      "type": "select",
+      "id": "tab_title_weight",
+      "label": "t:settings.button_text_weight",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "400",
+          "label": "t:options.regular"
+        },
+        {
+          "value": "600",
+          "label": "t:options.semibold"
+        },
+        {
+          "value": "700",
+          "label": "t:options.bold"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type":  "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_tabs",
+      "blocks": {
+        "description_KGH7xF": {
+          "type": "_product-tabs-description",
+          "name": "t:settings.description",
+          "settings": {
+            "title": "Description"
+          }
+        },
+        "html_bpg6VR": {
+          "type": "_product-tabs-html",
+          "settings": {
+            "title": "Tab custom HTML",
+            "content": "<p>Tab custom HTML</p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "description_KGH7xF",
+        "html_bpg6VR"
+      ],
+      "settings": {
+        "color_scheme": "",
+        "accordion_gap": 10,
+        "accordion_bg": "rgba(0,0,0,0)",
+        "accordion_pl": 0,
+        "accordion_pr": 45,
+        "accordion_pt": 15,
+        "accordion_pb": 15,
+        "alignment": "start",
+        "alignment_mb": "start",
+        "gap": 30,
+        "font_size": "1.6rem",
+        "padding_left": 0,
+        "padding_right": 0,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    }
+  ]
+}
+{% endschema %}

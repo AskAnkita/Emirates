@@ -1,0 +1,36 @@
+{% comment %}
+  Usage:
+  {% render 'highlight-class', order: order, keys: 'key_1_, key_2_, key_3_', compare: link.title, settings: section.settings %}
+{% endcomment %}
+{%- liquid
+  assign order = order | split: ','
+  assign keys = keys | split: ','
+  assign compare = compare | downcase | strip | handle
+-%}
+{%- capture variable_highlight_title -%}
+  {%- for key in keys -%}
+    {%- for i in order -%}
+      {%- liquid
+        assign name = key | split: '_' | first
+        assign item_setting_id = key | append: i
+        assign highlight_title = settings[item_setting_id]
+        assign value = highlight_title | downcase | split: ','
+      -%}
+      {%- if value != blank -%}
+        {%- capture list_class -%}
+          {% for item in value %}
+            {%- assign item_handle = item | strip | handle -%}
+            {%- if item_handle == compare %}
+              {{ name }}-item
+            {% endif %}
+            {% unless forloop.last %}
+              <!--@list/split-->
+            {% endunless %}
+          {% endfor %}
+        {%- endcapture -%}
+        {{ list_class | strip | split: '<!--@list/split-->' }}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{{ variable_highlight_title | strip | strip_newlines }}

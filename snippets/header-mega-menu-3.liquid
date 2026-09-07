@@ -1,0 +1,290 @@
+{% comment %}
+  Renders a megamenu for the header.
+
+  Usage:
+  {% render 'header-mega-menu' %}
+{% endcomment %}
+
+{%- liquid
+  assign bl_stts = block.settings
+  assign banner_row = bl_stts.banner_row
+  assign has_mega_menu_images = false
+  if bl_stts.show_promotion_banner
+    if bl_stts.image_1 != blank
+      assign has_mega_menu_images = true
+      assign mega_menu_images_size = 0
+    endif
+
+    if bl_stts.divider and banner_row == 'bottom'
+      assign divider = true
+    endif
+  endif
+
+  assign section_fetch = section_fetch | default: false
+  if section.index == nil
+    assign section_fetch = true
+  endif
+-%}
+
+{%- capture banner -%}
+  {%- if has_mega_menu_images == true -%}
+    {%- liquid
+      assign image = bl_stts.image_1
+      assign link_url = bl_stts.link_url_1
+    -%}
+    {%- if image != blank -%}
+      <div class="
+          collage__item
+          collage__item--2
+          overflow-hidden
+          collage__item--image
+        "
+        style="
+          --border-radius: {{ bl_stts.image_corner_radius | divided_by: 10.0 }}rem;
+          --border-width: {{ bl_stts.image_border_thickness | divided_by: 10.0 }}rem;
+        "
+      >
+        <a
+          class="block relative h-full"
+          {% if link_url != blank %}
+            href="{{ link_url }}"
+          {% else %}
+            role="link" aria-disabled="true"
+          {% endif %}
+        >
+          {%- liquid
+            assign ratio = image.aspect_ratio | default: 1
+            assign image_alt = image.alt | default: shop.name | escape
+            assign widths = '300, 450, 600, 750, 900, 1050, 1200, 1350, 1500, 1650, 1800, 1950, 2000, 2500, 3000, 3500, 4000, 5000'
+            assign sizes = 'auto, (min-width: 750px) 50vw, 100vw'
+          -%}
+          <div
+            class="media media--transparent media--adapt"
+            style="--media-adapt-ratio: {{ ratio }};"
+          >
+            {%- render 'image', image: image, sizes: sizes, widths: widths, loading: 'lazy', alt: image_alt, class: 'motion-reduce' -%}
+          </div>
+        </a>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- unless section_fetch -%}
+  <div
+    id="MegaMenu-Content-{{ section.id }}-{{ forloopIndex }}-{{ block_id }}"
+    class="list-menu--wrapper"
+    tabindex="-1"
+    style="--columns-count: {{ bl_stts.grid }}; --gap-x: 1.6rem; --gap-y: 1.6rem"
+  ></div>
+{%- else -%}
+  <div
+    id="MegaMenu-Content-{{ section.id }}-{{ forloopIndex }}-{{ block_id }}"
+    class="list-menu--wrapper mega-menu--3"
+    tabindex="-1"
+    style="--columns-count: {{ bl_stts.grid }}; --gap-x: 1.6rem; --gap-y: 1.6rem"
+  >
+    <div class="mega-menu__container page-width page-width--{{ bl_stts.width }}">
+      {%- if banner_row == 'top' and has_mega_menu_images == true -%}
+        <div class="collage collage-2-columns">
+      {%- endif -%}
+      <ul
+        class="
+          mega-menu__list header__mega-submenu
+          {% if banner_row == 'top' %} collage__item collage__item--1{% endif %}
+          {% if link.levels == 1 %} mega-menu__list--condensed{% endif %}
+        "
+        role="list"
+      >
+        {% if bl_stts.megamenu_submenu != blank %}
+          <li class="mega-menu__submenu" role="list">
+            <ul class="list-unstyled" role="list">
+              {% for link in bl_stts.megamenu_submenu.links %}
+                <li>
+                  <a
+                    href="{{ link.url }}"
+                    title="{{ link.title | escape }}"
+                    class="
+                      header__menu-item mega-menu__link mega-menu__link--level-2 link link--hover-underline
+                      {% render 'highlight-class', order: '2', keys: keys, compare: link.title, settings: sec_settings %}
+                    "
+                    style="{%  render 'highlight-style', order: '2', keys: keys, compare: link.title, color: highlight_color, settings: sec_settings %}"
+                  >
+                    <span class="text">
+                      {{ link.title | escape }}
+                    </span>
+                    {% render 'highlight-label-menu',
+                      order: '2',
+                      keys: keys,
+                      compare: link.title,
+                      settings: sec_settings
+                    %}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% endif %}
+        {%- for childlink in link.links -%}
+          <li>
+            <a
+              id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
+              href="{{ childlink.url }}"
+              class="
+                header__menu-item mega-menu__link mega-menu__link--level-2 link link--hover-underline
+                {% if childlink.current %} list-menu__item--active{% endif %}
+                {% render 'highlight-class', order: '2', keys: keys, compare: childlink.title, settings: sec_settings %}
+              "
+              style="{%  render 'highlight-style', order: '2', keys: keys, compare: childlink.title, color: highlight_color, settings: sec_settings %}"
+              {% if childlink.current %}
+                aria-current="page"
+              {% endif %}
+            >
+              <span class="text">
+                {{ childlink.title | escape }}
+              </span>
+              {% render 'highlight-label-menu',
+                order: '2',
+                keys: keys,
+                compare: childlink.title,
+                settings: sec_settings
+              %}
+            </a>
+            {%- if childlink.links != blank -%}
+              <ul class="list-unstyled" role="list">
+                {%- for grandchildlink in childlink.links -%}
+                  <li>
+                    <a
+                      id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                      href="{{ grandchildlink.url }}"
+                      class="
+                        header__menu-item mega-menu__link link link--hover-underline mega-menu__link--level-3
+                        {% if grandchildlink.current %} list-menu__item--active{% endif %}
+                        {% render 'highlight-class', order: '3', keys: keys, compare: grandchildlink.title, settings: sec_settings %}
+                      "
+                      {% if grandchildlink.current %}
+                        aria-current="page"
+                      {% endif %}
+                      style="{%  render 'highlight-style', order: '3', keys: keys, compare: grandchildlink.title, color: highlight_color, settings: sec_settings %}"
+                    >
+                      <span class="text">
+                        {{ grandchildlink.title | escape }}
+                      </span>
+                      {% render 'highlight-label-menu',
+                        order: '3',
+                        keys: keys,
+                        compare: grandchildlink.title,
+                        settings: sec_settings
+                      %}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+      {%- if banner_row == 'top' and has_mega_menu_images == true -%}
+        {{ banner }}
+        </div>
+      {%- endif -%}
+    </div>
+    {% if bl_stts.product_collection != blank %}
+      <div class="mega-menu__collage-wrapper{% if bl_stts.inherit_color_scheme == false %} color-{{ bl_stts.color_scheme }}{% endif %}{% if divider %} mega-menu__collage-wrapper--divider{% endif %}">
+        <div class="page-width page-width--{{ bl_stts.width }}">
+          <div
+            class="mega-menu__collage{% if banner_row == 'bottom' and has_mega_menu_images == true %} collage collage-2-columns collage--{{ mega_menu_images_size }}-items{% endif %}"
+            style="
+              --gap-x: var(--gap-2xl);
+              --gap-y: var(--gap-2xl);
+            "
+          >
+            {%- liquid
+              assign collection = bl_stts.product_collection
+              assign max_items = bl_stts.product_limit
+              assign columns_desktop = bl_stts.product_columns
+              if max_items > columns_desktop
+                assign is_swiper = true
+                assign product_wrapper = 'swiper-component'
+              else
+                assign columns_desktop = max_items
+                assign product_wrapper = 'div'
+                assign is_swiper = false
+              endif
+              assign columns_tablet = 2
+              if columns_desktop == 1
+                assign columns_tablet = 1
+              elsif columns_desktop == 4
+                assign columns_tablet = 3
+              endif
+              assign columns_mobile = 1
+              assign columns_gap = 30
+              assign product_direction = bl_stts.product_direction
+              if product_direction == 'column'
+                assign vertical_alignment = bl_stts.vertical_alignment_flex_direction_column
+              else
+                assign horizontal_alignment = bl_stts.horizontal_alignment
+              endif
+            -%}
+            {%- capture breakpoints -%}
+              {
+                "768": { "slidesPerView": {{ columns_tablet }} },
+                "1024": { "slidesPerView": {{ columns_tablet }} },
+                "1400": { "slidesPerView": {{ columns_desktop }} }
+              }
+            {%- endcapture -%}
+            <{{ product_wrapper }}
+              class="mega-menu__collection{% if banner_row == 'bottom' %} collage__item collage__item--1{% endif %}"
+              {%- render 'swiper-data',
+                settings: bl_stts,
+                slides_per_view: columns_mobile,
+                space_between: columns_gap,
+                watch_slides_progress: true,
+                breakpoints: breakpoints
+              -%}
+              style="
+                {% render 'swiper-style',
+                  columns_mobile: columns_mobile,
+                  columns_tablet: columns_tablet,
+                  columns_desktop: columns_desktop,
+                  columns_gap: columns_gap,
+                %}
+              "
+            >
+              <div class="{% if is_swiper %}swiper{% endif %} h-full">
+                <ul
+                  class="{% if is_swiper %}swiper-wrapper{% endif %} grid-layout grid-layout-no-js list-unstyled lg:grid-layout--{{ columns_desktop }} md:grid-layout--{{ columns_tablet }} grid--{{ columns_mobile }}-col-mobile"
+                  id="Slider-{{ block.id }}"
+                  data-id="{{ block.id }}"
+                >
+                  {% for product in collection.products limit: max_items %}
+                    <li
+                      id="Slide-{{ block.id }}-{{ product.id }}-{{ forloop.index }}"
+                      class="mega-menu__collection--item grid__item{% if is_swiper %} swiper-slide{% endif %}"
+                    >
+                      {% render 'resource-card',
+                        resource_type: 'product',
+                        resource_direction: product_direction,
+                        horizontal_alignment: horizontal_alignment,
+                        vertical_alignment: vertical_alignment,
+                        resource: product,
+                        image_width: 500,
+                        image_hover: true,
+                        image_aspect_ratio: '4 / 5',
+                        show_variant_swatches: true,
+                        index: forloop.index
+                      %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </{{ product_wrapper }}>
+            {%- if banner_row == 'bottom' and has_mega_menu_images == true -%}
+              {{ banner }}
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{%- endunless -%}

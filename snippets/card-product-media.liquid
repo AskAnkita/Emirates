@@ -1,0 +1,75 @@
+{%- capture sizes -%}
+  {% comment %} '(min-width: 750px) 50vw, 100vw' {% endcomment %}
+  {%- render 'util-product-media-sizes-attr', block: block, section: section, settings: settings, is_single_column: is_single_column, needs_both_sizes: needs_both_sizes -%}
+{%- endcapture -%}
+
+{%- capture f_media_alt -%}
+  {{ 'content.product_image_main' | t }}
+{%- endcapture -%}
+{%- capture media_alt -%}
+  {{ 'content.product_image_secondary' | t }}
+{%- endcapture -%}
+
+{%- liquid
+  assign f_media = card_product.featured_media
+  assign f_media_width = f_media.width
+  assign media = card_product.media
+  assign media_width = media.width
+
+  assign f_media_alt = f_media.alt | default: card_product.title | append: ' ' | append: f_media_alt | strip
+  assign media_alt = media.alt | default: card_product.title | append: ' ' | append: media_alt | strip
+
+  assign sizes = sizes
+
+  assign f_widths = widths | default: '240, 352, 650, 832, 1200'
+  assign m_widths = widths | default: '240, 352, 650, 832, 1200'
+
+  unless lazy_load == false
+    assign loading = "lazy"
+  endunless
+
+  if collection and collection.handle
+    assign href_product_url = '/collections/' | append: collection.handle | append: '/products/' | append: card_product.handle
+  else
+    assign href_product_url = card_product.url
+  endif
+
+  if f_media.presentation.focal_point != blank
+    assign focal_point_style = '--image-focal-point: ' | append: media[0].presentation.focal_point | append: ';'
+  endif
+
+  assign secondary_focal_point_style = '--image-focal-point: ' | append: media[1].presentation.focal_point | append: ';'
+-%}
+
+<card-media class="card__media block{% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ settings.card_color_scheme }}{% endif %}">
+  {% comment %} <section-fetcher class="absolute inset-0" data-section-id="{{ section.id }}" data-target-id="{{ secondary_media_id }}" data-activate="inview"></section-fetcher> {% endcomment %}
+  <div class="media media--transparent media--hover-effect" id="CardProductMedia-Content-{{ section.id }}-{{ card_product.id }}">
+    {% if f_media %}
+      {{ f_media | image_url: width: f_media_width , format: 'webp' | image_tag: sizes: sizes, widths: f_widths, loading: 'lazy', alt: f_media_alt, class: 'motion-reduce', loading: loading, style: focal_point_style }}
+    {% else %}
+      {{ 'product-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+    {% endif %}
+    {%- if media[1] != null and show_secondary_image -%}
+      {%- case media[1].media_type -%}
+        {%- when 'image' -%}
+          {{ media[1] | image_url: width: media_width , format: 'webp' | image_tag: sizes: sizes, widths: m_widths, loading: 'lazy', alt: media_alt, class: 'motion-reduce', loading: 'lazy', id: secondary_media_id, style: secondary_focal_point_style }}
+        {%- when 'video', 'external_video' -%}
+          {%- render 'video',
+            video: media[1],
+            widths: widths,
+            sizes: sizes,
+            loading: loading,
+            disable_controls: true,
+            video_autoplay: true,
+            video_loop: true,
+            video_id: media[1].id,
+            section_id: section.id,
+            id: secondary_media_id
+          -%}
+      {%- endcase -%}
+    {%- endif -%}
+  </div>
+  <a href="{{ href_product_url }}" class="full-unstyled-link link-wrap z-2" aria-labelledby="MediaStandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }}" id="MediaStandardCardNoMediaLink-{{ section_id }}-{{ card_product.id }}">
+    <span class="visually-hidden">{{ card_product.title | escape }}</span>
+  </a>
+</card-media>

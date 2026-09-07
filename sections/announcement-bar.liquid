@@ -1,0 +1,169 @@
+<announcement-bar
+  class="
+    group-block block page-width
+    group-block--{{ section.id }}
+    color-{{ section.settings.color_scheme }}
+  "
+  style="
+    --pt:{{ section.settings.padding_top }}px;
+    --pb:{{ section.settings.padding_bottom }}px;
+  "
+>
+  {% content_for 'blocks' %}
+</announcement-bar>
+
+{% schema %}
+{
+  "name": "t:names.announcement_bar",
+  "class": "section-header section-announcement-bar",
+  "limit": 1,
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "blocks": [{ "type": "@app" }, { "type": "_group-announcement-bar" }, { "type": "_group-sale-banner" }],
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:content.spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.spacing_bottom",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:content.section_padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.top",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.bottom",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.announcement_bar",
+      "category": "t:categories.storytelling",
+      "blocks": {
+        "group_announcement_bar_BabaCW": {
+          "type": "_group-announcement-bar",
+          "settings": {
+            "padding_top": 0,
+            "padding_right": 0,
+            "padding_bottom": 0,
+            "padding_left": 0,
+            "content_direction": "row",
+            "wrap": "wrap",
+            "align_items": "start",
+            "justify_content": "start",
+            "gap_x": 0,
+            "gap_y": 0,
+            "show_line_separator": false,
+            "inherit_color_scheme": true,
+            "scheme_background": "#ffffff",
+            "scheme_background_gradient": "",
+            "scheme_foreground_heading": "#000000",
+            "scheme_foreground": "#000000",
+            "scheme_primary": "#000f9f",
+            "scheme_primary_hover": "#000000",
+            "scheme_border": "#e6e6e6",
+            "scheme_shadow": "#000000"
+          },
+          "blocks": {
+            "group_announcement_U74tte": {
+              "type": "_group-announcement",
+              "settings": {
+                "width_grid_item": 100,
+                "autoplay": false,
+                "autoplay_speed": 5,
+                "inherit_color_scheme": true,
+                "scheme_background": "#ffffff",
+                "scheme_background_gradient": "",
+                "scheme_foreground_heading": "#000000",
+                "scheme_foreground": "#000000",
+                "scheme_primary": "#000f9f",
+                "scheme_primary_hover": "#000000",
+                "scheme_border": "#e6e6e6",
+                "scheme_shadow": "#000000"
+              },
+              "blocks": {
+                "announcement_text_hGknhk": {
+                  "type": "_announcement-text",
+                  "settings": {
+                    "text": "End of season sale up to 50% off. <a href=\"/collections\" title=\"All collections\">Shop Now</a>",
+                    "font": "body",
+                    "font_size": "1.4rem"
+                  },
+                  "blocks": {}
+                },
+                "announcement_text_EYmrCA": {
+                  "type": "_announcement-text",
+                  "settings": {
+                    "text": "Welcome to our store",
+                    "font": "body",
+                    "font_size": "1.4rem"
+                  },
+                  "blocks": {}
+                },
+                "announcement_text_dLXHXE": {
+                  "type": "_announcement-text",
+                  "settings": {
+                    "text": "Welcome to our store",
+                    "font": "body",
+                    "font_size": "1.4rem"
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "announcement_text_hGknhk",
+                "announcement_text_EYmrCA",
+                "announcement_text_dLXHXE"
+              ]
+            }
+          },
+          "block_order": [
+            "group_announcement_U74tte"
+          ]
+        }
+      },
+      "block_order": [
+        "group_announcement_bar_BabaCW"
+      ],
+      "settings": {
+        "color_scheme": "scheme-3",
+        "margin_bottom": 0,
+        "padding_top": 15,
+        "padding_bottom": 15
+      }
+    }
+  ]
+}
+{% endschema %}

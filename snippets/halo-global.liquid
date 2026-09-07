@@ -1,0 +1,5 @@
+{%- if settings.show_floating_icons -%}
+  {%- render 'floating-icons' -%}
+  {{ 'floating-icons.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'floating-icons.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}

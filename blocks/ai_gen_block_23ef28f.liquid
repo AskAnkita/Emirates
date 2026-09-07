@@ -1,0 +1,1343 @@
+{% doc %}
+  @prompt
+    Generate this banner (Total Slides: 5
+    Layout: Each slide should have a 50% Left, 50% Right layout.
+    Text Alignment:
+    Desktop: Choose Left, Center, or Right alignment for text.
+    Mobile: Text alignment options: Left, Center, or Right.
+    Text Position: Choose Top, Center, or Bottom for text positioning.
+    Padding Settings:
+    Allow for custom padding on Top, Bottom, Left, and Right of the main section.
+    
+    For Each Slide:
+    
+    Left Side (Image, Heading, Description, Button)
+    Image Selection: Choose an image for the left side of the slide.
+    Heading: A customizable heading for the left side.
+    Description: A customizable text description for the left side.
+    Button: A customizable button with a link, ensuring that the button works when clicked, as well as the image click acting as a link.
+    Right Side (Image, Heading, Description, Button)
+    Image Selection: Choose an image for the right side of the slide.
+    Heading: A customizable heading for the right side.
+    Description: A customizable text description for the right side.
+    Button: A customizable button with a link, ensuring that the button works when clicked, as well as the image click acting as a link.
+    
+    Responsive Design Settings:
+    
+    Image Ratio:
+    Options: Adapt to image, Portrait, Square.
+    Desktop Settings:
+    Choose between Fit or Custom for Desktop width.
+    Tablet Settings:
+    Choose between Fit or Custom for Tablet width.
+    Mobile Settings:
+    Choose between Fit or Custom for Mobile width.
+    
+    Functionality:
+    
+    Ensure that both images and buttons are clickable and lead to the correct links when clicked.
+    Responsiveness: The layout should be fully responsive, adjusting to different screen sizes and maintaining the 50% split for desktop, tablet, and mobile views.
+    
+    Mobile Optimizations:
+    
+    The text, buttons, and images should align properly across devices. On mobile, ensure the layout switches smoothly to a stacked format if necessary, while maintaining the overall design and button links.
+    
+    Design Notes:
+    
+    Text should be legible and not overlapping with images.
+    Buttons should have a clear call to action, positioned in a consistent manner across all slides.), Add this setting in image settings Desktop width(Fit,Custom) & Unit=(Pixel, Percent) & (Custom width
+    
+    Tablet width(Fit,Custom) & Unit=(Pixel, Percent) & (Custom width
+    
+    Mobile width(Fit,Custom) & Unit=(Pixel, Percent) & (Custom width
+    
+    & One more thing only that slide will be visible that have uploded Imge , Just kame sure when i upload image it will set auto metical fit to image size ans only give this width(Fit,Custom) when i select Custom (Custom width) settin will apear & make sure i'll just set with hight auto maetical set acording to image size , Also Need this setting Image ratio( Adapt to image, Portrait, Square) , Update image size (Adapt to image, Portrait, Square, horizontal)
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% liquid
+  assign visible_slides = ''
+  for i in (1..5)
+    assign left_image_key = 'slide_' | append: i | append: '_left_image'
+    assign right_image_key = 'slide_' | append: i | append: '_right_image'
+    assign left_image = block.settings[left_image_key]
+    assign right_image = block.settings[right_image_key]
+    
+    if left_image != blank or right_image != blank
+      if visible_slides != ''
+        assign visible_slides = visible_slides | append: ','
+      endif
+      assign visible_slides = visible_slides | append: i
+    endif
+  endfor
+  
+  assign visible_slides_array = visible_slides | split: ','
+  assign total_visible_slides = visible_slides_array.size
+%}
+
+{% style %}
+
+
+
+  .ai-split-banner-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    position: relative;
+    padding-top: {{ block.settings.padding_top }}px;
+    padding-bottom: {{ block.settings.padding_bottom }}px;
+    padding-left: {{ block.settings.padding_left }}px;
+    padding-right: {{ block.settings.padding_right }}px;
+  }
+
+  .ai-split-banner-slider-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+    {% if block.settings.desktop_width_type == 'custom' %}
+      {% if block.settings.desktop_width_unit == 'percent' %}
+        width: {{ block.settings.desktop_custom_width }}%;
+      {% else %}
+        width: {{ block.settings.desktop_custom_width }}px;
+      {% endif %}
+      margin: 0 auto;
+    {% else %}
+      width: 100%;
+    {% endif %}
+  }
+
+  .ai-split-banner-slides-{{ ai_gen_id }} {
+    display: flex;
+    transition: transform 0.5s ease;
+  }
+
+  .ai-split-banner-slide-{{ ai_gen_id }} {
+    min-width: 100%;
+    display: flex;
+    gap: 0;
+  }
+
+  .ai-split-banner-half-{{ ai_gen_id }} {
+    width: 50%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: {{ block.settings.text_position }};
+    align-items: {{ block.settings.text_alignment }};
+    padding: 40px;
+    {% if block.settings.image_ratio == 'portrait' %}
+      aspect-ratio: 3 / 4;
+    {% elsif block.settings.image_ratio == 'square' %}
+      aspect-ratio: 1 / 1;
+    {% elsif block.settings.image_ratio == 'horizontal' %}
+      aspect-ratio: 16 / 9;
+    {% endif %}
+  }
+
+  .ai-split-banner-image-wrapper-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .ai-split-banner-image-wrapper-{{ ai_gen_id }} a {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ai-split-banner-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    {% if block.settings.image_ratio == 'adapt' %}
+      object-fit: contain;
+    {% else %}
+      object-fit: cover;
+    {% endif %}
+  }
+
+  .ai-split-banner-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-split-banner-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 300px;
+  }
+
+  .ai-split-banner-content-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    text-align: {{ block.settings.text_alignment }};
+  }
+
+  .ai-split-banner-heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 16px;
+    font-weight: 600;
+  }
+
+  .ai-split-banner-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+
+  .ai-split-banner-button-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 14px 32px;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_font_size }}px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .ai-split-banner-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_bg_color }};
+    color: {{ block.settings.button_hover_text_color }};
+  }
+
+  .ai-split-banner-nav-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .ai-split-banner-nav-button-{{ ai_gen_id }} {
+    background-color: {{ block.settings.nav_color }};
+    border: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .ai-split-banner-nav-button-{{ ai_gen_id }}.active {
+    background-color: {{ block.settings.nav_active_color }};
+    width: 32px;
+    border-radius: 6px;
+  }
+
+  .ai-split-banner-arrows-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: {{ block.settings.arrow_bg_color }};
+    color: {{ block.settings.arrow_color }};
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+
+  .ai-split-banner-arrows-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.arrow_hover_bg_color }};
+    color: {{ block.settings.arrow_hover_color }};
+  }
+
+  .ai-split-banner-arrows-{{ ai_gen_id }}.prev {
+    left: 20px;
+  }
+
+  .ai-split-banner-arrows-{{ ai_gen_id }}.next {
+    right: 20px;
+  }
+
+  @media screen and (min-width: 750px) and (max-width: 989px) {
+    .ai-split-banner-slider-{{ ai_gen_id }} {
+      {% if block.settings.tablet_width_type == 'custom' %}
+        {% if block.settings.tablet_width_unit == 'percent' %}
+          width: {{ block.settings.tablet_custom_width }}%;
+        {% else %}
+          width: {{ block.settings.tablet_custom_width }}px;
+        {% endif %}
+        margin: 0 auto;
+      {% else %}
+        width: 100%;
+      {% endif %}
+    }
+
+    .ai-split-banner-half-{{ ai_gen_id }} {
+      padding: 30px;
+    }
+
+    .ai-split-banner-heading-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.heading_size }}px * 0.8);
+    }
+
+    .ai-split-banner-description-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.description_size }}px * 0.9);
+    }
+
+    .ai-split-banner-content-{{ ai_gen_id }} {
+      text-align: {{ block.settings.text_alignment_mobile }};
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-split-banner-slider-{{ ai_gen_id }} {
+      {% if block.settings.mobile_width_type == 'custom' %}
+        {% if block.settings.mobile_width_unit == 'percent' %}
+          width: {{ block.settings.mobile_custom_width }}%;
+        {% else %}
+          width: {{ block.settings.mobile_custom_width }}px;
+        {% endif %}
+        margin: 0 auto;
+      {% else %}
+        width: 100%;
+      {% endif %}
+    }
+
+    .ai-split-banner-slide-{{ ai_gen_id }} {
+      flex-direction: column;
+    }
+
+    .ai-split-banner-half-{{ ai_gen_id }} {
+      width: 100%;
+      min-height: 300px;
+      padding: 24px;
+    }
+
+    .ai-split-banner-heading-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.heading_size }}px * 0.7);
+    }
+
+    .ai-split-banner-arrows-{{ ai_gen_id }} {
+      width: 40px;
+      height: 40px;
+    }
+
+    .ai-split-banner-arrows-{{ ai_gen_id }}.prev {
+      left: 10px;
+    }
+
+    .ai-split-banner-arrows-{{ ai_gen_id }}.next {
+      right: 10px;
+    }
+  }
+{% endstyle %}
+
+{% if total_visible_slides > 0 %}
+  <split-banner-{{ ai_gen_id }} class="ai-split-banner-{{ ai_gen_id }}" data-total-slides="{{ total_visible_slides }}" {{ block.shopify_attributes }}>
+    <div class="ai-split-banner-slider-{{ ai_gen_id }}">
+      <div class="ai-split-banner-slides-{{ ai_gen_id }}">
+        {% for slide_num in visible_slides_array %}
+          {% liquid
+            assign i = slide_num | plus: 0
+            assign left_image_key = 'slide_' | append: i | append: '_left_image'
+            assign left_heading_key = 'slide_' | append: i | append: '_left_heading'
+            assign left_description_key = 'slide_' | append: i | append: '_left_description'
+            assign left_button_text_key = 'slide_' | append: i | append: '_left_button_text'
+            assign left_button_link_key = 'slide_' | append: i | append: '_left_button_link'
+            
+            assign right_image_key = 'slide_' | append: i | append: '_right_image'
+            assign right_heading_key = 'slide_' | append: i | append: '_right_heading'
+            assign right_description_key = 'slide_' | append: i | append: '_right_description'
+            assign right_button_text_key = 'slide_' | append: i | append: '_right_button_text'
+            assign right_button_link_key = 'slide_' | append: i | append: '_right_button_link'
+
+            assign left_image = block.settings[left_image_key]
+            assign left_heading = block.settings[left_heading_key]
+            assign left_description = block.settings[left_description_key]
+            assign left_button_text = block.settings[left_button_text_key]
+            assign left_button_link = block.settings[left_button_link_key]
+
+            assign right_image = block.settings[right_image_key]
+            assign right_heading = block.settings[right_heading_key]
+            assign right_description = block.settings[right_description_key]
+            assign right_button_text = block.settings[right_button_text_key]
+            assign right_button_link = block.settings[right_button_link_key]
+          %}
+
+          <div class="ai-split-banner-slide-{{ ai_gen_id }}">
+            <div class="ai-split-banner-half-{{ ai_gen_id }}">
+              <div class="ai-split-banner-image-wrapper-{{ ai_gen_id }}">
+                {% if left_button_link != blank %}
+                  <a href="{{ left_button_link }}" aria-label="{{ left_heading | escape }}">
+                {% endif %}
+                  {% if left_image %}
+                    <img
+                      src="{{ left_image | image_url: width: 1200 }}"
+                      alt="{{ left_image.alt | escape }}"
+                      class="ai-split-banner-image-{{ ai_gen_id }}"
+                      loading="lazy"
+                      width="{{ left_image.width }}"
+                      height="{{ left_image.height }}"
+                    >
+                  {% else %}
+                    <div class="ai-split-banner-placeholder-{{ ai_gen_id }}">
+                      {{ 'image' | placeholder_svg_tag }}
+                    </div>
+                  {% endif %}
+                {% if left_button_link != blank %}
+                  </a>
+                {% endif %}
+              </div>
+
+              <div class="ai-split-banner-content-{{ ai_gen_id }}">
+                {% if left_heading != blank %}
+                  <h2 class="ai-split-banner-heading-{{ ai_gen_id }}">{{ left_heading }}</h2>
+                {% endif %}
+
+                {% if left_description != blank %}
+                  <div class="ai-split-banner-description-{{ ai_gen_id }}">{{ left_description }}</div>
+                {% endif %}
+
+                {% if left_button_text != blank and left_button_link != blank %}
+                  <a href="{{ left_button_link }}" class="ai-split-banner-button-{{ ai_gen_id }}">
+                    {{ left_button_text }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="ai-split-banner-half-{{ ai_gen_id }}">
+              <div class="ai-split-banner-image-wrapper-{{ ai_gen_id }}">
+                {% if right_button_link != blank %}
+                  <a href="{{ right_button_link }}" aria-label="{{ right_heading | escape }}">
+                {% endif %}
+                  {% if right_image %}
+                    <img
+                      src="{{ right_image | image_url: width: 1200 }}"
+                      alt="{{ right_image.alt | escape }}"
+                      class="ai-split-banner-image-{{ ai_gen_id }}"
+                      loading="lazy"
+                      width="{{ right_image.width }}"
+                      height="{{ right_image.height }}"
+                    >
+                  {% else %}
+                    <div class="ai-split-banner-placeholder-{{ ai_gen_id }}">
+                      {{ 'image' | placeholder_svg_tag }}
+                    </div>
+                  {% endif %}
+                {% if right_button_link != blank %}
+                  </a>
+                {% endif %}
+              </div>
+
+              <div class="ai-split-banner-content-{{ ai_gen_id }}">
+                {% if right_heading != blank %}
+                  <h2 class="ai-split-banner-heading-{{ ai_gen_id }}">{{ right_heading }}</h2>
+                {% endif %}
+
+                {% if right_description != blank %}
+                  <div class="ai-split-banner-description-{{ ai_gen_id }}">{{ right_description }}</div>
+                {% endif %}
+
+                {% if right_button_text != blank and right_button_link != blank %}
+                  <a href="{{ right_button_link }}" class="ai-split-banner-button-{{ ai_gen_id }}">
+                    {{ right_button_text }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if block.settings.show_arrows and total_visible_slides > 1 %}
+        <button class="ai-split-banner-arrows-{{ ai_gen_id }} prev" aria-label="Previous slide">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button class="ai-split-banner-arrows-{{ ai_gen_id }} next" aria-label="Next slide">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      {% endif %}
+    </div>
+
+    {% if block.settings.show_navigation and total_visible_slides > 1 %}
+      <div class="ai-split-banner-nav-{{ ai_gen_id }}">
+        {% for i in (1..total_visible_slides) %}
+          <button class="ai-split-banner-nav-button-{{ ai_gen_id }} {% if i == 1 %}active{% endif %}" data-slide="{{ i | minus: 1 }}" aria-label="Go to slide {{ i }}"></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </split-banner-{{ ai_gen_id }}>
+{% endif %}
+
+<script>
+  (function() {
+    class SplitBanner{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentSlide = 0;
+        this.totalSlides = parseInt(this.dataset.totalSlides) || 0;
+        this.autoplayInterval = null;
+      }
+
+      connectedCallback() {
+        if (this.totalSlides === 0) return;
+
+        this.slidesContainer = this.querySelector('.ai-split-banner-slides-{{ ai_gen_id }}');
+        this.navButtons = this.querySelectorAll('.ai-split-banner-nav-button-{{ ai_gen_id }}');
+        this.prevButton = this.querySelector('.ai-split-banner-arrows-{{ ai_gen_id }}.prev');
+        this.nextButton = this.querySelector('.ai-split-banner-arrows-{{ ai_gen_id }}.next');
+
+        this.setupEventListeners();
+        
+        {% if block.settings.autoplay %}
+          if (this.totalSlides > 1) {
+            this.startAutoplay();
+          }
+        {% endif %}
+      }
+
+      setupEventListeners() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.goToPrevSlide());
+        }
+
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.goToNextSlide());
+        }
+
+        this.navButtons.forEach((button) => {
+          button.addEventListener('click', (e) => {
+            const slideIndex = parseInt(e.target.dataset.slide);
+            this.goToSlide(slideIndex);
+          });
+        });
+
+        this.addEventListener('mouseenter', () => this.stopAutoplay());
+        this.addEventListener('mouseleave', () => {
+          {% if block.settings.autoplay %}
+            if (this.totalSlides > 1) {
+              this.startAutoplay();
+            }
+          {% endif %}
+        });
+      }
+
+      goToSlide(index) {
+        this.currentSlide = index;
+        this.updateSlidePosition();
+        this.updateNavigation();
+      }
+
+      goToNextSlide() {
+        this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+        this.updateSlidePosition();
+        this.updateNavigation();
+      }
+
+      goToPrevSlide() {
+        this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+        this.updateSlidePosition();
+        this.updateNavigation();
+      }
+
+      updateSlidePosition() {
+        const offset = -this.currentSlide * 100;
+        this.slidesContainer.style.transform = `translateX(${offset}%)`;
+      }
+
+      updateNavigation() {
+        this.navButtons.forEach((button, index) => {
+          if (index === this.currentSlide) {
+            button.classList.add('active');
+          } else {
+            button.classList.remove('active');
+          }
+        });
+      }
+
+      startAutoplay() {
+        this.stopAutoplay();
+        this.autoplayInterval = setInterval(() => {
+          this.goToNextSlide();
+        }, {{ block.settings.autoplay_speed | times: 1000 }});
+      }
+
+      stopAutoplay() {
+        if (this.autoplayInterval) {
+          clearInterval(this.autoplayInterval);
+          this.autoplayInterval = null;
+        }
+      }
+
+      disconnectedCallback() {
+        this.stopAutoplay();
+      }
+    }
+
+    customElements.define('split-banner-{{ ai_gen_id }}', SplitBanner{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Split banner slider",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Image settings"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "Adapt to image"
+        },
+        {
+          "value": "portrait",
+          "label": "Portrait"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        },
+        {
+          "value": "horizontal",
+          "label": "Horizontal"
+        }
+      ],
+      "default": "adapt"
+    },
+    {
+      "type": "header",
+      "content": "Desktop width"
+    },
+    {
+      "type": "select",
+      "id": "desktop_width_type",
+      "label": "Width",
+      "options": [
+        {
+          "value": "fit",
+          "label": "Fit"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "fit"
+    },
+    {
+      "type": "select",
+      "id": "desktop_width_unit",
+      "label": "Unit",
+      "options": [
+        {
+          "value": "pixel",
+          "label": "Pixel"
+        },
+        {
+          "value": "percent",
+          "label": "Percent"
+        }
+      ],
+      "default": "percent"
+    },
+    {
+      "type": "range",
+      "id": "desktop_custom_width",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Tablet width"
+    },
+    {
+      "type": "select",
+      "id": "tablet_width_type",
+      "label": "Width",
+      "options": [
+        {
+          "value": "fit",
+          "label": "Fit"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "fit"
+    },
+    {
+      "type": "select",
+      "id": "tablet_width_unit",
+      "label": "Unit",
+      "options": [
+        {
+          "value": "pixel",
+          "label": "Pixel"
+        },
+        {
+          "value": "percent",
+          "label": "Percent"
+        }
+      ],
+      "default": "percent"
+    },
+    {
+      "type": "range",
+      "id": "tablet_custom_width",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Mobile width"
+    },
+    {
+      "type": "select",
+      "id": "mobile_width_type",
+      "label": "Width",
+      "options": [
+        {
+          "value": "fit",
+          "label": "Fit"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "fit"
+    },
+    {
+      "type": "select",
+      "id": "mobile_width_unit",
+      "label": "Unit",
+      "options": [
+        {
+          "value": "pixel",
+          "label": "Pixel"
+        },
+        {
+          "value": "percent",
+          "label": "Percent"
+        }
+      ],
+      "default": "percent"
+    },
+    {
+      "type": "range",
+      "id": "mobile_custom_width",
+      "label": "Custom width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Text settings"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Desktop text alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment_mobile",
+      "label": "Mobile text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Text position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 16,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "label": "Description size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Hover background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Hover text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Slider controls"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_color",
+      "label": "Arrow background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Arrow color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_hover_bg_color",
+      "label": "Arrow hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_hover_color",
+      "label": "Arrow hover color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation",
+      "label": "Show navigation dots",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "nav_color",
+      "label": "Navigation color",
+      "default": "#cccccc"
+    },
+    {
+      "type": "color",
+      "id": "nav_active_color",
+      "label": "Active navigation color",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Slide 1 - Left side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_1_left_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_left_heading",
+      "label": "Heading",
+      "default": "Left Heading 1"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_1_left_description",
+      "label": "Description",
+      "default": "Discover our amazing collection"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_left_button_text",
+      "label": "Button text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "slide_1_left_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 1 - Right side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_1_right_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_right_heading",
+      "label": "Heading",
+      "default": "Right Heading 1"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_1_right_description",
+      "label": "Description",
+      "default": "Explore new arrivals"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_right_button_text",
+      "label": "Button text",
+      "default": "Explore"
+    },
+    {
+      "type": "url",
+      "id": "slide_1_right_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 2 - Left side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_2_left_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_left_heading",
+      "label": "Heading",
+      "default": "Left Heading 2"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_2_left_description",
+      "label": "Description",
+      "default": "Premium quality products"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_left_button_text",
+      "label": "Button text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "slide_2_left_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 2 - Right side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_2_right_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_right_heading",
+      "label": "Heading",
+      "default": "Right Heading 2"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_2_right_description",
+      "label": "Description",
+      "default": "Exclusive deals"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_right_button_text",
+      "label": "Button text",
+      "default": "Explore"
+    },
+    {
+      "type": "url",
+      "id": "slide_2_right_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 3 - Left side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_3_left_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_left_heading",
+      "label": "Heading",
+      "default": "Left Heading 3"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_3_left_description",
+      "label": "Description",
+      "default": "Trending styles"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_left_button_text",
+      "label": "Button text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "slide_3_left_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 3 - Right side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_3_right_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_right_heading",
+      "label": "Heading",
+      "default": "Right Heading 3"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_3_right_description",
+      "label": "Description",
+      "default": "Limited edition"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_right_button_text",
+      "label": "Button text",
+      "default": "Explore"
+    },
+    {
+      "type": "url",
+      "id": "slide_3_right_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 4 - Left side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_4_left_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_left_heading",
+      "label": "Heading",
+      "default": "Left Heading 4"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_4_left_description",
+      "label": "Description",
+      "default": "Best sellers"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_left_button_text",
+      "label": "Button text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "slide_4_left_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 4 - Right side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_4_right_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_right_heading",
+      "label": "Heading",
+      "default": "Right Heading 4"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_4_right_description",
+      "label": "Description",
+      "default": "Customer favorites"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_right_button_text",
+      "label": "Button text",
+      "default": "Explore"
+    },
+    {
+      "type": "url",
+      "id": "slide_4_right_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 5 - Left side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_5_left_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_5_left_heading",
+      "label": "Heading",
+      "default": "Left Heading 5"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_5_left_description",
+      "label": "Description",
+      "default": "Special offers"
+    },
+    {
+      "type": "text",
+      "id": "slide_5_left_button_text",
+      "label": "Button text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "slide_5_left_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 5 - Right side"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_5_right_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "slide_5_right_heading",
+      "label": "Heading",
+      "default": "Right Heading 5"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_5_right_description",
+      "label": "Description",
+      "default": "Seasonal collection"
+    },
+    {
+      "type": "text",
+      "id": "slide_5_right_button_text",
+      "label": "Button text",
+      "default": "Explore"
+    },
+    {
+      "type": "url",
+      "id": "slide_5_right_button_link",
+      "label": "Button link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Split banner slider"
+    }
+  ]
+}
+{% endschema %}

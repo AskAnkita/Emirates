@@ -1,0 +1,56 @@
+{%- liquid
+  assign search_type = settings.search_type
+-%}
+
+{%- capture grid_layout -%}
+  predictive-search-results__list
+  predictive-search-results__wrapper-products
+  grid-layout
+  {% if search_type == 'full' %}
+    lg:grid-layout--3
+    gap-2xl
+  {% elsif search_type == 'drawer' %}
+    grid-layout--1
+    gap-xl
+  {% else %}
+    predictive-search-results__list-inline
+    grid-layout--2
+    gap-md
+  {% endif %}
+  list-unstyled
+{%- endcapture -%}
+
+{% if settings.search_layout == 'default' %}
+  <h6 class="predictive-search__heading body-m-font-size">
+    {{ title }}
+  </h6>
+{% endif %}
+<div
+  id="predictive-search-products"
+  class="predictive-search-results__products"
+  {% if products_test_id %}
+    data-testid="{{ products_test_id }}"
+  {% endif %}
+>
+  <ul
+    class="{{ grid_layout }}"
+    role="listbox"
+    aria-label="{{ title }}"
+  >
+    {% liquid
+      assign limit = settings.quick_products_to_show | default: 9
+    %}
+    {% for product in products limit: limit %}
+      <li class="predictive-search-results__card predictive-search-results__card--product">
+        {% render 'resource-card',
+          resource_type: 'product',
+          resource: product,
+          image_width: 500,
+          image_hover: true,
+          image_aspect_ratio: '4 / 5',
+          resource_direction: resource_direction
+        %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>

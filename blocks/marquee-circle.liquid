@@ -1,0 +1,318 @@
+{%- liquid
+  assign block_settings = block.settings
+  assign width = block_settings.width
+  assign mobile_width = block_settings.mobile_width
+
+  assign is_rtl = false
+  if settings.enable_rtl_layout
+    assign rtl_locales = "ar,ae,arc,fa,he,ur,ps,sd,dv,yi,ug,ha,ckb,ku,ks,pnb,bcc,bqi,azb,mzn,glk,nqo,kwh" | split: ","
+    if rtl_locales contains request.locale.iso_code
+      assign is_rtl = true
+    endif
+  endif
+
+  assign movement_direction_effective = block_settings.movement_direction
+  if is_rtl
+    if block_settings.movement_direction == 'normal'
+      assign movement_direction_effective = 'reverse'
+    else
+      assign movement_direction_effective = 'normal'
+    endif
+  endif
+-%}
+
+<div
+  class="
+    marquee-circle
+    relative block svg-wrapper w-full overflow-hidden
+    spacing-style
+    gap-style
+    {% if block_settings.inherit_color_scheme == false %}color-scheme-custom{% endif %}
+    {% if block_settings.positions_type == 'floating' %}position-style{% endif %}
+    {% if block_settings.pause_on_hover %}pause-on-hover{% endif %}
+  "
+  style="
+    --width: {{ width }}vw;
+    --mobile-width: {{ mobile_width }}vw;
+    --marquee-speed: {{ block_settings.speed }}s;
+    --marquee-direction: {{ movement_direction_effective }};
+    {%- render 'spacing-style', settings: block_settings %};
+    {% render 'gap-style', value: block_settings.gap_between_elements, name: 'marquee-gap' %}
+    {% if block_settings.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: block_settings %}
+    {% endif %}
+    {%- if block_settings.positions_type == 'floating' -%}{%- render 'position-style', settings: block_settings -%}{%- endif -%}
+    {%- if block_settings.transparent_background == true -%}background-color: transparent;{%- endif -%}
+  "
+  {{ block.shopify_attributes }}
+>
+  <svg class="circle-path" viewBox="0 0 200 200">
+    <defs>
+      <path id="circlePath" d=" M 100, 100 m -75, 0 a 75,75 0 0,1 150,0 a 75,75 0 0,1 -150,0"/>
+    </defs>
+    <g class="circle-animation">
+      <use xlink:href="#circlePath" fill="none"/>
+      <text class="circle-text" fill="currentColor">
+        <textPath xlink:href="#circlePath">
+          {{ block_settings.text }}
+        </textPath>
+      </text>
+    </g>
+  </svg>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.marquee_circle",
+  "settings": [
+    {
+      "type": "select",
+      "id": "movement_direction",
+      "label": "t:settings.motion_direction",
+      "options": [
+        {
+          "value": "normal",
+          "label": "t:options.forward"
+        },
+        {
+          "value": "reverse",
+          "label": "t:options.reverse"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "gap_between_elements",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "t:settings.pause_on_hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:names.content"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:settings.text",
+      "default": "Circular marquee text • Goes around and around • "
+    },
+    {
+      "type": "header",
+      "content": "t:content.size"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "label": "t:settings.width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "mobile_width",
+      "label": "t:settings.width_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_background",
+      "label": "t:settings.background",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color_background",
+      "id": "scheme_background_gradient",
+      "label": "t:settings.background_gradient",
+      "info": "t:info.background_gradient_info",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground_heading",
+      "label": "t:settings.headings",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground",
+      "label": "t:settings.text",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary",
+      "label": "t:settings.primary_color",
+      "default": "#000F9F",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary_hover",
+      "label": "t:settings.primary_hover_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_shadow",
+      "label": "t:settings.shadow_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_background",
+      "label": "t:settings.transparent_background",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "positions_type",
+      "label": "t:settings.positions_type",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "floating",
+          "label": "t:options.floating"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "range",
+      "id": "position-horizontal",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.horizontal_position",
+      "default": 50,
+      "visible_if": "{{ block.settings.positions_type == 'floating' }}"
+    },
+    {
+      "type": "range",
+      "id": "position-vertical",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.vertical_position",
+      "default": 0,
+      "visible_if": "{{ block.settings.positions_type == 'floating' }}"
+    },
+    {
+      "type": "range",
+      "id": "position-horizontal-mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.mobile_horizontal_position",
+      "default": 50,
+      "visible_if": "{{ block.settings.positions_type == 'floating' }}"
+    },
+    {
+      "type": "range",
+      "id": "position-vertical-mobile",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.mobile_vertical_position",
+      "default": 0,
+      "visible_if": "{{ block.settings.positions_type == 'floating' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.animation"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "label": "t:settings.speed",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.marquee_circle",
+      "category": "t:categories.decorative"
+    }
+  ]
+}
+{% endschema %}

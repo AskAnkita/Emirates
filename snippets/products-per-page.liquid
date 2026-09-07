@@ -1,0 +1,100 @@
+{% comment %}
+  Render products per page
+  Accepts:
+  - limit: {Object}
+
+  Usage:
+  {% render 'products-per-page', limit: limit %}
+{% endcomment %}
+
+{% comment %} if cart.attributes.pagination != blank and cart.attributes.pagination
+  assign paginate_by = cart.attributes.pagination
+else
+endif {% endcomment %}
+{%- liquid
+  assign paginate_by = limit
+-%}
+
+<div class="flex items-center gap-lg">
+  <span class="shrink-0 facet-filters__field-label {{ text_label_case }}" style="--font-size: {{ heading_label_font_size }};">{{ 'content.items_per_page_label' | t }}</span>
+  <details
+    id="Details-PerPage"
+    class="facets__panel facets__panel--{{ style }} details--dropdown facet-filters__sort relative caption-large"
+    is="dropdown-details"
+    {% if enable_hover_reveal %}
+      activate-event="hover"
+    {% endif %}
+    data-index="0"
+    style="--font-size: {{ text_label_font_size }};"
+  >
+    <summary class="details__summary facets__summary focus-inset limit-{{ limit }} paginate_by-{{ paginate_by }} {{ cart.attributes.pagination }}">
+      <span class="label-text" name="paginateBy" style="--font-size: {{ text_label_font_size }};">
+        {%- if cart.attributes.pagination != blank and cart.attributes.pagination -%}
+            {{ cart.attributes.pagination }}
+          {%- else -%}
+            {{ paginate_by }}
+        {%- endif -%}
+      </span>
+      <span class="flex items-center gap-xl">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+    </summary>
+    <div
+      id="PerPageDropdown"
+      class="details__list facets__list absolute top-full right-0 z-1 global-settings-popup bg-background {{ text_label_case }}"
+      style="--min-w: 20rem;"
+      tabindex="-1"
+    >
+      <ul class="list-unstyled {{ paginate_by }}" role="list">
+        <li
+          class="facet-filters__sort_item relative{% if paginate_by == '8' %} selected pointer-events-none{% endif %}"
+          style="--p: 0.5rem 0;"
+          tabindex="-1"
+        >
+          <label for="Products-per-page-8" class="facet-checkbox cursor-pointer">
+            <input type="checkbox" name="per_page" value="8" id="Products-per-page-8" class="visually-hidden"{% if paginate_by == '8' %} checked{% endif %}>
+            <span class="label full-unstyled-link">
+              {{- 'content.items_per_page' | t: limit: 8 -}}
+            </span>
+          </label>
+        </li>
+        <li
+          class="facet-filters__sort_item relative{% if paginate_by == '16' %} selected pointer-events-none{% endif %}"
+          style="--p: 0.5rem 0;"
+          tabindex="-1"
+        >
+          <label for="Products-per-page-16" class="facet-checkbox cursor-pointer">
+            <input type="checkbox" name="per_page" value="16" id="Products-per-page-16" class="visually-hidden"{% if paginate_by == '16' %} checked{% endif %}>
+            <span class="label full-unstyled-link">
+              {{- 'content.items_per_page' | t: limit: 16 -}}
+            </span>
+          </label>
+        </li>
+        <li
+          class="facet-filters__sort_item relative{% if paginate_by == '24' %} selected pointer-events-none{% endif %}"
+          style="--p: 0.5rem 0;"
+          tabindex="-1"
+        >
+          <label for="Products-per-page-24" class="facet-checkbox cursor-pointer">
+            <input type="checkbox" name="per_page" value="24" id="Products-per-page-24" class="visually-hidden"{% if paginate_by == '24' %} checked{% endif %}>
+            <span class="label full-unstyled-link">
+              {{- 'content.items_per_page' | t: limit: 24 -}}
+            </span>
+          </label>
+        </li>
+        <li
+          class="facet-filters__sort_item relative{% if paginate_by == '32' %} selected pointer-events-none{% endif %}"
+          style="--p: 0.5rem 0;"
+          tabindex="-1"
+        >
+          <label for="Products-per-page-32" class="facet-checkbox cursor-pointer">
+            <input type="checkbox" name="per_page" value="32" id="Products-per-page-32" class="visually-hidden"{% if paginate_by == '32' %} checked{% endif %}>
+            <span class="label full-unstyled-link">
+              {{- 'content.items_per_page' | t: limit: 32 -}}
+            </span>
+          </label>
+        </li>
+      </ul>
+    </div>
+  </details>
+</div>

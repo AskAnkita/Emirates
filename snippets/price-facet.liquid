@@ -1,0 +1,135 @@
+{%- liquid
+  assign money_format = shop.money_format
+
+  if money_format contains 'amount'
+    assign shop_money_format = 'amount'
+  endif
+
+  if money_format contains 'amount_no_decimals'
+    assign shop_money_format = 'amount_no_decimals'
+  endif
+
+  if money_format contains 'amount_with_comma_separator'
+    assign shop_money_format = 'amount_with_comma_separator'
+  endif
+
+  if money_format contains 'amount_no_decimals_with_comma_separator'
+    assign shop_money_format = 'amount_no_decimals_with_comma_separator'
+  endif
+
+  if money_format contains 'amount_with_apostrophe_separator'
+    assign shop_money_format = 'amount_with_apostrophe_separator'
+  endif
+
+  assign min_value = filter.min_value.value | money_without_currency | replace: ',', ''
+  assign max_value = filter.max_value.value | money_without_currency | replace: ',', ''
+  assign range_max = filter.range_max | money_without_currency | replace: ',', '' | ceil
+
+  if shop_money_format == 'amount_with_comma_separator' or shop_money_format == 'amount_no_decimals_with_comma_separator'
+    assign min_value = filter.min_value.value | money_without_currency | replace: '.', ''
+    assign max_value = filter.max_value.value | money_without_currency | replace: '.', ''
+    assign range_max = filter.range_max | money_without_currency | replace: '.', '' | ceil
+  endif
+
+  if shop_money_format == 'amount_with_apostrophe_separator'
+    assign min_value = filter.min_value.value | money_without_currency | replace: "'", ''
+    assign max_value = filter.max_value.value | money_without_currency | replace: "'", ''
+    assign range_max = filter.range_max | money_without_currency | replace: "'", '' | ceil
+  endif
+-%}
+
+<div class="facets-price__range relative" style="--lg-m: 0 0 3rem; --m: 0 0 1rem;">
+  <input
+    class="filter__price_change filter__price_min"
+    min="0"
+    step="1"
+    type="range"
+    max="{{ range_max }}"
+    {%- if filter.min_value.value -%}
+      value="{{ min_value }}"
+    {%- else -%}
+      value="0"
+    {%- endif -%}
+    aria-label="Min"
+  >
+  <input
+    class="filter__price_change filter__price_max"
+    min="0"
+    step="1"
+    type="range"
+    max="{{ range_max }}"
+    {%- if filter.max_value.value -%}
+      value="{{ max_value }}"
+    {%- else -%}
+      value="{{ range_max }}"
+    {%- endif -%}
+    aria-label="Max"
+  >
+</div>
+
+<div class="facets-price__input flex items-center gap-sm">
+  <div class="field">
+    <span class="field-currency absolute-c-y z-1 left-0_5">{{ cart.currency.symbol }}</span>
+
+    <input
+      class="field__input filter__price_number"
+      name="{{ filter.min_value.param_name }}"
+      id="{{ id_prefix }}{{ filter.label | escape }}-GTE"
+      max="{{ filter.range_max | money_without_currency }}"
+      {%- if filter.min_value.value -%}
+        value="{{ filter.min_value.value | money_without_currency }}"
+        placeholder="{{ min_value }}"
+      {%- else -%}
+        value="0"
+        placeholder="0"
+      {%- endif -%}
+      type="text"
+      inputmode="decimal"
+      data-pattern="\d| |,|\."
+      data-min="0"
+      data-max="{{ filter.range_max | money_without_currency }}"
+    >
+    <label class="field__label visually-hidden" for="{{ id_prefix }}{{ filter.label | escape }}-GTE">
+      {{- 'products.facets.from' | t -}}
+    </label>
+  </div>
+  <div class="field-to-price">
+    <span class="field-to-price__text">
+      {{- 'products.facets.to' | t -}}
+    </span>
+  </div>
+  <div class="field">
+    <span class="field-currency absolute-c-y z-1 left-0_5">{{ cart.currency.symbol }}</span>
+    <input
+      class="field__input filter__price_number"
+      name="{{ filter.max_value.param_name }}"
+      id="{{ id_prefix }}{{ filter.label | escape }}-LTE"
+      max="{{ filter.range_max | money_without_currency }}"
+      {%- if filter.max_value.value -%}
+        value="{{ filter.max_value.value | money_without_currency }}"
+        placeholder="{{ max_value }}"
+      {%- else -%}
+        value="{{ filter.range_max | money_without_currency }}"
+        placeholder="{{ range_max }}"
+      {%- endif -%}
+      type="text"
+      inputmode="decimal"
+      data-pattern="\d| |,|\."
+      data-min="0"
+      data-max="{{ filter.range_max | money_without_currency }}"
+    >
+    <label class="field__label visually-hidden" for="{{ id_prefix }}{{ filter.label | escape }}-LTE">
+      {{- 'products.facets.to' | t -}}
+    </label>
+  </div>
+</div>
+
+<div class="facets-price__apply" >
+  <button class="button button--primary button--full-width button--outline"style="height:35px; font-size:12px; display:flex; align-items:center; justify-content:center;" >
+    <span class="button-overflow relative overflow-hidden" data-button-text="{{ 'products.facets.apply' | t }}">
+      <span class="button-text-main inline-block relative z-1">
+        {{- 'products.facets.apply' | t -}}
+      </span>
+    </span>
+  </button>
+</div>

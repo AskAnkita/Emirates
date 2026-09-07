@@ -1,0 +1,265 @@
+{%- doc -%}
+  Renders a card for displaying various resource types (products, collections, articles, pages).
+
+  @param {object} resource - The product or collection resource to render
+  @param {string} resource_type - The type of resource to render.
+  @param {string} [collection_thumbnails] - The style of the collection card. Can be 'single' or 'multiple'. Defaults to 'single'
+  @param {string} [style] - The style of the card. Can be 'default' or 'overlay'
+  @param {number} [image_width] - The maximum width of the image, value influences the srcset attribute. Defaults to 1200px.
+  @param {string} [image_aspect_ratio] - The aspect ratio to display the image. Defaults to image's natural ratio
+  @param {boolean} [image_hover] - Whether to show a secondary image on hover and focus
+  @param {string} [image_sizes] - The sizes attribute for responsive images. Defaults to 'auto'
+  @param {string} [resource_direction] - The direction of the card. Can be 'column' or 'row'. Defaults to 'row'
+  @param {string} [horizontal_alignment] - The alignment of the content. Can be 'flex-start', 'center', 'flex-end', 'space-between'. Defaults to 'flex-start'
+  @param {string} [vertical_alignment] - The alignment of the content. Can be 'stretch', 'flex-start', 'center', 'flex-end'. Defaults to 'center'
+{%- enddoc -%}
+
+{% liquid
+  if image_aspect_ratio == blank or image_aspect_ratio == 'adapt'
+    assign ratio = resource.featured_image.aspect_ratio
+  else
+    assign ratio = image_aspect_ratio
+  endif
+  assign image_width = image_width | default: 1200
+  assign widths = '240, 352, 832, 1200'
+  assign image_sizes = image_sizes | default: 'auto'
+  assign single_thumbnail_collection = false
+  if resource_type == 'collection' and collection_thumbnails != 'multiple'
+    assign single_thumbnail_collection = true
+  endif
+
+  if resource_type == 'product' and settings.transition_to_main_product
+    assign featured_media_url = resource.selected_or_first_available_variant.featured_image | image_url: width: image_width
+    if featured_media_url == blank
+      assign featured_media_url = resource.featured_media.preview_image | image_url: width: image_width
+    endif
+  endif
+%}
+
+<div
+  class="resource-card-wrapper product-card-wrapper card-wrapper"
+  style="
+    {% if settings.animations_reveal_on_scroll %}
+      --animation-order: {{ index | default: 1 }};
+    {% endif %}
+  "
+>
+  <div class="card">
+    <div
+      class="
+        resource-card
+        {% if resource_direction == 'column' %} resource-card--column{% endif %}
+        {% if style == 'overlay' %} resource-card--overlay{% endif %}
+        {% if resource_type == 'product' %} resource-card--product{% endif %}
+      "
+      data-resource-type="{{ resource_type }}"
+    >
+      {% if resource_type == 'product' %}
+        <template>
+          <div
+            data-json-product='{"id": {{resource.id}},"handle": "{{resource.handle}}","media": {{resource.media | json | escape}},"variants": {{ resource.variants | json | escape}}}'
+          ></div>
+        </template>
+      {% endif %}
+      {% if resource_type != 'product' %}
+        <a
+          class="resource-card__link"
+          href="{{ resource.url }}"
+        >
+          <span class="visually-hidden">
+            {{ resource.title }}
+          </span>
+        </a>
+      {% endif %}
+      <div
+        class="resource-card__media-wrapper relative"
+        style="--resource-card-aspect-ratio: {{ ratio }};"
+      >
+        <card-media class="card__media block">
+          <div
+            class="resource-card__media media media--transparent media--hover-effect"
+            {% if resource_type == 'product' and settings.transition_to_main_product %}
+              data-view-transition-to-main-product
+            {% endif %}
+          >
+            {%- if resource_type == 'product' or single_thumbnail_collection -%}
+              {% assign featured_image = resource.featured_image | default: resource.featured_media.preview_image %}
+              {% liquid
+                assign primary_focal_point_style = ''
+                if resource.media[0].presentation.focal_point != blank
+                  assign primary_focal_point_style = 'object-position: ' | append: resource.media[0].presentation.focal_point | append: ';'
+                endif
+              %}
+              {%- if featured_image != blank -%}
+                {{
+                  featured_image
+                  | image_url: width: image_width
+                  | image_tag:
+                    loading: 'lazy',
+                    class: 'resource-card__image',
+                    widths: widths,
+                    sizes: image_sizes,
+                    transitionToProduct: settings.transition_to_main_product,
+                    data-media-id: featured_image.id,
+                    style: primary_focal_point_style
+                }}
+                {%- if image_hover and resource.media.size > 1 -%}
+                  {% liquid
+                    assign secondary_focal_point_style = ''
+                    if resource.media[1].presentation.focal_point != blank
+                      assign secondary_focal_point_style = 'object-position: ' | append: resource.media[1].presentation.focal_point | append: ';'
+                    endif
+                  %}
+                  {%- case resource.media[1].media_type -%}
+                    {%- when 'image' -%}
+                      {{
+                        resource.media[1]
+                        | image_url: width: 1946
+                        | image_tag:
+                          sizes: image_sizes,
+                          widths: widths,
+                          loading: 'lazy',
+                          alt: resource.media[1].alt,
+                          class: 'resource-card__image resource-card__image--secondary',
+                          loading: 'lazy'
+                      }}
+                    {%- when 'video', 'external_video' -%}
+                      {%- render 'video',
+                        video: resource.media[1],
+                        widths: widths,
+                        sizes: image_sizes,
+                        loading: 'lazy',
+                        disable_controls: true,
+                        video_autoplay: false,
+                        video_loop: true,
+                        section_id: section.id
+                      -%}
+                  {%- endcase -%}
+                {%- endif -%}
+              {%- else -%}
+                <div
+                  aria-hidden="true"
+                  class="resource-card__image-placeholder"
+                >
+                  {{- resource.title | truncate: 60 -}}
+                </div>
+              {%- endif -%}
+            {%- elsif resource_type == 'collection' -%}
+              {%- if resource.products.size > 0 -%}
+                <div class="resource-card__image-wrapper">
+                  {% assign resource_products = resource.products | where: 'featured_image' %}
+                  {% for product in resource_products limit: 4 %}
+                    {{
+                      product.featured_image
+                      | image_url: width: image_width
+                      | image_tag:
+                        loading: 'lazy',
+                        class: 'resource-card__collection-image',
+                        sizes: image_sizes,
+                        widths: widths
+                    }}
+                  {% endfor %}
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+          {% if resource_type == 'product' %}
+            <a
+              class="resource-card__link"
+              href="{{ resource.url }}"
+            >
+              <span class="visually-hidden">
+                {{ resource.title }}
+              </span>
+            </a>
+          {% endif %}
+        </card-media>
+      </div>
+      <div
+        class="
+          resource-card__content
+          {% if horizontal_alignment != blank %} {{ horizontal_alignment}}{% endif %}
+          {% if vertical_alignment != blank %} {{ vertical_alignment}}{% endif %}
+        "
+      >
+        {% if resource_type == 'product' and settings.predictive_search_show_vendor %}
+          <p class="resource-card__subtext paragraph">
+            {{- resource.vendor -}}
+          </p>
+        {% endif %}
+        <p
+          class="
+            resource-card__title
+            {% if style == 'overlay' %} h5{%else %} paragraph{% endif %}
+            {% if resource_type == 'product' %} card__heading{% endif %}
+          "
+        >
+          {% if resource_type == 'product' %}
+            <a href="{{ resource.url }}" class="card-title-change link link--hover-underline">
+          {% endif %}
+          <span class="text">{{- resource.title -}}</span>
+          {% if resource_type == 'product' %}
+            </a>
+          {% endif %}
+        </p>
+
+        {% if resource_type == 'product' and settings.predictive_search_show_price %}
+          {% render 'price', product: resource, show_unit_price: true %}
+        {% elsif resource_type == 'collection' and single_thumbnail_collection == false %}
+          <p class="resource-card__subtext paragraph">
+            {{- 'content.search_results_resource_products_count' | t: count: resource.all_products_count -}}
+          </p>
+        {% else %}
+          <p class="resource-card__subtext paragraph">
+            {{- resource.excerpt | default: resource.content | strip_html | truncate: 65 -}}
+          </p>
+        {% endif %}
+        {% if resource_type == 'product' and show_variant_swatches %}
+          {%- liquid
+            assign product_swatch_option = settings.swatch | downcase
+            assign isColor = false
+            assign variant_img = ''
+            for option in resource.options_with_values
+              assign option_name = option.name | downcase
+              if product_swatch_option contains option_name
+                assign isColor = true
+                assign index = forloop.index0
+                assign position = forloop.index | minus: 1
+                assign variant_selected = option.selected_value
+                if settings.show_quick_shop
+                  for variant in resource.variants limit: 1
+                    if variant.image != null
+                      assign variant_img = variant.image
+                    endif
+                  endfor
+                endif
+                break
+              else
+                assign position = 0
+                assign variant_selected = null
+              endif
+            endfor
+
+            if horizontal_alignment == 'items-center' or vertical_alignment == 'justify-center'
+              assign alignment = 'center'
+            elsif horizontal_alignment == 'items-end' or vertical_alignment == 'justify-end'
+              assign alignment = 'end'
+            else
+              assign alignment = 'start'
+            endif
+          -%}
+          {% if isColor %}
+            <div class="resource-card__variant">
+              {%- render 'product-swatch',
+                product: resource,
+                variant_selected: variant_selected,
+                index: index,
+                alignment: alignment
+              -%}
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

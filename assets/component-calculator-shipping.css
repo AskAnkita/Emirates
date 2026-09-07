@@ -1,0 +1,158 @@
+.haloCalculatorShipping {
+  position: relative;
+  margin: 30px 0 12px 0;
+  min-height: var(--free-shipping-min-height);
+}
+
+.haloCalculatorShipping .progress {
+  position: relative;
+  margin: 0 0 10px 0;
+  font-size: 0;
+  letter-spacing: 0;
+}
+
+.haloCalculatorShipping .progress.progress-hidden {
+  display: none;
+}
+
+.haloCalculatorShipping .progress .progress_shipping {
+  height: var(--free-shipping-height);
+  background-color: var(--free-shipping-bg);
+  border-radius: var(--free-shipping-border-radius);
+  border: 0;
+}
+
+.haloCalculatorShipping .progress .progress-meter {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-size: calc(var(--font-body--size) + 2px);
+  font-weight: var(--font-body--weight);
+  letter-spacing: 0;
+  line-height: 1;
+  color: var(--free-shipping-color);
+  animation: 2s linear 0s infinite progress-bar-stripes;
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, .15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, .15) 50%,
+    rgba(255, 255, 255, .15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 40px 40px;
+  transition: .9s linear;
+  transition-property: width, background-color;
+  border-radius: var(--free-shipping-border-radius);
+}
+
+.haloCalculatorShipping .progress .progress-meter .text {
+  position: absolute;
+  right: -20px;
+  bottom: calc(var(--free-shipping-height) + 5px);
+}
+
+.haloCalculatorShipping .progress .progress-meter .circle-wrapper {
+  position: absolute;
+  right: calc((var(--free-shipping-height) + 6px) / -2);
+  bottom: -3px;
+  width: calc(var(--free-shipping-height) + 6px);
+  height: calc(var(--free-shipping-height) + 6px);
+  border-radius: var(--style-border-radius-50);
+  background-color: #fff;
+  border: 3px solid var(--free-shipping-color);
+}
+
+.haloCalculatorShipping .progress .progress-meter:not(:has( > *)) {
+  background-image: none;
+}
+
+.haloCalculatorShipping .progress.progress-free .progress_shipping {
+  border-color: var(--free-shipping-bg-4);
+}
+
+.haloCalculatorShipping .progress.progress-30 .progress_shipping {
+  border-color: var(--free-shipping-bg-1);
+}
+
+.haloCalculatorShipping .progress.progress-60 .progress_shipping {
+  border-color: var(--free-shipping-bg-2);
+}
+
+.haloCalculatorShipping .progress.progress-100 .progress_shipping {
+  border-color: var(--free_shipping_color3);
+}
+
+.haloCalculatorShipping .progress.progress-free .progress-meter {
+  background-color: var(--free-shipping-bg-4);
+}
+
+.haloCalculatorShipping .progress.progress-30 .progress-meter {
+  background-color: var(--free-shipping-bg-1);
+}
+
+.haloCalculatorShipping .progress.progress-60 .progress-meter {
+  background-color: var(--free-shipping-bg-2);
+}
+
+.haloCalculatorShipping .progress.progress-100 .progress-meter {
+  background-color: var(--free-shipping-bg-3);
+}
+
+.haloCalculatorShipping .message {
+  font-size: var(--font-body--size);
+  font-weight: var(--font-body--weight);
+  letter-spacing: 0;
+  line-height: var(--font-body--line-height);
+  color: var(--free-shipping-color);
+  transition: color 350ms ease-in-out;
+}
+
+.haloCalculatorShipping .progress.progress-free + .message {
+  color: var(--free-shipping-bg-4);
+}
+
+.haloCalculatorShipping .message .text {
+  text-transform: capitalize;
+}
+
+.progress-truck-wrapper {
+  position: absolute;
+  right: calc(var(--free-shipping-height) * -1);
+  bottom: calc(var(--free-shipping-height) - 2px);
+}
+
+.progress-truck-wrapper .icon-shipping-truck {
+  fill: var(--free-shipping-bg);
+  max-width: fit-content;
+  width: calc(var(--free-shipping-height) * 3);
+  height: calc(var(--free-shipping-height) * 3);
+  transition: fill 350ms ease-in-out;
+}
+
+.haloCalculatorShipping .progress.progress-free .progress-meter .progress-truck-wrapper .icon-shipping-truck {
+  fill: var(--free-shipping-bg-4);
+  color: var(--free-shipping-bg-4);
+}
+
+.haloCalculatorShipping .progress.progress-30 .progress-meter .progress-truck-wrapper .icon-shipping-truck {
+  fill: var(--free-shipping-bg-1);
+  color: var(--free-shipping-bg-1);
+}
+
+.haloCalculatorShipping .progress.progress-60 .progress-meter .progress-truck-wrapper .icon-shipping-truck {
+  fill: var(--free-shipping-bg-2);
+  color: var(--free-shipping-bg-2);
+}
+
+.haloCalculatorShipping .progress.progress-100 .progress-meter .progress-truck-wrapper .icon-shipping-truck {
+  fill: var(--free-shipping-bg-3);
+  color: var(--free-shipping-bg-3);
+}
+
+.haloCalculatorShipping .progress-truck-wrapper .icon-shipping-truck .wheel {
+  fill: white !important;
+}

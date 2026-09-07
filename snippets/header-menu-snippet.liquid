@@ -1,0 +1,18 @@
+{% comment %}
+  Renders a header menu snippet.
+
+  Accepts:
+  - header_settings: {Object}
+  - blocks: {Array}
+  - variant: {String} (mobile or desktop)
+
+  Usage:
+  {% render 'header-menu-snippet', header_settings: header_settings, blocks: blocks, variant: 'mobile' %}
+{% endcomment %}
+
+{%- case variant -%}
+  {%- when 'mobile' -%}
+    {% render 'mobile-menu', header_settings: header_settings, blocks: blocks, localPosition: 'mobile' %}
+  {%- else -%}
+    {% render 'header-menu', header_settings: header_settings, blocks: blocks, menu_gap: menu_gap %}
+{%- endcase -%}

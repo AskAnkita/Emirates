@@ -1,0 +1,142 @@
+{%- liquid
+  assign variant_selected = variant_selected | handleize
+  assign variant_count = product.variants | size
+  assign swatch_type = settings.swatch_type
+  assign color_list = '|'
+  assign color = ''
+  assign count = 0
+  if settings.enable_custom_position_swatch_layout_card_1
+    assign number_limit = 5
+  else
+    assign number_limit = 4
+  endif
+-%}
+
+{%- capture class_swatch -%}
+    swatch block max-w-full
+{%- endcapture -%}
+
+{%- capture class_tooltip -%}
+    tooltip center absolute bottom-full  left-0  z-1 whitespace-nowrap capitalize text-sm
+{%- endcapture -%}
+
+{%- if variant_count > 0 and product.variants.first.title != 'Default Title' -%}
+  <div class="card__swatch relative z-2" id="product-swatch-{{ product.id }}">
+    <color-swatch>
+      <ul
+        class="swatch-list list-unstyled flex flex-wrap items-center justify-{{ alignment | replace: 'left', 'start' | replace: 'right', 'end' }}"
+        style="--gap: 0.6rem;"
+      >
+        {%- for color in product.options_with_values[index].values -%}
+          {%- liquid
+            assign variant = color.variant
+            assign enable_variant_image = false
+            case swatch_type
+              when 'variant_image'
+                assign background_image = variant.image.src | image_url: width: '40x'
+                if variant.image
+                  assign enable_variant_image = true
+                endif
+              when 'color'
+              assign background_image = color | handle | append: '.png'
+              if images[background_image] != blank
+                assign background_image = background_image | file_url
+              else
+                assign background_image = ''
+              endif
+                assign enable_variant_image = true
+              when 'metaobjects'
+                assign metaobject_color = color.swatch.color
+                assign metaobject_image = color.swatch.image
+                assign has_metaobject = false
+                if metaobject_image != blank
+                  assign background_image = metaobject_image | image_url: width: '40x'
+                  assign enable_variant_image = true
+                  assign has_metaobject = true
+                elsif metaobject_color != blank
+                  assign background_color = metaobject_color
+                  assign enable_variant_image = true
+                  assign has_metaobject = true
+                  assign background_image = ''
+                elsif variant.image
+                  assign background_image = variant.image.src | image_url: width: '40x'
+                  assign enable_variant_image = true
+
+                  assign image_sources = 'jpg,png,webp,avif' | split: ','
+                  assign found_image = false
+                  for ext in image_sources
+                    assign ext = ext | strip
+                    assign item_image = background_color | append: '.' | append: ext
+                    if images[item_image] != blank and found_image == false
+                      assign found_image = true
+                      assign image = item_image | file_url
+                    endif
+                  endfor
+                else
+                  assign background_color = color | handle
+                  assign has_metaobject = true
+                  assign enable_variant_image = true
+                endif
+
+            endcase
+
+          -%}
+          {%- if count < number_limit -%}
+            <li class="swatch-item cursor-pointer relative{% if forloop.first %} active{% endif %}">
+                <span
+                  {% if enable_variant_image %}
+                    class="{{ class_swatch }} color-swacth-color--{{ color | handle }}"
+                    style="
+                      {%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                      {%- if has_metaobject -%}--swatch--background-color: {{ background_color }};{%- endif -%}
+                      {% comment %} {%- if has_metaobject and metaobject_color == blank -%}--swatch--background-color: {{ background_color }};{%- endif -%} {% endcomment %}
+                      {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}
+                    "
+                    data-title="{{ color | handle }}"
+                    data-variant-id="{{ variant.id }}"
+                    data-variant-img="{% if variant.image != blank %}{{ variant.image.src | image_url: width: '800x' }}{% endif %}"
+                  {% else %}
+                    class="{{ class_swatch }} color-swacth-color--{{ color | handle }} swatch--unavailable"
+                  {% endif %}
+                ></span>
+                <span class="{{ class_tooltip }}">{{ color | escape }}</span>
+            </li>
+          {%- else -%}
+            {%- if count == number_limit -%}
+              <li class="group-swatch " style="--gap-x: 0.5rem; display: none">
+            {%- endif -%}
+            <div class="swatch-item cursor-pointer relative">
+                <span
+                  {% if enable_variant_image %}
+                    class="{{ class_swatch }} color-swacth-color--{{ color | handle }}"
+                    style="
+                      {%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                      {%- if has_metaobject and metaobject_color != blank -%}--swatch--background-color: {{ background_color }};{%- endif -%}
+                      {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}
+                    "
+                    data-title="{{ color | handle }}"
+                    data-variant-id="{{ variant.id }}"
+                    data-variant-img="{% if variant.image != blank %}{{ variant.image.src | image_url: width: '800x' }}{% endif %}"
+                  {% else %}
+                    class="{{ class_swatch }} color-swacth-color--{{ color | handle }} swatch--unavailable"
+                  {% endif %}
+                ></span>
+                <span class="{{ class_tooltip }}">{{ color | escape }}</span>
+            </div>
+            {%- if forloop.last -%}
+              </li>
+            {%- endif -%}
+          {%- endif -%}
+          {%- assign count = count | plus: 1 -%}
+        {%- endfor -%}
+        {%- if count > number_limit -%}
+          <li class="item-swatch-more item">
+            <button type="button" class="number-showmore t-button cursor-pointer" title="More Color">
+              <span>+</span> <span class="text-number">{{ count | minus: number_limit }}</span>
+            </button>
+          </li>
+        {%- endif -%}
+      </ul>
+    </color-swatch>
+  </div>
+{%- endif -%}

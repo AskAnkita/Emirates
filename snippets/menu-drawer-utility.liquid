@@ -1,0 +1,112 @@
+<div
+  class="menu-drawer__utility-links"
+  style="--menu-drawer-animation-index: {{ listmenu_size | plus: 1 }};"
+>
+
+  {% liquid
+    assign show_language = sec_settings.show_language
+    if localization.available_languages.size <= 1
+      assign show_language = false
+    endif
+
+    assign show_country = sec_settings.show_country
+    if localization.available_countries.size <= 1
+      assign show_country = false
+    endif
+
+    assign country_style = sec_settings.country_selector_style
+  %}
+
+  {%- if country_style == true -%}
+    <link rel="stylesheet" href="{{ 'icon-flag.css' | asset_url }}" media="print" onload="this.media='all'">
+  {%- endif -%}
+
+  {%- capture icon_globe -%}
+    <svg
+      class="icon-globe icon"
+      aria-hidden="true"
+      focusable="false"
+      fill="none"
+      viewBox="0 0 50 50"
+    >
+      {%- render 'icon', icon: 'globe' -%}
+    </svg>
+  {%- endcapture -%}
+
+
+  {%- if show_language or show_country or settings.show_wishlist -%}
+    {%- if settings.show_wishlist -%}
+      {% capture wishlist_icon %}
+        <svg
+          class="icon icon-heart"
+          aria-hidden="true"
+          focusable="false"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          width="16"
+          height="16"
+        >
+          {% render 'icon', icon: 'heart' %}
+        </svg>
+      {% endcapture %}
+
+      {%- assign wishlist_link = settings.link_wishlist | strip -%}
+      {%- if wishlist_link != blank -%}
+        {%- assign wishlist_href = wishlist_link -%}
+        {%- assign wishlist_disabled = false -%}
+      {%- elsif pages['wish-list'] and pages['wish-list'].url != blank -%}
+        {%- assign wishlist_href = pages['wish-list'].url -%}
+        {%- assign wishlist_disabled = false -%}
+      {%- else -%}
+        {%- assign wishlist_disabled = true -%}
+      {%- endif -%}
+
+      <div class="{% if class_animated != blank %} {{ class_animated }}{% endif %}">
+        <a
+          {% if wishlist_disabled %}role="link" aria-disabled="true"{% else %}href="{{ wishlist_href }}"{% endif %}
+          class="
+            header__icon header__icon--summary header-wishlist header__icon--wishlist button button-unstyled relative focus-inset
+            {{ class_icon_type }}
+            {% if wishlist_disabled %} disabled{% endif %}
+          "
+          aria-label="{{ 'content.wishlist' | t }}"
+          {% if wishlist_disabled %}tabindex="-1"{% endif %}
+        >
+          <span class="svg-wrapper">
+            {{ wishlist_icon }}
+          </span>
+          <span class="wishlist-text">
+            {{- 'content.wishlist' | t -}}
+          </span>
+          <div class="wishlist-count-bubble" style="display: none;">
+            <span class="text" aria-hidden="true" data-wishlist-count>0</span><span class="visually-hidden">{{ 'content.wishlist' | t }}</span>
+          </div>
+        </a>
+      </div>
+    {%- endif -%}
+
+    {%- if show_language or show_country -%}
+      <div class="{% if class_animated != blank %} {{ class_animated }}{% endif %}">
+        <h3 class="menu-drawer__utility-heading h6" id="HeaderLanguageLabel">
+          {%- if show_language and show_country -%}
+            {{ 'content.localization_region_and_language' | t }}
+          {%- elsif show_language and show_country == false -%}
+            {{ 'content.language' | t }}
+          {%- elsif show_language == false and show_country -%}
+              {{ 'content.country_label' | t }}
+          {%- endif -%}
+        </h3>
+        {%- render 'language-country-localization',
+          localPosition: 'DrawerHeaderLanguage',
+          country_style: country_style,
+          show_language: show_language,
+          show_country: show_country,
+          icon_globe: icon_globe,
+          show_back_button: true,
+          element: 'drawer',
+          section_id: section_id
+        -%}
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+</div>

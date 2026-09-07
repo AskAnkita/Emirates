@@ -1,0 +1,11 @@
+.card-countdown-wrapper {
+  margin-bottom: 0.5rem;
+}
+
+.card-countdown-wrapper:has(:not(.is_show)) {
+  opacity: var(--opacity-0);
+}
+
+.card-countdown-wrapper:has(.is_show) {
+  opacity: var(--opacity-100);
+}

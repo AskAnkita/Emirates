@@ -1,0 +1,50 @@
+{%- liquid
+  assign gift_wrap_product = settings.gift_wrap_product
+  if gift_wrap_product != blank and gift_wrap_product.available
+    assign gift_wrap_product_id = gift_wrap_product.selected_or_first_available_variant.id | minus: 0
+    assign gift_wrap_product_quantity = cart | item_count_for_variant: gift_wrap_product_id
+  endif
+-%}
+
+{%- if gift_wrap_product_quantity == 0 -%}
+  {%- assign gift_wrap_money = gift_wrap_product.variants.first.price | money -%}
+
+  {% if gift_card_type == 'cart-drawer' %}
+    <gift-wrap-button
+      class="button button--full-width"
+      id="cart-gift-wrapping-add"
+      data-section-id="{{ section.id }}"
+      data-gift-wrap-variant-id="{{ gift_wrap_product_id }}"
+      type="button"
+    >
+      {%- render 'loading-spinner' -%}
+      {{ 'actions.add' | t }}
+    </gift-wrap-button>
+  {% else %}
+    <div class="cart-gift-card">
+      <svg
+        class="gift-wrap-icon inline-block v-a-middle"
+        aria-hidden="true"
+        focusable="false"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        width="20"
+        height="20"
+      >
+        {% render 'icon', icon: 'gift-wrapping' %}
+      </svg>
+      <span class="gift-wrap-title inline-block v-a-middle uppercase">{{ 'content.cart.gift_wrapping_title' | t}}</span>
+      <span class="gift-wrap-content font-bold inline-block v-a-middle uppercase">{{ 'content.cart.gift_wrapping_content' | t: money: gift_wrap_money }}</span>
+      <gift-wrap-button
+        class="button inline-block v-a-middle"
+        id="cart-gift-wrapping-add"
+        data-section-id="{{ section.id }}"
+        data-gift-wrap-variant-id="{{ gift_wrap_product_id }}"
+        type="button"
+      >
+        {%- render 'loading-spinner' -%}
+        {{ 'actions.add' | t }}
+      </gift-wrap-button>
+    </div>
+  {% endif %}
+{%- endif -%}

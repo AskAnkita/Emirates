@@ -1,0 +1,120 @@
+{%- doc -%}
+  Calculate the sizes attribute for product media images in the product media gallery.
+
+  @param {object} block - Block object containing media gallery settings
+  @param {object} section - Section object containing layout settings
+  @param {object} settings - Theme settings object containing page width configuration
+  @param {boolean} [is_first_image] - Whether this is the first image (for large_first_image mode)
+  @param {boolean} [is_single_column] - Whether the layout is single column (carousel or one-column grid)
+  @param {boolean} [needs_both_sizes] - Whether we need to calculate different sizes for first and other images
+
+  @example
+  {% capture media_sizes %}
+    {% render 'util-product-media-sizes-attr', block: block, section: section, settings: settings, is_single_column: is_single_column %}
+  {% endcapture %}
+  {% assign media_sizes = media_sizes | strip %}
+  {{ media | image_url: width: 800 | image_tag: sizes: media_sizes }}
+{%- enddoc -%}
+
+{%- liquid
+  assign block_settings = block.settings
+  # Constants
+  assign page_margin = '40px'
+  # Section gap divided by 2 (used for single column layouts)
+  assign gap_half = section.settings.columns_gap | default: 0 | divided_by: 2 | append: 'px'
+  # Section gap divided by 4 (used for two column layouts where each column gets half of the half gap)
+  assign gap_quarter = section.settings.columns_gap | default: 0 | divided_by: 4 | append: 'px'
+  # Image gap divided by 2 (space between images in grid)
+
+  assign is_single_column = is_single_column | default: false
+  assign needs_both_sizes = needs_both_sizes | default: false
+
+  # Determine which size calculation to use
+  assign calculate_single_column = false
+  assign calculate_grid_column = false
+
+  if needs_both_sizes
+    if is_first_image
+      assign calculate_single_column = true
+    else
+      assign calculate_grid_column = true
+    endif
+  elsif is_single_column
+    assign calculate_single_column = true
+  else
+    assign calculate_grid_column = true
+  endif
+
+  assign page_width_setting = settings.page_width
+  assign section_width = section.settings.section_width | default: section.settings.page_width
+  if section_width == 'custom'
+    assign breakpoint_custom_value = section.settings.page_width_custom | divided_by: 10 | append: 'rem'
+  endif
+
+  # Set up default sizes
+  if calculate_single_column
+    # Default for carousel or single column grid (or first image in large_first_image mode)
+    if section.settings.equal_columns == false
+      assign default_sizes = '(min-width: 750px) calc(100vw - 25rem - [gap_half]), 100vw' | replace: '[gap_half]', gap_half
+    else
+      assign default_sizes = '(min-width: 750px) calc(50vw - [gap_half]), 100vw' | replace: '[gap_half]', gap_half
+    endif
+  else
+    # Default for two column grid - includes image gap and quarter section gap
+    if section.settings.equal_columns == false
+      assign default_sizes = '(min-width: 750px) calc((100vw - 25rem) / 2 - [gap_quarter]), 100vw' | replace: '[gap_quarter]', gap_quarter
+    else
+      assign default_sizes = '(min-width: 750px) calc(50vw / 2 - [gap_quarter]), 100vw' | replace: '[gap_quarter]', gap_quarter
+    endif
+  endif
+
+  # Override for center-aligned content
+  if section_width != blank
+    # Define breakpoints and base sizes based on page width
+    # Breakpoints are the page width setting + margin (where 2 x margin is 80px = 5rem)
+    case section_width
+      when 'custom'
+        assign breakpoint = breakpoint_custom_value
+        assign media_base_size_equal_columns = '45rem'
+      when 'page-width'
+        assign breakpoint = page_width_setting | divided_by: 10 | append: 'rem'
+        assign media_base_size_equal_columns = '60rem'
+      when 'full-width'
+        assign breakpoint = '155rem'
+        assign media_base_size_equal_columns = '75rem'
+    endcase
+
+    # Select the appropriate base size
+    assign media_base_size = media_base_size_equal_columns
+
+    # Calculate large screen size base
+    assign large_size_base = media_base_size
+
+    # Calculate medium screen size
+    assign medium_base = '50vw'
+
+    # Build calculation based on column type
+    if calculate_grid_column
+      # Grid column calculation - includes image gap
+      assign medium_base = '([medium_base]) / 2' | replace: '[medium_base]', medium_base
+      # Build the complete large size expression
+      assign large_size_expr = '([large_size_base]) / 2' | replace: '[large_size_base]', large_size_base
+      assign large_size = 'calc([large_size_expr])' | replace: '[large_size_expr]', large_size_expr
+
+      assign medium_size = 'calc([medium_base] - [page_margin] - [gap_quarter])' | replace: '[medium_base]', medium_base | replace: '[page_margin]', page_margin | replace: '[gap_quarter]', gap_quarter
+      assign sizes = '(min-width: [breakpoint]) [large_size], (min-width: 750px) [medium_size], 100vw' | replace: '[breakpoint]', breakpoint | replace: '[large_size]', large_size | replace: '[medium_size]', medium_size
+    else
+      # Single column calculation
+      assign large_size = large_size_base
+
+      assign medium_size = 'calc([medium_base] - [page_margin] - [gap_quarter] - [page_margin])' | replace: '[medium_base]', medium_base | replace: '[page_margin]', page_margin | replace: '[gap_quarter]', gap_quarter
+      assign sizes = '(min-width: [breakpoint]) [large_size], (min-width: 750px) [medium_size], 100vw' | replace: '[breakpoint]', breakpoint | replace: '[large_size]', large_size | replace: '[medium_size]', medium_size
+    endif
+  else
+    # Use default sizes
+    assign sizes = default_sizes
+  endif
+
+  # Echo the sizes attribute
+  echo sizes
+-%}

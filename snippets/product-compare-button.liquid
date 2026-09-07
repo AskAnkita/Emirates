@@ -1,0 +1,53 @@
+<div
+  class="card-product__group-item card-compare max-sm:hidden"
+  data-product-compare
+  data-product-compare-handle="{{ card_product.handle }}"
+  data-product-compare-id="{{ card_product.id }}"
+>
+  <div
+    type="button"
+    title="{{ 'products.product.compare' | t }}"
+    class="{{ class_button }} compare-button"
+    data-compare
+    data-compare-handle="{{ card_product.handle }}"
+    data-product-id="{{ card_product.id }}"
+  >
+    {% comment %}
+      <span class="text pointer-events-none absolute-c-y z--1">
+          <span class="text-inner">{{ 'products.product.compare' | t }}</span>
+      </span>
+      {% render 'icon', icon: 'compare' %}
+    {% endcomment %}
+
+    <input
+      {% if sectionId %}
+        id="compare-{{ card_product.id }}-{{ sectionId }}"
+      {% endif %}
+      class="compare-checkbox visibility-hidden"
+      type="checkbox"
+      name="compare"
+      value="{{ card_product.handle }}"
+    >
+    <label
+      class="compare-label cursor-pointer"
+      {% if sectionId %}
+        for="compare-{{ card_product.id }}-{{ sectionId }}"
+      {% endif %}
+    >
+      <span class="{{ class_text }}">
+        <span class="{{ class_text_inner }}">{{ 'products.product.compare' | t }}</span>
+      </span>
+      <svg
+        class="compare-button__icon"
+        aria-hidden="true"
+        focusable="false"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 512 512"
+        width="16"
+        height="16"
+      >
+        {% render 'icon', icon: 'compare' %}
+      </svg>
+    </label>
+  </div>
+</div>

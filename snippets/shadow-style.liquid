@@ -1,0 +1,14 @@
+{%- comment -%}
+  Intended for blocks and sections that provide values for all the referenced settings.
+
+  <div class="shadow-style" style="{%  render 'shadow-style', settings: section.settings %}">
+
+   Accepts:
+      settings: {settings || section.settings}
+{%- endcomment -%}
+
+--shadow-vertical-offset: {{ settings.shadow_vertical_offset }}px;
+--shadow-horizontal-offset: {{ settings.shadow_horizontal_offset }}px;
+--shadow-blur: {{ settings.shadow_blur }}px;
+--shadow-color: rgb({{ settings.shadow_color.rgba }});
+--shadow-spread-radius: {{ settings.spread_radius }}px;

@@ -1,0 +1,24 @@
+.quick-view-modal {
+  --full-page-grid-central-column-width: min(
+    var(--page-width) - var(--page-margin) * 2,
+    calc(100% - var(--page-margin) * 2)
+  );
+  --full-page-grid-margin: minmax(var(--page-margin), 1fr);
+  --full-page-grid-with-margins: var(--full-page-grid-margin) var(--full-page-grid-central-column-width)
+    var(--full-page-grid-margin);
+
+  --util-page-margin-offset: max(
+    var(--page-margin),
+    calc((100% - min(var(--page-content-width), calc(100% - (var(--page-margin) * 2)))) / 2)
+  );
+  --full-page-margin-inline-offset: calc(((100vw - var(--scrollbar-width, 0px) - var(--full-page-grid-central-column-width)) / 2) * -1);
+}
+
+.quick-view-modal__content {
+  padding: 1rem 1.5rem;
+  width: min(100% - 3rem, 120rem);
+}
+
+.quick-view-modal .product-information__grid {
+  --gap: 1.5rem;
+}

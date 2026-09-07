@@ -1,0 +1,1126 @@
+{% doc %}
+  @prompt
+    Section Name:
+    
+    "Shop Diamonds by Shape (Interactive Grid + Preview)"
+    
+    🎯 Goal:
+    
+    Create a fully responsive Shopify section that matches the provided design exactly.
+    
+    🖥️ Desktop Layout (Important)
+    Use a 2-column layout
+    Left side: 30% width
+    Right side: 70% width
+    🔹 Left Side (30%)
+    Add a Heading text field
+    Below heading, show a large preview image
+    By default: show first collection's hover image
+    When user hovers any item on right → update this image dynamically
+    🔹 Right Side (70%)
+    
+    Create a Grid of 10 items (collections)
+    
+    Layout:
+    5 columns
+    2 rows
+    Total: 10 items
+    📦 Each Grid Item Must Have:
+    Default Image
+    Hover Image
+    Text label (below image)
+    Collection link (clickable)
+    🖱️ Hover Interaction (VERY IMPORTANT)
+    
+    When hovering on any item:
+    
+    Right Side:
+    Image switches to hover image
+    Show underline below text
+    Smooth transition (200–300ms)
+    Left Side:
+    Update preview image to that item's hover image
+    🔗 Click Behavior
+    Clicking image OR text → open selected collection link
+    📱 Tablet Layout
+    Remove 30% / 70% layout
+    Hide left preview section
+    Show only carousel slider
+    Carousel Behavior:
+    Show image + text
+    Smooth scroll
+    Autoplay (optional)
+    📱 Mobile Layout
+    Same as tablet (carousel)
+    Show:
+    3 items per view
+    Swipe enabled
+    ⚙️ Section Settings (Customizer)
+    General Settings:
+    Heading (rich text supported)
+    Padding:
+    Top
+    Bottom
+    Left
+    Right
+    Layout Settings:
+    Tablet columns (default: 7)
+    Mobile columns (default: 3)
+    Grid Spacing:
+    Column gap
+    Row gap
+    Left Section Settings:
+    Vertical gap (heading ↔ image spacing)
+    📋 Blocks (Repeatable up to 10)
+    
+    Each block = 1 collection item
+    
+    Fields:
+    
+    Collection (link target)
+    Default Image
+    Hover Image
+    Text label
+    🎨 Design Requirements
+    Match provided UI exactly:
+    Clean luxury style
+    Center aligned images
+    Text below image
+    Thin underline on hover
+    Soft transitions
+    Image ratio: 1:1
+    Maintain consistent spacing
+    ✨ Animation & Effects
+    Hover image fade transition
+    Underline animation on text
+    Left preview image fade update
+    📐 Responsiveness
+    Desktop → Grid layout (5x2)
+    Tablet → Carousel (7 items visible)
+    Mobile → Carousel (3 items visible)
+    ⚠️ Important Notes
+    Limit blocks to maximum 10
+    First item should be active by default
+    Fully editable via Shopify customizer
+    Use clean Liquid + minimal JS (no heavy libraries)
+    Ensure performance optimized
+    ✅ Expected Result
+    Interactive diamond shape selector
+    Hover updates preview (left side)
+    Fully responsive slider on mobile/tablet
+    Pixel-perfect design based on screenshots When we hover right side in collaction just change hovered image in right side don't change image in left side while hovering & We need Default image in tablet & mobile don't show Hover image in tablet & mobile & give background color option for section, When we hover right side in collaction just change hovered image in left side don't change image in right side while hovering & We need Default image in tablet & mobile don't show Hover image in tablet & mobile & give background color option for section, Can you add left right arrow for mobile & Tablet for carousel Smooth slider 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-diamond-shape-section-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.padding_top }}px {{ block.settings.padding_right }}px {{ block.settings.padding_bottom }}px {{ block.settings.padding_left }}px;
+  }
+
+  .ai-diamond-shape-container-{{ ai_gen_id }} {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-diamond-shape-desktop-layout-{{ ai_gen_id }} {
+    display: flex;
+    gap: 30px;
+  }
+
+  .ai-diamond-shape-left-section-{{ ai_gen_id }} {
+    width: 30%;
+    flex-shrink: 0;
+  }
+
+  .ai-diamond-shape-heading-{{ ai_gen_id }} {
+    margin: 0 0 {{ block.settings.vertical_gap }}px 0;
+    font-size: 2.4rem;
+    line-height: 1.3;
+  }
+
+  .ai-diamond-shape-preview-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+
+  .ai-diamond-shape-preview-image-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-diamond-shape-preview-image-{{ ai_gen_id }}.ai-diamond-shape-active-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .ai-diamond-shape-right-section-{{ ai_gen_id }} {
+    width: 70%;
+    flex-grow: 1;
+  }
+
+  .ai-diamond-shape-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: {{ block.settings.row_gap }}px {{ block.settings.column_gap }}px;
+  }
+
+  .ai-diamond-shape-item-{{ ai_gen_id }} {
+    text-align: center;
+  }
+
+  .ai-diamond-shape-item-link-{{ ai_gen_id }} {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .ai-diamond-shape-item-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .ai-diamond-shape-item-image-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-diamond-shape-item-text-{{ ai_gen_id }} {
+    font-size: 1.4rem;
+    line-height: 1.4;
+    position: relative;
+    display: inline-block;
+  }
+
+  .ai-diamond-shape-item-text-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: currentColor;
+    transition: width 0.25s ease;
+  }
+
+  .ai-diamond-shape-item-{{ ai_gen_id }}:hover .ai-diamond-shape-item-text-{{ ai_gen_id }}::after {
+    width: 100%;
+  }
+
+  .ai-diamond-shape-carousel-{{ ai_gen_id }} {
+    display: none;
+  }
+
+  .ai-diamond-shape-carousel-container-{{ ai_gen_id }} {
+    position: relative;
+  }
+
+  .ai-diamond-shape-carousel-wrapper-{{ ai_gen_id }} {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ai-diamond-shape-carousel-track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.column_gap }}px;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-diamond-shape-carousel-item-{{ ai_gen_id }} {
+    flex: 0 0 auto;
+    text-align: center;
+  }
+
+  .ai-diamond-shape-carousel-item-link-{{ ai_gen_id }} {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .ai-diamond-shape-carousel-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .ai-diamond-shape-carousel-image-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-diamond-shape-carousel-text-{{ ai_gen_id }} {
+    font-size: 1.4rem;
+    line-height: 1.4;
+  }
+
+  .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: {{ block.settings.arrow_background }};
+    border: 1px solid {{ block.settings.arrow_border }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+
+  .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.arrow_hover_background }};
+    border-color: {{ block.settings.arrow_hover_border }};
+  }
+
+  .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+    stroke: {{ block.settings.arrow_color }};
+  }
+
+  .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }}:hover svg {
+    stroke: {{ block.settings.arrow_hover_color }};
+  }
+
+  .ai-diamond-shape-carousel-arrow-prev-{{ ai_gen_id }} {
+    left: -20px;
+  }
+
+  .ai-diamond-shape-carousel-arrow-next-{{ ai_gen_id }} {
+    right: -20px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-diamond-shape-desktop-layout-{{ ai_gen_id }} {
+      display: none;
+    }
+
+    .ai-diamond-shape-carousel-{{ ai_gen_id }} {
+      display: block;
+    }
+
+    .ai-diamond-shape-carousel-item-{{ ai_gen_id }} {
+      width: calc((100% - ({{ block.settings.tablet_columns | minus: 1 }} * {{ block.settings.column_gap }}px)) / {{ block.settings.tablet_columns }});
+    }
+
+    .ai-diamond-shape-carousel-arrow-prev-{{ ai_gen_id }} {
+      left: 10px;
+    }
+
+    .ai-diamond-shape-carousel-arrow-next-{{ ai_gen_id }} {
+      right: 10px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-diamond-shape-section-{{ ai_gen_id }} {
+      padding: {{ block.settings.padding_top | times: 0.7 }}px {{ block.settings.padding_right | times: 0.7 }}px {{ block.settings.padding_bottom | times: 0.7 }}px {{ block.settings.padding_left | times: 0.7 }}px;
+    }
+
+    .ai-diamond-shape-carousel-item-{{ ai_gen_id }} {
+      width: calc((100% - ({{ block.settings.mobile_columns | minus: 1 }} * {{ block.settings.column_gap }}px)) / {{ block.settings.mobile_columns }});
+    }
+
+    .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} {
+      width: 36px;
+      height: 36px;
+    }
+
+    .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .ai-diamond-shape-carousel-arrow-prev-{{ ai_gen_id }} {
+      left: 5px;
+    }
+
+    .ai-diamond-shape-carousel-arrow-next-{{ ai_gen_id }} {
+      right: 5px;
+    }
+  }
+{% endstyle %}
+
+<diamond-shape-section-{{ ai_gen_id }} class="ai-diamond-shape-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-diamond-shape-container-{{ ai_gen_id }} section">
+    <div class="ai-diamond-shape-desktop-layout-{{ ai_gen_id }}">
+      <div class="ai-diamond-shape-left-section-{{ ai_gen_id }}">
+        {% if block.settings.heading != blank %}
+          <div class="ai-diamond-shape-heading-{{ ai_gen_id }}">
+            {{ block.settings.heading }}
+          </div>
+        {% endif %}
+        
+        <div class="ai-diamond-shape-preview-wrapper-{{ ai_gen_id }}">
+          {% for i in (1..10) %}
+            {% liquid
+              assign hover_image_key = 'item_' | append: i | append: '_hover_image'
+              assign default_image_key = 'item_' | append: i | append: '_default_image'
+              assign text_key = 'item_' | append: i | append: '_text'
+              
+              assign hover_image = block.settings[hover_image_key]
+              assign default_image = block.settings[default_image_key]
+              assign text = block.settings[text_key]
+            %}
+            
+            {% if hover_image or default_image %}
+              {% if hover_image %}
+                <img
+                  src="{{ hover_image | image_url: width: 800 }}"
+                  alt="{{ text | escape }}"
+                  class="ai-diamond-shape-preview-image-{{ ai_gen_id }} {% if forloop.first %}ai-diamond-shape-active-{{ ai_gen_id }}{% endif %}"
+                  data-preview-index="{{ forloop.index0 }}"
+                  loading="lazy"
+                  width="800"
+                  height="800"
+                >
+              {% elsif default_image %}
+                <img
+                  src="{{ default_image | image_url: width: 800 }}"
+                  alt="{{ text | escape }}"
+                  class="ai-diamond-shape-preview-image-{{ ai_gen_id }} {% if forloop.first %}ai-diamond-shape-active-{{ ai_gen_id }}{% endif %}"
+                  data-preview-index="{{ forloop.index0 }}"
+                  loading="lazy"
+                  width="800"
+                  height="800"
+                >
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="ai-diamond-shape-right-section-{{ ai_gen_id }}">
+        <div class="ai-diamond-shape-grid-{{ ai_gen_id }}">
+          {% for i in (1..10) %}
+            {% liquid
+              assign collection_key = 'item_' | append: i | append: '_collection'
+              assign default_image_key = 'item_' | append: i | append: '_default_image'
+              assign hover_image_key = 'item_' | append: i | append: '_hover_image'
+              assign text_key = 'item_' | append: i | append: '_text'
+              
+              assign collection = block.settings[collection_key]
+              assign default_image = block.settings[default_image_key]
+              assign hover_image = block.settings[hover_image_key]
+              assign text = block.settings[text_key]
+            %}
+            
+            {% if default_image or text != blank %}
+              <div class="ai-diamond-shape-item-{{ ai_gen_id }}" data-item-index="{{ forloop.index0 }}">
+                <a 
+                  href="{{ collection.url | default: '#' }}" 
+                  class="ai-diamond-shape-item-link-{{ ai_gen_id }}"
+                >
+                  <div class="ai-diamond-shape-item-image-wrapper-{{ ai_gen_id }}">
+                    {% if default_image %}
+                      <img
+                        src="{{ default_image | image_url: width: 400 }}"
+                        alt="{{ text | escape }}"
+                        class="ai-diamond-shape-item-image-{{ ai_gen_id }}"
+                        loading="lazy"
+                        width="400"
+                        height="400"
+                      >
+                    {% endif %}
+                  </div>
+                  
+                  {% if text != blank %}
+                    <div class="ai-diamond-shape-item-text-{{ ai_gen_id }}">
+                      {{ text }}
+                    </div>
+                  {% endif %}
+                </a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-diamond-shape-carousel-{{ ai_gen_id }}">
+      <div class="ai-diamond-shape-carousel-container-{{ ai_gen_id }}">
+        <button 
+          class="ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} ai-diamond-shape-carousel-arrow-prev-{{ ai_gen_id }}"
+          aria-label="Previous"
+          data-direction="prev"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <div class="ai-diamond-shape-carousel-wrapper-{{ ai_gen_id }}">
+          <div class="ai-diamond-shape-carousel-track-{{ ai_gen_id }}">
+            {% for i in (1..10) %}
+              {% liquid
+                assign collection_key = 'item_' | append: i | append: '_collection'
+                assign default_image_key = 'item_' | append: i | append: '_default_image'
+                assign text_key = 'item_' | append: i | append: '_text'
+                
+                assign collection = block.settings[collection_key]
+                assign default_image = block.settings[default_image_key]
+                assign text = block.settings[text_key]
+              %}
+              
+              {% if default_image or text != blank %}
+                <div class="ai-diamond-shape-carousel-item-{{ ai_gen_id }}">
+                  <a 
+                    href="{{ collection.url | default: '#' }}" 
+                    class="ai-diamond-shape-carousel-item-link-{{ ai_gen_id }}"
+                  >
+                    <div class="ai-diamond-shape-carousel-image-wrapper-{{ ai_gen_id }}">
+                      {% if default_image %}
+                        <img
+                          src="{{ default_image | image_url: width: 400 }}"
+                          alt="{{ text | escape }}"
+                          class="ai-diamond-shape-carousel-image-{{ ai_gen_id }}"
+                          loading="lazy"
+                          width="400"
+                          height="400"
+                        >
+                      {% endif %}
+                    </div>
+                    
+                    {% if text != blank %}
+                      <div class="ai-diamond-shape-carousel-text-{{ ai_gen_id }}">
+                        {{ text }}
+                      </div>
+                    {% endif %}
+                  </a>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <button 
+          class="ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} ai-diamond-shape-carousel-arrow-next-{{ ai_gen_id }}"
+          aria-label="Next"
+          data-direction="next"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</diamond-shape-section-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class DiamondShapeSection{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.itemsPerView = 3;
+      }
+
+      connectedCallback() {
+        this.setupHoverEffect();
+        this.setupCarousel();
+      }
+
+      setupHoverEffect() {
+        const items = this.querySelectorAll('.ai-diamond-shape-item-{{ ai_gen_id }}');
+        const previewImages = this.querySelectorAll('.ai-diamond-shape-preview-image-{{ ai_gen_id }}');
+        
+        if (items.length === 0 || previewImages.length === 0) return;
+
+        items.forEach(function(item) {
+          item.addEventListener('mouseenter', function() {
+            const index = parseInt(item.getAttribute('data-item-index'));
+            
+            previewImages.forEach(function(img) {
+              img.classList.remove('ai-diamond-shape-active-{{ ai_gen_id }}');
+            });
+            
+            if (previewImages[index]) {
+              previewImages[index].classList.add('ai-diamond-shape-active-{{ ai_gen_id }}');
+            }
+          });
+        });
+      }
+
+      setupCarousel() {
+        const track = this.querySelector('.ai-diamond-shape-carousel-track-{{ ai_gen_id }}');
+        const prevBtn = this.querySelector('.ai-diamond-shape-carousel-arrow-prev-{{ ai_gen_id }}');
+        const nextBtn = this.querySelector('.ai-diamond-shape-carousel-arrow-next-{{ ai_gen_id }}');
+        
+        if (!track || !prevBtn || !nextBtn) return;
+
+        const items = track.querySelectorAll('.ai-diamond-shape-carousel-item-{{ ai_gen_id }}');
+        if (items.length === 0) return;
+
+        const updateItemsPerView = function() {
+          if (window.innerWidth <= 749) {
+            this.itemsPerView = {{ block.settings.mobile_columns }};
+          } else if (window.innerWidth <= 989) {
+            this.itemsPerView = {{ block.settings.tablet_columns }};
+          } else {
+            this.itemsPerView = {{ block.settings.tablet_columns }};
+          }
+        }.bind(this);
+
+        const getItemWidth = function() {
+          return items[0].offsetWidth;
+        };
+
+        const getGap = function() {
+          const computedStyle = window.getComputedStyle(track);
+          return parseFloat(computedStyle.gap) || 0;
+        };
+
+        const updateCarousel = function() {
+          const itemWidth = getItemWidth();
+          const gap = getGap();
+          const offset = -(this.currentIndex * (itemWidth + gap));
+          track.style.transform = 'translateX(' + offset + 'px)';
+          this.updateArrows();
+        }.bind(this);
+
+        this.updateArrows = function() {
+          const maxIndex = Math.max(0, items.length - this.itemsPerView);
+          
+          if (this.currentIndex <= 0) {
+            prevBtn.disabled = true;
+          } else {
+            prevBtn.disabled = false;
+          }
+
+          if (this.currentIndex >= maxIndex) {
+            nextBtn.disabled = true;
+          } else {
+            nextBtn.disabled = false;
+          }
+        }.bind(this);
+
+        prevBtn.addEventListener('click', function() {
+          if (this.currentIndex > 0) {
+            this.currentIndex--;
+            updateCarousel();
+          }
+        }.bind(this));
+
+        nextBtn.addEventListener('click', function() {
+          const maxIndex = Math.max(0, items.length - this.itemsPerView);
+          if (this.currentIndex < maxIndex) {
+            this.currentIndex++;
+            updateCarousel();
+          }
+        }.bind(this));
+
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+        let startTranslate = 0;
+
+        track.addEventListener('touchstart', function(e) {
+          isDragging = true;
+          startX = e.touches[0].clientX;
+          const itemWidth = getItemWidth();
+          const gap = getGap();
+          startTranslate = -(this.currentIndex * (itemWidth + gap));
+          track.style.transition = 'none';
+        }.bind(this));
+
+        track.addEventListener('touchmove', function(e) {
+          if (!isDragging) return;
+          currentX = e.touches[0].clientX;
+          const diff = currentX - startX;
+          track.style.transform = 'translateX(' + (startTranslate + diff) + 'px)';
+        });
+
+        track.addEventListener('touchend', function(e) {
+          if (!isDragging) return;
+          isDragging = false;
+          track.style.transition = 'transform 0.3s ease';
+          
+          const diff = currentX - startX;
+          const threshold = 50;
+          const maxIndex = Math.max(0, items.length - this.itemsPerView);
+
+          if (diff > threshold && this.currentIndex > 0) {
+            this.currentIndex--;
+          } else if (diff < -threshold && this.currentIndex < maxIndex) {
+            this.currentIndex++;
+          }
+
+          updateCarousel();
+        }.bind(this));
+
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(function() {
+            updateItemsPerView();
+            this.currentIndex = Math.min(this.currentIndex, Math.max(0, items.length - this.itemsPerView));
+            updateCarousel();
+          }.bind(this), 250);
+        }.bind(this));
+
+        updateItemsPerView();
+        updateCarousel();
+      }
+    }
+
+    customElements.define('diamond-shape-section-{{ ai_gen_id }}', DiamondShapeSection{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Shop diamonds by shape",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "General"
+    },
+    {
+      "type": "richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "<p>Shop Diamonds by Shape</p>"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "tablet_columns",
+      "label": "Tablet columns",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "label": "Mobile columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Grid spacing"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Column gap",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "label": "Row gap",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Left section"
+    },
+    {
+      "type": "range",
+      "id": "vertical_gap",
+      "label": "Vertical gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Carousel arrows"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Arrow color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_border",
+      "label": "Border",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_hover_color",
+      "label": "Hover arrow color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_hover_background",
+      "label": "Hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_hover_border",
+      "label": "Hover border",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Item 1"
+    },
+    {
+      "type": "collection",
+      "id": "item_1_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_1_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_1_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_1_text",
+      "label": "Text",
+      "default": "Round"
+    },
+    {
+      "type": "header",
+      "content": "Item 2"
+    },
+    {
+      "type": "collection",
+      "id": "item_2_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_2_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_2_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_2_text",
+      "label": "Text",
+      "default": "Princess"
+    },
+    {
+      "type": "header",
+      "content": "Item 3"
+    },
+    {
+      "type": "collection",
+      "id": "item_3_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_3_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_3_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_3_text",
+      "label": "Text",
+      "default": "Cushion"
+    },
+    {
+      "type": "header",
+      "content": "Item 4"
+    },
+    {
+      "type": "collection",
+      "id": "item_4_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_4_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_4_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_4_text",
+      "label": "Text",
+      "default": "Emerald"
+    },
+    {
+      "type": "header",
+      "content": "Item 5"
+    },
+    {
+      "type": "collection",
+      "id": "item_5_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_5_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_5_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_5_text",
+      "label": "Text",
+      "default": "Oval"
+    },
+    {
+      "type": "header",
+      "content": "Item 6"
+    },
+    {
+      "type": "collection",
+      "id": "item_6_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_6_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_6_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_6_text",
+      "label": "Text",
+      "default": "Radiant"
+    },
+    {
+      "type": "header",
+      "content": "Item 7"
+    },
+    {
+      "type": "collection",
+      "id": "item_7_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_7_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_7_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_7_text",
+      "label": "Text",
+      "default": "Asscher"
+    },
+    {
+      "type": "header",
+      "content": "Item 8"
+    },
+    {
+      "type": "collection",
+      "id": "item_8_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_8_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_8_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_8_text",
+      "label": "Text",
+      "default": "Marquise"
+    },
+    {
+      "type": "header",
+      "content": "Item 9"
+    },
+    {
+      "type": "collection",
+      "id": "item_9_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_9_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_9_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_9_text",
+      "label": "Text",
+      "default": "Heart"
+    },
+    {
+      "type": "header",
+      "content": "Item 10"
+    },
+    {
+      "type": "collection",
+      "id": "item_10_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_10_default_image",
+      "label": "Default image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_10_hover_image",
+      "label": "Hover image"
+    },
+    {
+      "type": "text",
+      "id": "item_10_text",
+      "label": "Text",
+      "default": "Pear"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shop diamonds by shape"
+    }
+  ]
+}
+{% endschema %}

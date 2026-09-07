@@ -1,0 +1,40 @@
+<ul role="list" class="list-unstyled countries" id="CountryLocalizationList">
+  {%- for country in localization.available_countries -%}
+    <li class="disclosure__item" tabindex="-1">
+      <a
+        class="disclosure__link caption-large focus-inset"
+        href="#"
+        {% if country.iso_code == localization.country.iso_code %}
+          aria-current="true"
+        {% endif %}
+        data-value="{{ country.iso_code }}"
+        id="{{ country.name }}"
+      >
+        <span class="icon-flag icon-flag--{{ country.iso_code }}"></span>
+        <span class="country">{{- country.name }} </span>
+        <span class="country-code">({{ country.currency.symbol -}}{{ country.currency.iso_code }})</span>
+      </a>
+    </li>
+  {%- endfor -%}
+</ul>
+
+{% comment %} Mobile version {% endcomment %}
+<ul role="list" class="list-unstyled countries" id="MobileCountryLocalizationList">
+  {%- for country in localization.available_countries -%}
+    <li class="disclosure__item" tabindex="-1">
+      <a
+        class="disclosure__link caption-large focus-inset"
+        href="#"
+        {% if country.iso_code == localization.country.iso_code %}
+          aria-current="true"
+        {% endif %}
+        data-value="{{ country.iso_code }}"
+        id="{{ country.name }}"
+      >
+        <span class="icon-flag icon-flag--{{ country.iso_code }}"></span>
+        <span class="country">{{- country.name }} </span>
+        <span class="country-code">({{ country.currency.symbol -}}{{ country.currency.iso_code }})</span>
+      </a>
+    </li>
+  {%- endfor -%}
+</ul>

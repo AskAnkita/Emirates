@@ -1,0 +1,44 @@
+{% liquid
+  assign map = block.settings.map
+%}
+
+<div class="storeLocator__item" data-map='{{ map }}'>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.store_locator_item",
+  "settings": [
+    { "type": "textarea", "id": "map", "label": "t:settings.map" }
+  ],
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "_heading"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "spacer"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.store_locator_item"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,112 @@
+<ul class="grid grid-layout list-unstyled editorial-list lg:grid-layout--2 md:grid-layout--2 max-sm:grid-layout--1">
+  {% for collection in collections %}
+    {% liquid
+      assign current_grid_index = forloop.index0 | divided_by: 10
+      assign current_item_index = forloop.index0 | modulo: 10
+      assign pt = 0
+      assign pb = 0
+      assign pl = 0
+      assign pr = 0
+      assign pt_mb = 0
+      assign pb_mb = 0
+      assign pl_mb = 0
+      assign pr_mb = 0
+      assign mt = 0
+      assign mb = 0
+      assign ml = 0
+      assign mr = 0
+      assign mt_mb = 0
+      assign mb_mb = 0
+      assign ml_mb = 0
+      assign mr_mb = 0
+
+      case current_item_index
+        when 0
+          assign pt = 7.5
+          assign pb = 10
+          assign pl = 7
+          assign pr = 10.5
+          assign pt_mb = 3.8
+          assign pr_mb = 10.8
+        when 1
+          assign pl = 28.5
+          assign pr = 20
+          assign pt_mb = 7.5
+          assign pl_mb = 18.7
+        when 2
+          assign pt = 5
+          assign pl = 39
+          assign pt_mb = 7.7
+          assign pr_mb = 16.8
+        when 3
+          assign pb = 10
+          assign pl = 15
+          assign pr = 7
+          assign mt = -38
+          assign pt_mb = 7.5
+          assign pl_mb = 12.4
+        when 4
+          assign pt = 15
+          assign pl = 7
+          assign pr = 28.5
+          assign pt_mb = 7.5
+          assign pr_mb = 10.8
+        when 5
+          assign pt = 12
+          assign pb = 10
+          assign pl = 15.5
+          assign pr = 17.5
+          assign mt = -36.5
+          assign pt_mb = 7.5
+          assign pl_mb = 18.7
+      endcase
+    %}
+
+    <li class="grid__item editorial-item scroll-trigger animate--slide-in" style="--animation-order: {{ current_grid_index }}">
+      <div class="h-full" 
+      style="
+          --editorial-margin-top: {{ mt }}%;
+          --editorial-margin-bottom: {{ mb }}%;
+          --editorial-margin-left: {{ ml }}%;
+          --editorial-margin-right: {{ mr }}%; 
+          
+          --editorial-margin-top-mb: {{ mt_mb }}%;
+          --editorial-margin-bottom-mb: {{ mb_mb }}%;
+          --editorial-margin-left-mb: {{ ml_mb }}%;
+          --editorial-margin-right-mb: {{ mr_mb }}%; 
+          
+          --editorial-padding-top: {{ pt }}%;
+          --editorial-padding-bottom: {{ pb }}%;
+          --editorial-padding-left: {{ pl }}%;
+          --editorial-padding-right: {{ pr }}%; 
+          
+          --editorial-padding-top-mb: {{ pt_mb }}%;
+          --editorial-padding-bottom-mb: {{ pb_mb }}%;
+          --editorial-padding-left-mb: {{ pl_mb }}%;
+          --editorial-padding-right-mb: {{ pr_mb }}%;"
+        >
+        <a href="{{ collection.url }}" class="image-block image-zoomin">
+        {% render 'image',
+            image: collection.image,
+            class: 'image-block__image',
+            loading: 'lazy',
+            fetch_priority: 'high',
+            sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+            widths: '100vw, 50vw, 33vw'
+          %}
+        </a>
+        <div class="size-style spacing-style text-block max-w-full flex text-block--ARjFGSGZKWThQQk8xd__text_d7wXRd flex-column h4" style="
+            --size-style-width: fit-content;--size-style-width-tablet: fit-content;--size-style-width-mobile: fit-content; 
+            --size-style-width-mobile-min: fit-content;
+            --padding-block-start: 25px;--padding-block-end:8px;--padding-inline-start:0px;--padding-inline-end:0px;--color: var(--color-foreground);">
+            <p><strong>{{ collection.title }}</strong></p>    
+        </div>
+        <a href="{{ collection.url }}" class="size-style link link--underline" style="
+        --size-style-width: fit-content;--size-style-width-tablet: fit-content;--size-style-width-mobile: fit-content; 
+        --size-style-width-mobile-min: fit-content;
+        --button-font-size-link: clamp(1.3rem, 1.6vw, 1.6rem);--button-font-weight-link: 700;--text-wrap: pretty;--text-transform: none;--font-style: normal;
+        "><span class="text">Shop the collection</span></a>
+      </div>
+    </li>
+  {% endfor %}
+</ul>

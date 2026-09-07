@@ -1,0 +1,116 @@
+{%- capture children -%}
+  {% content_for 'blocks' %}
+{%- endcapture -%}
+
+<div
+  class="collection-header spacing-style"
+  style="  {% render 'spacing-style', settings: block.settings %}"
+>
+  {{ children }}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.collection_header",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_heading"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "_collection_header_image"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.collection_header",
+      "category": "t:categories.collections",
+      "blocks": {
+        "image": {
+          "type": "_collection_header_image",
+          "name": "Image",
+          "settings": {
+            "width": "custom",
+            "unit": "percent",
+            "custom_width": 100,
+            "custom_width_pixel": 100,
+            "width_tablet": "custom",
+            "unit_tablet": "percent",
+            "custom_width_tablet": 100,
+            "custom_width_tablet_pixel": 100,
+            "width_mobile": "custom",
+            "unit_mobile": "percent",
+            "custom_width_mobile": 100,
+            "custom_width_mobile_pixel": 100,
+          }
+        },
+        "heading": {
+          "type": "_heading",
+          "name": "Heading",
+          "settings": {
+            "text": "<h1>{{ closest.collection.title }}</h1>",
+          }
+        },
+        "text": {
+          "type": "text",
+          "name": "Description",
+          "settings": {
+            "collection_description_only": true,
+            "text": "<p>{{ closest.collection.description }}</p>"
+          }
+        }
+      },
+      "block_order": ["image", "heading", "text"]
+    }
+  ]
+}
+{% endschema %}

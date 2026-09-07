@@ -1,0 +1,125 @@
+{% assign bl_stts = block.settings %}
+{%- capture cart_product_inner_class -%}
+  cart__products-inner cart__products
+  {% if bl_stts.extend_summary == false and bl_stts.border_radius > 0 -%}
+    has-border-radius
+  {%- endif -%}
+{%- endcapture -%}
+
+{% if bl_stts.extend_summary %}
+  <div
+    class="section-background {% if bl_stts.inherit_color_scheme == false %} color-scheme-custom{% endif %}"
+    {% if bl_stts.inherit_color_scheme == false %}style="{% render 'color-scheme-style', settings: bl_stts %}"{% endif %}
+  ></div>
+{% endif %}
+<div
+  id="main-cart-products"
+  class="cart__products-container border-style{% if bl_stts.extend_summary == true %} cart__container--extend{% if bl_stts.inherit_color_scheme == false %} color-scheme-custom{% endif %}{% endif %}{% if bl_stts.border_radius > 0 %} has-border-radius{% endif %}{% if cart.empty? %} is-empty{% endif %}"
+  data-id="{{ section.id }}"
+  style="
+    {% render 'border-override', settings: bl_stts %}
+    {% if bl_stts.inherit_color_scheme == false %}
+      {% render 'color-scheme-style', settings: bl_stts %}
+    {% endif %}
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="{{ cart_product_inner_class }}">
+    {% content_for 'block', id: 'cart-product', type: '_cart-product' %}
+    {%- unless cart.empty? -%}
+      {% content_for 'block', id: 'cart-gift-card', type: '_cart-gift-card' %}
+      {% content_for 'block', id: 'cart-note', type: '_cart-note' %}
+      {% content_for 'blocks' %}
+    {%- endunless -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.cart_items",
+  "tag": null,
+  "blocks": [
+    { "type": "@app" },
+    { "type": "@theme" },
+    { "type": "spacer" },
+    { "type": "_divider" },
+    { "type": "image-with-content" }
+  ],
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "inherit_color_scheme",
+      "label": "t:settings.inherit_color_scheme",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "scheme_background",
+      "label": "t:settings.background",
+      "default": "#FFFFFF",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color_background",
+      "id": "scheme_background_gradient",
+      "label": "t:settings.background_gradient",
+      "info": "t:info.background_gradient_info",
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground_heading",
+      "label": "t:settings.headings",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_foreground",
+      "label": "t:settings.text",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary",
+      "label": "t:settings.primary_color",
+      "default": "#000F9F",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_primary_hover",
+      "label": "t:settings.primary_hover_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_border",
+      "label": "t:settings.borders",
+      "default": "#E6E6E6",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    },
+    {
+      "type": "color",
+      "id": "scheme_shadow",
+      "label": "t:settings.shadow_color",
+      "default": "#000000",
+      "alpha": true,
+      "visible_if": "{{ block.settings.inherit_color_scheme == false }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.cart_items"
+    }
+  ]
+}
+{% endschema %}

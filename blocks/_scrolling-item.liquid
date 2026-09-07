@@ -1,0 +1,23 @@
+<div class="parallax-scroll-item" {{ block.shopify_attributes }}>
+  {{ block.settings.text }}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.scrolling_item",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:settings.text",
+      "default": "Scrolling Item"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.scrolling_item",
+      "category": "t:categories.decorative"
+    }
+  ]
+}
+{% endschema %}

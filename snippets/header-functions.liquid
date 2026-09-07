@@ -1,0 +1,258 @@
+{% comment %}
+  Renders a header functions.
+
+  Accepts:
+  - enable_cart: {Boolean}
+  - enable_wishlist: {Boolean}
+
+  Usage:
+  {% render 'header-functions', enable_cart: true, enable_wishlist: true %}
+{% endcomment %}
+
+{%- liquid
+  assign actions_type = sec_stts.actions_type
+  assign gift_cards_enabled = sec_stts.gift_cards_enabled
+  assign actions_display_type = sec_stts.actions_display_type
+  assign extra_class = extra_class | default: '' | strip
+-%}
+
+{%- capture class_icon_type -%}
+    header__icon--{{ actions_type }}{% if actions_type == 'both' %} header__icon--layout-{{ actions_display_type }}{% endif %}
+{%- endcapture -%}
+
+{%- capture header_utility_custom_style -%}
+  {% if custom_header_utility %}
+    {%- render 'typography-style', settings: sec_stts, preset: 'custom', font_size: header_utility_size, font: header_utility_font, weight: header_utility_weight, line_height: header_utility_line_height, letter_spacing: header_utility_letter_spacing, case: header_utility_case, wrap: header_utility_wrap %}
+  {% endif %}
+{%- endcapture -%}
+
+{%- capture account_custom_class -%}
+  {% if custom_header_utility %} custom-typography custom-font-size{% endif %}
+{%- endcapture -%}
+
+{%- if enable_wishlist -%}
+  {% capture wishlist_icon %}
+    <svg
+      class="icon icon-heart"
+      aria-hidden="true"
+      focusable="false"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      width="16"
+      height="16"
+    >
+      {% render 'icon', icon: 'heart' %}
+    </svg>
+  {% endcapture %}
+
+  {%- assign wishlist_link = settings.link_wishlist | strip -%}
+  {%- if wishlist_link != blank -%}
+    {%- assign wishlist_href = wishlist_link -%}
+    {%- assign wishlist_disabled = false -%}
+  {%- elsif pages['wish-list'] and pages['wish-list'].url != blank -%}
+    {%- assign wishlist_href = pages['wish-list'].url -%}
+    {%- assign wishlist_disabled = false -%}
+  {%- else -%}
+    {%- assign wishlist_disabled = true -%}
+  {%- endif -%}
+
+  <a
+    {% if wishlist_disabled %}role="link" aria-disabled="true"{% else %}href="{{ wishlist_href }}"{% endif %}
+    class="
+      header__column-action header__column-action--{{ actions_type }} header__icon header-wishlist header__icon--wishlist button relative focus-inset max-md:hidden
+      {{ class_icon_type }}
+      {% if extra_class != blank %} {{ extra_class }}{% endif %}
+      {% if wishlist_disabled %} disabled{% endif %}
+    "
+    aria-label="{{ 'content.wishlist' | t }}"
+    {% if wishlist_disabled %}tabindex="-1"{% endif %}
+  >
+    <span class="svg-wrapper{% if actions_type == 'text' %} lg:none{% endif %}">
+      {{ wishlist_icon }}
+    </span>
+    {%- if actions_type == 'text' or actions_type == 'both' -%}
+      <span
+        class="
+          wishlist-text max-md:hidden
+          {% if actions_type == 'icon' %} visually-hidden{% endif %} {{ account_custom_class }}
+        "
+        style="{{ header_utility_custom_style }}"
+      >
+        {{- 'content.wishlist' | t -}}
+      </span>
+    {%- endif -%}
+
+    <div class="wishlist-count-bubble" style="display: none;">
+      <span class="text" aria-hidden="true" data-wishlist-count>0</span><span class="visually-hidden">{{ 'content.wishlist' | t }}</span>
+    </div>
+  </a>
+{%- endif -%}
+
+{%- if gift_cards_enabled -%}
+  {%- capture gift_cards_icon -%}
+    <svg class="icon icon-gift-cards" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+      {% render 'icon', icon: 'gift-cards' %}
+    </svg>
+  {%- endcapture -%}
+
+  <a
+    {% if sec_stts.link_giftcards == blank %}
+      role="link" aria-disabled="true"
+    {% else %}
+      href="{{ sec_stts.link_giftcards }}"
+    {% endif %}
+    class="
+      header__column-action header__column-action--{{ actions_type }} header__icon header__icon--giftcards
+      max-md:hidden
+      button focus-inset focus-inset
+      {{ class_icon_type }}
+      {% if extra_class != blank %} {{ extra_class }}{% endif %}
+    "
+    aria-label="{{ 'gift_cards.title' | t }}"
+  >
+    <span class="svg-wrapper{% if actions_type == 'text' %} lg:none{% endif %}">
+      {{ gift_cards_icon }}
+    </span>
+
+    {%- if actions_type == 'text' or actions_type == 'both' -%}
+      <span class="giftcards-text max-md:hidden{% if actions_type == 'icon' %} visually-hidden{% endif %} {{ account_custom_class }}" style="{{ header_utility_custom_style }}">
+        {{- 'gift_cards.title' | t -}}
+      </span>
+    {%- endif -%}
+  </a>
+{%- endif -%}
+
+{%- if enable_cart and settings.cart_type != 'none' -%}
+  {%- if settings.cart_type == 'drawer' -%}
+    <noscript>
+      <a
+        href="{{ routes.cart_url }}"
+        class="
+          header__column-action header__column-action--{{ actions_type }} header__icon button relative focus-inset cart-icon--drawer header-actions
+          {{ class_icon_type }} {%  if actions_type != 'text' %} header__icon--cart{% endif %}
+          {% if extra_class != blank %} {{ extra_class }}{% endif %}
+        "
+        aria-label="{{ 'content.cart_count' | t: count: cart.item_count }}"
+      >
+        {%- if actions_type == 'icon' or actions_type == 'both' -%}
+          <span class="svg-wrapper">
+            {{ 'icon-cart.svg' | inline_asset_content }}
+          </span>
+        {%- endif -%}
+
+        {%- if actions_type == 'text' or actions_type == 'both' -%}
+          <span class="cart-text max-md:hidden{% if actions_type == 'icon' %} visually-hidden{% endif %} {{ account_custom_class }}" style="{{ header_utility_custom_style }}">
+            {{- 'content.cart_title' | t -}}
+
+             <span aria-hidden="true" data-cart-count>
+              {%- if cart.item_count < 100 -%}
+                ({{ cart.item_count }})
+              {%- else -%}
+                ({{ 'content.cart_count_max.more' | t }})
+              {%- endif -%}
+            </span>
+            <span class="visually-hidden" data-cart-text>{{ 'content.cart_count' | t: count: cart.item_count }}</span>
+          </span>
+        {%- endif -%}
+        {%- if cart != empty and actions_type != 'text' -%}
+          <div class="cart-count-bubble">
+            <span aria-hidden="true" data-cart-count>
+              {%- if cart.item_count < 100 -%}
+                {{ cart.item_count }}
+              {%- else -%}
+                {{ 'content.cart_count_max.more' | t }}
+              {%- endif -%}
+            </span>
+            <span class="visually-hidden" data-cart-text>{{ 'content.cart_count' | t: count: cart.item_count }}</span>
+          </div>
+        {%- endif -%}
+      </a>
+    </noscript>
+    <side-drawer-opener
+      class="no-js-hidden header__column-action header__column-action--{{ actions_type }} header-actions{% if extra_class != blank %} {{ extra_class }}{% endif %}"
+      data-side-drawer="#Cart-Drawer"
+    >
+      <button
+        class="header__icon button relative focus-inset cart-icon--drawer
+        {{ class_icon_type }}{%  if actions_type != 'text' %} header__icon--cart{% endif %}{% if extra_class != blank %} {{ extra_class }}{% endif %}"
+        type="button"
+        aria-haspopup="dialog"
+        aria-label="{{ 'content.cart_count' | t: count: cart.item_count }}"
+        id="cart-icon-bubble"
+      >
+        <span class="svg-wrapper{% if actions_type == 'text' %} lg:none{% endif %}">
+          {{ 'icon-cart.svg' | inline_asset_content }}
+        </span>
+
+        {%- if actions_type == 'text' or actions_type == 'both' -%}
+          <span class="cart-text max-md:hidden{% if actions_type == 'icon' %} visually-hidden{% endif %} {{ account_custom_class }}" style="{{ header_utility_custom_style }}">
+            {{- 'content.cart_title' | t -}}
+            <span aria-hidden="true" data-cart-count>
+              &nbsp;
+              {%- if cart.item_count < 100 -%}
+                ({{ cart.item_count }})
+              {%- else -%}
+                ({{ 'content.cart_count_max.more' | t }})
+              {%- endif -%}
+            </span>
+            <span class="visually-hidden" data-cart-text>{{ 'content.cart_count' | t: count: cart.item_count }}</span>
+          </span>
+        {%- endif -%}
+
+        {%- if cart != empty and actions_type != 'text' -%}
+          <div class="cart-count-bubble">
+            <span aria-hidden="true" data-cart-count>
+              {%- if cart.item_count < 100 -%}
+                {{ cart.item_count }}
+              {%- else -%}
+                {{ 'content.cart_count_max.more' | t }}
+              {%- endif -%}
+            </span>
+            <span class="visually-hidden" data-cart-text>{{ 'content.cart_count' | t: count: cart.item_count }}</span>
+          </div>
+        {%- endif -%}
+      </button>
+    </side-drawer-opener>
+  {%- elsif settings.cart_type == 'page' -%}
+    <a
+      href="{{ routes.cart_url }}"
+      class="
+        header__column-action header__column-action--{{ actions_type }} header__icon button relative focus-inset cart-icon--drawer header-actions
+        {{ class_icon_type }} {%  if actions_type != 'text' %} header__icon--cart{% endif %}
+        {% if extra_class != blank %} {{ extra_class }}{% endif %}
+      "
+      id="cart-icon-bubble"
+      aria-label="{{ 'content.cart_count' | t: count: cart.item_count }}"
+    >
+      <span class="svg-wrapper{% if actions_type == 'text' %} lg:none{% endif %}">
+        {{ 'icon-cart.svg' | inline_asset_content }}
+      </span>
+
+      {%- if actions_type == 'text' or actions_type == 'both' -%}
+        <span class="cart-text max-md:hidden{% if actions_type == 'icon' %} visually-hidden{% endif %} {{ account_custom_class }}" style="{{ header_utility_custom_style }}">
+          {{- 'content.cart_title' | t -}}
+           <span aria-hidden="true" data-cart-count>
+              {%- if cart.item_count < 100 -%}
+                ({{ cart.item_count }})
+              {%- else -%}
+                ({{ 'content.cart_count_max.more' | t }})
+              {%- endif -%}
+            </span>
+          <span class="visually-hidden" data-cart-text>{{ 'content.cart_count' | t: count: cart.item_count }}</span>
+        </span>
+      {%- endif -%}
+      {%- if cart != empty and actions_type != 'text' -%}
+        <div class="cart-count-bubble">
+          <span aria-hidden="true" data-cart-count>
+            {%- if cart.item_count < 100 -%}
+              {{ cart.item_count }}
+            {%- else -%}
+              {{ 'content.cart_count_max.more' | t }}
+            {%- endif -%}
+          </span>
+          <span class="visually-hidden" data-cart-text>{{ 'content.cart_count' | t: count: cart.item_count }}</span>
+        </div>
+      {%- endif -%}
+    </a>
+  {%- endif -%}
+{%- endif -%}

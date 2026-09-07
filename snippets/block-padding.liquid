@@ -1,0 +1,15 @@
+{%- comment -%}
+  Intended for blocks and sections that provide values for all the referenced settings.
+
+  <div style="{%  render 'spacing-padding', settings: section.settings %}">
+
+   Accepts:
+      settings: {block.settings || section.settings}
+{%- endcomment -%}
+{%- capture padding_style -%}
+  --pt: clamp(0px, {{ settings.padding_top | default: 0 }}px, var(--padding-sm));
+  --pb: clamp(0px, {{ settings.padding_bottom | default: 0 }}px, var(--padding-sm));
+  --pl: clamp(0px, {{ settings.padding_left | default: 0 }}px, var(--padding-sm));
+  --pr: clamp(0px, {{ settings.padding_right | default: 0 }}px, var(--padding-sm));
+{%- endcapture -%}
+{{- padding_style | strip | strip_newlines -}}

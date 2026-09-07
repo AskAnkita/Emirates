@@ -1,0 +1,50 @@
+<side-drawer-opener
+  class="product-popup-modal__opener quick-add-hidden no-js-hidden"
+  data-side-drawer="#PopupModal-{{ block.id }}"
+  {{ block.shopify_attributes }}
+>
+  <button
+    id="ProductPopup-{{ block.id }}"
+    class="product-popup-modal__button link"
+    type="button"
+    aria-haspopup="dialog"
+  >
+    {{ block.settings.text | default: block.settings.page.title | escape }}
+  </button>
+</side-drawer-opener>
+
+<side-drawer
+  class="product-popup-modal drawer fixed top-0 left-0 z-9 w-screen h-full flex justify-center no-js-hidden"
+  element-s-popup
+  id="PopupModal-{{ block.id }}"
+>
+  <div id="Drawer-Overlay-Product-Popup" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <div
+    class="popup__inner product-popup-modal__content w-auto h-full md:h-auto absolute-c-c flex flex-column global-settings-popup"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ block.settings.text }}"
+    tabindex="-1"
+    style="--modal-max-height: 85dvh;"
+  >
+    <div class="w-full h-full overflow-auto cus-scrollbar" style="--p: 1rem;">
+      <div class="drawer__header flex justify-end items-center relative"
+        style="--gap-x: 2rem; --p: 1.5rem 0;"
+      >
+        <button 
+          class="drawer__close block t-button bor-none rounded-full cursor-pointer" 
+          type="button" 
+          onclick="this.closest('side-drawer').close()" 
+          aria-label="{{ 'accessibility.close_dialog' | t }}"
+          style="--top: 0.3rem; --right: 0.3rem;"
+        >
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </button>
+      </div>
+      <div class="product-popup-modal__content-info">
+        <h1 class="h2">{{ block.settings.page.title | escape }}</h1>
+        {{ block.settings.page.content }}
+      </div>
+    </div>
+  </div>
+</side-drawer>

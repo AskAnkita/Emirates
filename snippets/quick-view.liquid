@@ -1,0 +1,15 @@
+<quick-view-modal class="quick-view-modal modal--popup fixed top-0 left-0 z-9 w-screen h-full flex justify-center no-js-hidden" id="QuickViewStandard">
+  <div id="Modal-Overlay" class="drawer__overlay fixed inset-0 cursor-pointer"></div>
+  <div class="popup__inner quick-view-modal__content w-auto h-full absolute-c-c flex flex-column global-settings-popup" role="dialog" aria-modal="true" aria-label="{{ 'products.product.choose_product_options' | t: product_name: product.title | escape }}" tabindex="-1" style="--modal-max-height: 85dvh;">
+    <button 
+      class="quick-view-modal__toggle drawer__close block t-button bor-none rounded-full cursor-pointer" 
+      type="button" 
+      onclick="this.closest('quick-view-modal').hide()" 
+      aria-label="{{ 'accessibility.close_dialog' | t }}"
+      style="--top: 0.3rem; --right: 0.3rem;"
+    >
+      {{- 'icon-close.svg' | inline_asset_content -}}
+    </button>
+    <div id="QuickViewModal" class="quick-view-modal__content-info cus-scrollbar"></div>
+  </div>
+</quick-view-modal>

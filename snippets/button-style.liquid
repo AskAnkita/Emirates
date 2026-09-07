@@ -1,0 +1,114 @@
+{%- comment -%}
+  Intended for blocks and sections that provide values for all the referenced settings.
+
+  <div class="button-style" style="{%  render 'button-style', settings: section.settings %}">
+
+   Accepts:
+      settings: {settings || section.settings}
+{%- endcomment -%}
+{%- liquid
+  assign style_class = style_class | default: settings.style_class
+  assign button_style = button_style | default: settings.button_style
+  assign button_border_width = button_border_width | default: settings.button_border_width
+  assign button_border_radius = button_border_radius | default: settings.button_border_radius
+  assign button_type_font = button_type_font | default: settings.button_type_font
+  assign button_type_size = button_type_size | default: settings.button_type_size
+  assign button_type_line_height = button_type_line_height | default: settings.button_type_line_height
+  assign button_font_weight = button_font_weight | default: settings.button_font_weight
+  assign button_text_case = button_text_case | default: settings.button_text_case
+  assign button_type_alignment = button_type_alignment | default: settings.button_type_alignment
+  assign buttons_shadow_horizontal_offset = buttons_shadow_horizontal_offset | default: settings.buttons_shadow_horizontal_offset
+  assign buttons_shadow_vertical_offset = buttons_shadow_vertical_offset | default: settings.buttons_shadow_vertical_offset
+  assign buttons_shadow_blur = buttons_shadow_blur | default: settings.buttons_shadow_blur
+  assign width = width | default: settings.width
+  assign buttons_padding_vertical = buttons_padding_vertical | default: settings.buttons_padding_vertical
+  assign buttons_padding_horizontal = buttons_padding_horizontal | default: settings.buttons_padding_horizontal
+  assign width_mobile = width_mobile | default: settings.width_mobile
+  assign buttons_padding_vertical_mobile = buttons_padding_vertical_mobile | default: settings.buttons_padding_vertical_mobile
+  assign buttons_padding_horizontal_mobile = buttons_padding_horizontal_mobile | default: settings.buttons_padding_horizontal_mobile
+  assign button_type_size_link = button_type_size_link | default: settings.button_type_size_link
+  assign button_font_weight_link = button_font_weight_link | default: settings.button_font_weight_link
+  assign custom_color_underline = custom_color_underline | default: settings.custom_color_underline
+  assign link_underline_color = link_underline_color | default: settings.link_underline_color
+  assign link_underline_width = link_underline_width | default: settings.link_underline_width
+-%}
+
+{%- capture button -%}
+  {%- if button_style == 'custom' -%}
+    {%- if button_border_width -%}
+      --button-border-width: {{ button_border_width | divided_by: 10.0 }}rem;
+    {%- endif -%}
+    {%- if button_border_radius -%}
+      --button-border-radius: {{ button_border_radius | divided_by: 10.0 }}rem;
+    {%- endif -%}
+    {%- if button_type_font -%}
+      --button-font-family: {{ button_type_font }};
+    {%- endif -%}
+    {%- if button_type_size -%}
+      --button-font-size: {{ button_type_size }};
+    {%- endif -%}
+    {%- if button_type_line_height -%}
+      --button-font-line-height: var(--line-height--body-{{ button_type_line_height }});
+    {%- endif -%}
+    {%- if button_font_weight -%}
+      --button-font-weight: {{ button_font_weight }};
+    {%- endif -%}
+    {%- if button_text_case -%}
+      --button-text-case: {{ button_text_case }};
+    {%- endif -%}
+    {%- if button_type_alignment -%}
+      --text-align: {{ button_type_alignment }};
+    {%- endif -%}
+    {%- if buttons_shadow_horizontal_offset -%}
+      --shadow-horizontal-offset: {{ buttons_shadow_horizontal_offset | divided_by: 10.0 }}rem;
+    {%- endif -%}
+    {%- if buttons_shadow_vertical_offset -%}
+      --shadow-vertical-offset: {{ buttons_shadow_vertical_offset | divided_by: 10.0 }}rem;
+    {%- endif -%}
+    {%- if buttons_shadow_blur -%}
+      --shadow-blur-radius: {{ buttons_shadow_blur | divided_by: 10.0 }}rem;
+    {%- endif -%}
+  {%- endif -%}
+  {%- if width == 'custom' -%}
+    {%- if buttons_padding_vertical -%}
+      --button-padding-vertical: {{ buttons_padding_vertical | divided_by: 10.0 }}rem;
+    {%- endif -%}
+    {%- if buttons_padding_horizontal -%}
+      --button-padding-horizontal: {{ buttons_padding_horizontal | divided_by: 10.0 }}rem;
+    {%- endif -%}
+  {%- endif -%}
+  {%- if width_mobile == 'custom' -%}
+    {%- if buttons_padding_vertical_mobile -%}
+      --button-padding-vertical-mobile: {{ buttons_padding_vertical_mobile | divided_by: 10.0 }}rem;
+    {%- endif -%}
+    {%- if buttons_padding_horizontal_mobile -%}
+      --button-padding-horizontal-mobile: {{ buttons_padding_horizontal_mobile | divided_by: 10.0 }}rem;
+    {%- endif -%}
+  {%- endif -%}
+  {%- if style_class == 'link' -%}
+    {%- if button_type_size_link -%}
+      {%- liquid
+        assign button_type_size_link = button_type_size_link | split: 'rem' | first | times: 1.0
+        assign font_size_cutoff = 4.8
+        if button_type_size_link < font_size_cutoff
+          assign fluid_size_min_rem = button_type_size_link | plus: 1 | times: 0.5
+        else
+          assign fluid_size_min_rem = button_type_size_link | times: 0.5
+        endif
+        assign fluid_size = button_type_size_link
+        assign fluid_size_max_rem = button_type_size_link
+      -%}
+      --button-font-size-link: clamp({{fluid_size_min_rem}}rem, {{fluid_size}}vw, {{fluid_size_max_rem}}rem);
+    {%- endif -%}
+    {%- if button_font_weight_link -%}
+      --button-font-weight-link: {{ button_font_weight_link }};
+    {%- endif -%}
+    {%- if custom_color_underline and link_underline_color -%}
+      --link-underline-color: rgb({{ link_underline_color.rgba }});
+      {%- if link_underline_width -%}
+      --link-underline-width: {{ link_underline_width | append: 'px' }}; 
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endcapture -%}
+{{- button | strip | strip_newlines -}}

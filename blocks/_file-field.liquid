@@ -1,0 +1,44 @@
+{%- liquid
+  assign property_id = product.id | append: block.settings.heading | handleize
+  assign property_name = block.settings.heading | escape
+-%}
+{% if block.settings.heading != blank %}
+  <div class="product-form__input file-field">
+    <label for="{{ property_id }}" class="form-label form__label" style="margin-bottom: {{ block.settings.gap }}px;">{{ property_name }}</label>
+    <input id="{{ property_id }}" type="file" accept="image/*" name="properties[{{ property_name }}]" class="form__input form-input">
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:names.file_option",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.option_name",
+      "default": "Input file",
+      "info": "Option name is unique"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:settings.gap",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.file_option"
+    }
+  ]
+}
+{% endschema %}
+
+  
+  

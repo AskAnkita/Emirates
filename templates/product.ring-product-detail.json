@@ -5287,11 +5287,11 @@
             "custom_width_mobile": 100,
             "height": "fill",
             "custom_height": 100,
-            "inherit_color_scheme": true,
+            "inherit_color_scheme": false,
             "scheme_background": "#ffffff",
             "scheme_background_gradient": "",
-            "scheme_foreground_heading": "#000000",
-            "scheme_foreground": "#000000",
+            "scheme_foreground_heading": "#ffffff",
+            "scheme_foreground": "#ffffff",
             "scheme_primary": "#000f9f",
             "scheme_primary_hover": "#000000",
             "scheme_border": "#e6e6e6",
@@ -5340,7 +5340,7 @@
             "text_nBTYhc": {
               "type": "text",
               "settings": {
-                "text": "<h2 style=\"color:#ffffff;\">Signature Collections</h2><h4 style=\"color:#ffffff;\">Every detail matters</h4><p style=\"color:#ffffff;\">Hand-set by master jewellers with the world's finest diamonds — designs made to be worn for a lifetime, and passed on.</p>",
+                "text": "<h2>Signature Collections</h2><h4>Every detail matters</h4><p>Hand-set by master jewellers with the world's finest diamonds — designs made to be worn for a lifetime, and passed on.</p>",
                 "collection_description_only": false,
                 "collapse_text": false,
                 "typing_text": false,
@@ -5509,7 +5509,7 @@
         "gradient_direction": "to top",
         "image_behavior": "none",
         "padding-block-start": 0,
-        "padding-block-end": 60,
+        "padding-block-end": 0,
         "padding-inline-start": 0,
         "padding-inline-end": 0
       }

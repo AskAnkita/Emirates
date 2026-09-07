@@ -5750,6 +5750,7 @@
                   "name": "t:names.image",
                   "settings": {
                     "image": "shopify://shop_images/4394e38b-127f-43d7-b0e7-37e917679def_a149afd7-ab99-428f-a17d-9c53f2addc10.png",
+                    "hover_image": "shopify://shop_images/02ff384e-410a-4523-bd80-4e1ddf677833.png",
                     "link": "shopify://collections/engagement-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -6150,7 +6151,8 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Nature_Inspired_Rings.png",
+                    "image": "shopify://shop_images/fef76010-ba6a-484f-b184-d28944043e0d.png",
+                    "hover_image": "shopify://shop_images/fef76010-ba6a-484f-b184-d28944043e0d.png",
                     "link": "shopify://collections/engagement-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -6350,7 +6352,8 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Solitaire_Rings.png",
+                    "image": "shopify://shop_images/4a9c1872-4fd1-4b7d-9989-1dd165e16976-2.png",
+                    "hover_image": "shopify://shop_images/b11cb74a-28b1-43ce-b752-123375e83274.png",
                     "link": "shopify://collections/engagement-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",

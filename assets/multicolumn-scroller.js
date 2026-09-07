@@ -2,24 +2,25 @@
  * <multicolumn-scroller>
  * Drives the prev/next arrows for a multicolumn grid that has switched to a
  * single-row horizontal scroller (`.grid-layout--overflow-scroll`).
- * The scrolling itself is native overflow; this only wires the arrow buttons
- * and hides them when there is nothing to scroll.
+ *
+ * The arrows are the theme's default carousel buttons (`swiper-button` snippet).
+ * Since this is native overflow scrolling and not a Swiper instance, this
+ * element wires the clicks/keyboard and toggles `swiper-button-disabled`
+ * itself, mirroring what Swiper would normally do.
  */
 if (!customElements.get('multicolumn-scroller')) {
   class MulticolumnScroller extends HTMLElement {
     connectedCallback() {
       this.scroller = this.querySelector('.grid-layout--overflow-scroll');
-      this.prevButton = this.querySelector('[data-scroll-prev]');
-      this.nextButton = this.querySelector('[data-scroll-next]');
+      this.prevButton = this.querySelector('.swiper-button-prev');
+      this.nextButton = this.querySelector('.swiper-button-next');
 
       if (!this.scroller || !this.prevButton || !this.nextButton) return;
 
-      this.update = this.update.bind(this);
-      this.onPrev = () => this.scrollByPage(-1);
-      this.onNext = () => this.scrollByPage(1);
+      this.setupButton(this.prevButton, this.dataset.prevLabel || 'Previous', () => this.scrollByPage(-1));
+      this.setupButton(this.nextButton, this.dataset.nextLabel || 'Next', () => this.scrollByPage(1));
 
-      this.prevButton.addEventListener('click', this.onPrev);
-      this.nextButton.addEventListener('click', this.onNext);
+      this.update = this.update.bind(this);
       this.scroller.addEventListener('scroll', this.update, { passive: true });
       window.addEventListener('resize', this.update);
 
@@ -27,10 +28,21 @@ if (!customElements.get('multicolumn-scroller')) {
     }
 
     disconnectedCallback() {
-      this.prevButton?.removeEventListener('click', this.onPrev);
-      this.nextButton?.removeEventListener('click', this.onNext);
       this.scroller?.removeEventListener('scroll', this.update);
       window.removeEventListener('resize', this.update);
+    }
+
+    setupButton(button, label, onActivate) {
+      button.setAttribute('role', 'button');
+      button.setAttribute('tabindex', '0');
+      button.setAttribute('aria-label', label);
+      button.addEventListener('click', onActivate);
+      button.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+          event.preventDefault();
+          onActivate();
+        }
+      });
     }
 
     step() {
@@ -53,8 +65,8 @@ if (!customElements.get('multicolumn-scroller')) {
       const hasOverflow = maxScroll > 1;
 
       this.classList.toggle('multicolumn-scroller--no-nav', !hasOverflow);
-      this.prevButton.disabled = !hasOverflow || scrollLeft <= 1;
-      this.nextButton.disabled = !hasOverflow || scrollLeft >= maxScroll - 1;
+      this.prevButton.classList.toggle('swiper-button-disabled', !hasOverflow || scrollLeft <= 1);
+      this.nextButton.classList.toggle('swiper-button-disabled', !hasOverflow || scrollLeft >= maxScroll - 1);
     }
   }
 

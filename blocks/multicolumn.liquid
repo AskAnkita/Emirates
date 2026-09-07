@@ -27,9 +27,10 @@
   endif
 
   assign grid_overflow_scroll = false
-  if block.settings.layout_type == 'grid' and show_mobile_slider == false and block.blocks.size > columns_desktop
+  if block.settings.layout_type == 'grid' and show_mobile_slider == false and block.blocks.size > columns_tablet
     assign grid_overflow_scroll = true
   endif
+  assign overflow_cols_mobile = mobile_columns | plus: 0.2
 
   assign enable_navigation = false
   if block.settings.navigation == 'arrows-pagination' or block.settings.navigation == 'arrows'
@@ -61,7 +62,11 @@
     {% when 'grid' %}
       <div class="collection--grid-layout w-full block">
         {%- if grid_overflow_scroll -%}
-          <multicolumn-scroller class="multicolumn-scroller">
+          <multicolumn-scroller
+            class="multicolumn-scroller"
+            data-prev-label="{{ 'content.slider.previous_slide' | t | escape }}"
+            data-next-label="{{ 'content.slider.next_slide' | t | escape }}"
+          >
         {%- endif -%}
         {%- if show_mobile_slider -%}
           <swiper-component
@@ -97,7 +102,7 @@
           class="grid grid-layout list-unstyled{% if show_mobile_slider %} swiper-wrapper md:grid{% endif %}{% if grid_overflow_scroll %} grid-layout--overflow-scroll{% endif %} lg:grid-layout--{{ columns_desktop }} md:grid-layout--{{ columns_tablet }} max-sm:grid-layout--{{ mobile_columns }}"
           role="list"
           aria-label="{{ 'content.grid.name' | t }}"
-          style="--grid-desktop-horizontal-spacing: {{ block.settings.column_gap }}px; --grid-desktop-vertical-spacing: {{ block.settings.vertical_gap }}px;{% if grid_overflow_scroll %} --overflow-cols-tablet: {{ columns_tablet }}; --overflow-cols-desktop: {{ columns_desktop }};{% endif %}"
+          style="--grid-desktop-horizontal-spacing: {{ block.settings.column_gap }}px; --grid-desktop-vertical-spacing: {{ block.settings.vertical_gap }}px;{% if grid_overflow_scroll %} --overflow-cols-mobile: {{ overflow_cols_mobile }}; --overflow-cols-tablet: {{ columns_tablet }}; --overflow-cols-desktop: {{ columns_desktop }};{% endif %}"
         >
           {{- list_items -}}
         </ul>
@@ -114,12 +119,9 @@
           </swiper-component>
         {%- endif -%}
         {%- if grid_overflow_scroll -%}
-            <button type="button" class="multicolumn-scroller__btn multicolumn-scroller__btn--prev" aria-label="{{ 'content.slider.previous_slide' | t }}" data-scroll-prev disabled>
-              <span class="svg-wrapper">{%- render 'icon-arrow' -%}</span>
-            </button>
-            <button type="button" class="multicolumn-scroller__btn multicolumn-scroller__btn--next" aria-label="{{ 'content.slider.next_slide' | t }}" data-scroll-next>
-              <span class="svg-wrapper">{%- render 'icon-arrow' -%}</span>
-            </button>
+            <div class="swiper-btns-wrap swiper-btns-wrap--outside" style="--arrow-position-outside: -24px;">
+              {%- render 'swiper-button', class_prev: 'swiper-button-disabled' -%}
+            </div>
           </multicolumn-scroller>
           <script src="{{ 'multicolumn-scroller.js' | asset_url }}" defer="defer"></script>
         {%- endif -%}

@@ -3070,7 +3070,7 @@
             "column_gap": 14,
             "gap": 16,
             "loop": false,
-            "navigation": "arrows-pagination",
+            "navigation": "arrows",
             "pagination_type": "dynamic",
             "dots_top_offset": 40,
             "progress_top_offset": 40,
@@ -5216,9 +5216,9 @@
         "multicolumn_A8DFEi": {
           "type": "multicolumn",
           "settings": {
-            "layout_type": "carousel",
-            "carousel_on_mobile": true,
-            "columns_grid": 3,
+            "layout_type": "grid",
+            "carousel_on_mobile": false,
+            "columns_grid": 6,
             "columns_carousel": 6,
             "tablet_columns_grid": 3,
             "mobile_columns_grid": "2",
@@ -6497,7 +6497,7 @@
         "horizontal_alignment_flex_direction_column": "center",
         "vertical_alignment_flex_direction_column": "flex-start",
         "gap": 20,
-        "section_width": "page-width",
+        "section_width": "full-width",
         "page_width_custom": 1820,
         "section_height": "",
         "section_height_custom": 50,
@@ -6518,8 +6518,8 @@
         "image_behavior": "none",
         "padding-block-start": 90,
         "padding-block-end": 4,
-        "padding-inline-start": 0,
-        "padding-inline-end": 0
+        "padding-inline-start": 12,
+        "padding-inline-end": 12
       }
     },
     "featured_collection_list_YeVaRD": {

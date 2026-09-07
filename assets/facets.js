@@ -42,6 +42,28 @@ class FacetFiltersForm extends HTMLElement {
     });
   }
 
+  // Freeze the mobile filter drawer (veil + block input + centered spinner)
+  // while a filter request is in flight, so the shopper can't change anything
+  // until the response has been applied.
+  static toggleMobileFacetsLoading(loading = true) {
+    const mobileForm = document.getElementById('FacetFiltersFormMobile');
+    if (!mobileForm) return;
+    mobileForm.classList.toggle('mobile-facets--loading', loading);
+    mobileForm.toggleAttribute('aria-busy', loading);
+
+    let overlay = mobileForm.querySelector(':scope > .mobile-facets__loading');
+    if (loading) {
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'mobile-facets__loading';
+        overlay.innerHTML = '<span class="mobile-facets__loading-spinner" aria-hidden="true"></span>';
+        mobileForm.appendChild(overlay);
+      }
+    } else if (overlay) {
+      overlay.remove();
+    }
+  }
+
   static renderPage(searchParams, event, updateURLHash = true) {
     FacetFiltersForm.searchParamsPrev = searchParams;
     const sections = FacetFiltersForm.getSections();
@@ -51,6 +73,7 @@ class FacetFiltersForm extends HTMLElement {
       '.product-count .loading__spinner, .product-grid-container .loading__spinner'
     );
     loadingSpinners.forEach((spinner) => spinner.classList.remove('hidden'));
+    FacetFiltersForm.toggleMobileFacetsLoading(true);
     document.getElementById('ProductGridContainer').querySelector('.collection').classList.add('loading');
     if (countContainer) {
       countContainer.classList.add('loading');
@@ -83,7 +106,8 @@ class FacetFiltersForm extends HTMLElement {
         FacetFiltersForm.renderProductPerPage();
         FacetFiltersForm.clickGridView(html);
         if (typeof initializeScrollAnimationTrigger === 'function') initializeScrollAnimationTrigger(html.innerHTML);
-      });
+      })
+      .finally(() => FacetFiltersForm.toggleMobileFacetsLoading(false));
   }
 
   static renderSectionFromCache(filterDataUrl, event) {
@@ -94,6 +118,7 @@ class FacetFiltersForm extends HTMLElement {
     FacetFiltersForm.renderProductPerPage();
     FacetFiltersForm.clickGridView(html);
     if (typeof initializeScrollAnimationTrigger === 'function') initializeScrollAnimationTrigger(html.innerHTML);
+    FacetFiltersForm.toggleMobileFacetsLoading(false);
   }
 
   static renderProductGridContainer(html) {
@@ -282,7 +307,7 @@ class FacetFiltersForm extends HTMLElement {
   }
 
   static renderAdditionalElements(html) {
-    const mobileElementSelectors = ['.mobile-facets__open', '.mobile-facets__count', '.sorting'];
+    const mobileElementSelectors = ['.mobile-facets__open', '.mobile-facets__count', '.sorting', '.mobile-facets__apply-btn'];
 
     mobileElementSelectors.forEach((selector) => {
       if (!html.querySelector(selector)) return;

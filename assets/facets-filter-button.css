@@ -44,10 +44,16 @@
   }
 }
 
-/* Left slot: the Filter button */
+/* Left slot: the Filter button — nudged in from the grid gutter */
 .facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper {
   order: -1;
   flex: 0 0 auto;
+  margin-inline-start: 0.8rem;
+}
+@media screen and (min-width: 750px) {
+  .facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper {
+    margin-inline-start: 2.4rem;
+  }
 }
 
 /* Right slot: the sort form. The theme forces this to width:100% on >=750px,
@@ -129,12 +135,12 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 .facets-block-wrapper--horizontal .mobile-facets__open,
 .facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field > div {
   box-sizing: border-box;
-  min-height: 5.2rem;
+  min-height: 4rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0 2.2rem;
-  font-size: 1.4rem;
+  gap: 0.8rem;
+  padding: 0 1.6rem;
+  font-size: 1.3rem;
   line-height: 1;
   white-space: nowrap;
 }
@@ -158,8 +164,8 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 }
 .facets-block-wrapper--horizontal .mobile-facets__open .svg-wrapper {
   order: 2;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.4rem;
+  height: 1.4rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -259,7 +265,7 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
    controls out as an equal-width pair:  [ CLEAR ALL ] [ VIEW N ITEMS ]. */
 .facets-block-wrapper--horizontal .mobile-facets__footer {
   bottom: 0;
-  padding: 1.6rem 2rem calc(1.8rem + env(safe-area-inset-bottom, 0px));
+  padding: 1.6rem 2.4rem calc(1.8rem + env(safe-area-inset-bottom, 0px));
   gap: 1.2rem;
   align-items: stretch;
 }
@@ -309,9 +315,21 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary:hover {
-  background: #264c40;
-  border-color: #264c40;
+/* hover / focus / disabled: the theme flips the primary button to a light
+   grey but keeps the label white, so it becomes unreadable. Force a dark,
+   legible label whenever the background is light. */
+.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary:hover,
+.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary:focus-visible,
+.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary[disabled],
+.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary[aria-disabled='true'] {
+  opacity: 1;
+  background: #ededed;
+  border-color: #d6d6d6;
+  color: #1a1a1a;
+}
+.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary:hover *,
+.facets-block-wrapper--horizontal .mobile-facets__footer .button--primary:focus-visible * {
+  color: inherit;
 }
 .facets-block-wrapper--horizontal .mobile-facets__main .mobile-facets__summary {
   padding-block: 1.9rem;
@@ -333,16 +351,20 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
   padding-bottom: 1.6rem;
 }
 
-/* The accordion JS (AccordionCustom.transition) freezes an inline pixel
-   `height` on the open <details> and on .details-content, taken from a
-   scrollHeight snapshot before layout has settled. Paired with
-   `.details-content { overflow: clip }`, that slices the last control off
-   (e.g. the price "Apply" button) and lets the next section ride up over
-   it. Let an open panel size to its real content instead. */
+/* The accordion JS (AccordionCustom.transition) drives the open/close with
+   inline styles from a Motion timeline: a frozen pixel `height` on the
+   <details> + `.details-content`, plus `opacity` / `transform` on the
+   content. After an AJAX re-render those inline values can be left behind
+   mid-flight — a fixed height that clips content, or opacity:0 / a Y-offset
+   that leaves the panel present but invisible (a blank gap before the next
+   section). Force an open panel to simply show its real content. */
 .facets-block-wrapper--horizontal .mobile-facets__main accordion-custom > details[open],
 .facets-block-wrapper--horizontal .mobile-facets__main details[open] > .mobile-facets__submenu {
   height: auto !important;
   overflow: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
 }
 
 /* the price block has no Apply button (it auto-applies) — just give the
@@ -365,6 +387,9 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
   margin-left: 0;
   margin-right: auto;
   border-width: 0 0.1rem 0 0;
+  /* roomier side gutters for the drawer header, section rows and panels
+     (the theme's default sits too tight against the edge) */
+  --facets-inner-padding-inline: 2.4rem;
 }
 .js .facets-block-wrapper--horizontal .disclosure-has-popup:not(.menu-opening) .mobile-facets__inner {
   transform: translateX(-100%);
@@ -398,4 +423,56 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 
 @media (prefers-reduced-motion: reduce) {
   .facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-opening * { animation: none !important; }
+}
+
+/* --------------------------------------------------------------------------
+   Filtering in progress — freeze the drawer until the response is applied.
+   JS (FacetFiltersForm.toggleMobileFacetsLoading) adds `.mobile-facets--loading`
+   to #FacetFiltersFormMobile and injects `.mobile-facets__loading` (which
+   holds `.mobile-facets__loading-spinner`) as a direct child for the life of
+   the request. The overlay is a child of the fixed form, not of the
+   scrolling panel, so the spinner stays centered no matter the scroll pos.
+   -------------------------------------------------------------------------- */
+.facets-block-wrapper--horizontal .mobile-facets--loading .mobile-facets__inner {
+  pointer-events: none;
+}
+.facets-block-wrapper--horizontal .mobile-facets__loading {
+  position: absolute;
+  inset: 0 auto 0 0;
+  /* match .mobile-facets__inner's width so the veil covers exactly the panel */
+  width: min(calc(100% - 5rem), 37.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  pointer-events: auto;
+  cursor: wait;
+}
+@media screen and (min-width: 1025px) {
+  .facets-block-wrapper--horizontal .mobile-facets__loading {
+    width: 52rem;
+  }
+}
+/* the veil itself, kept separate so the spinner stays fully opaque */
+.facets-block-wrapper--horizontal .mobile-facets__loading::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-background, #fff);
+  opacity: 0.6;
+}
+.facets-block-wrapper--horizontal .mobile-facets__loading-spinner {
+  position: relative;
+  width: 3.4rem;
+  height: 3.4rem;
+  border: 2px solid rgb(var(--color-foreground-rgb) / 0.22);
+  border-top-color: var(--color-foreground, #1a1a1a);
+  border-radius: 50%;
+  animation: facets-drawer-spin 0.7s linear infinite;
+}
+@keyframes facets-drawer-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .facets-block-wrapper--horizontal .mobile-facets__loading-spinner { animation-duration: 1.8s; }
 }

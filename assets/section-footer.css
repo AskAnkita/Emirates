@@ -394,3 +394,33 @@
   width: var(--icon-size-md);
   height: var(--icon-size-md);
 }
+/* --------------------------------------------------------------------------
+   Newsletter signup — show the submit arrow inside a solid black square
+   button flush with the input's right edge (theme default leaves the arrow
+   floating with no background).
+   -------------------------------------------------------------------------- */
+.section-footer .email-signup__button--icon {
+  background-color: #000;
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+}
+.section-footer .email-signup__button--icon.email-signup__button--integrated {
+  --button-offset: 0px;
+  height: 100%;
+  right: 0;
+}
+.section-footer .email-signup__button--icon svg {
+  color: #fff;
+  fill: currentColor;
+  padding: 0;
+  width: var(--icon-size-desktop, 2rem);
+  height: var(--icon-size-desktop, 2rem);
+}
+.section-footer .email-signup__button--icon:hover,
+.section-footer .email-signup__button--icon:focus-visible {
+  background-color: #1f1f1f;
+}

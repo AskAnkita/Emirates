@@ -753,7 +753,7 @@
         "add_item_to_cart": "Add ([item]) item to cart",
         "add_items_to_cart": "Add ([item]) items to cart"
       },
-      "choose_options": "Choose options",
+      "choose_options": "Add to cart",
       "choose_product_options": "Choose options for {{ product_name }}",
       "color": "Color: ",
       "compare": "Compare",

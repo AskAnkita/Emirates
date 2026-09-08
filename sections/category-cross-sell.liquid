@@ -1,0 +1,326 @@
+{%- liquid
+  comment
+    Renders a row of category tiles, hiding any category the current
+    product already belongs to. On a ring product the row resolves to
+    Necklaces / Bracelets / Earrings; on a necklace product it resolves
+    to Rings / Bracelets / Earrings, and so on.
+
+    Off a product template `product` is nil, so nothing is excluded and
+    the first `max_items` blocks render as-is.
+  endcomment
+
+  assign max_items = section.settings.max_items | default: 3
+
+  assign owned = ','
+  for product_collection in product.collections
+    assign owned = owned | append: product_collection.handle | append: ','
+  endfor
+-%}
+
+<div
+  class="ccs"
+  style="
+    --ccs-width: {% if section.settings.full_width %}100%{% else %}{{ section.settings.content_width }}px{% endif %};
+    --ccs-gap: {{ section.settings.gap }}px;
+    --ccs-radius: {{ section.settings.border_radius }}px;
+    --ccs-padding-inline: {{ section.settings.padding_inline }}px;
+    --ccs-ratio: {{ section.settings.tile_ratio }};
+    --ccs-padding-start: {{ section.settings.padding_top }}px;
+    --ccs-padding-end: {{ section.settings.padding_bottom }}px;
+  "
+>
+  {%- if section.settings.heading != blank -%}
+    <h2 class="ccs__heading">{{ section.settings.heading }}</h2>
+  {%- endif -%}
+
+  <ul class="ccs__grid" role="list">
+    {%- assign shown = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if shown >= max_items -%}
+        {%- break -%}
+      {%- endif -%}
+
+      {%- liquid
+        assign category = block.settings.collection
+
+        # the picked collection plus any extra handles that mean "same category"
+        assign candidates = block.settings.match_handles | append: ',' | append: category.handle | split: ','
+        assign is_current_category = false
+        for candidate in candidates
+          assign handle = candidate | strip
+          if handle != blank
+            assign needle = ',' | append: handle | append: ','
+            if owned contains needle
+              assign is_current_category = true
+            endif
+          endif
+        endfor
+
+        assign label = block.settings.label | default: category.title
+        assign image = block.settings.image | default: category.featured_image
+        assign url = block.settings.link | default: category.url
+      -%}
+
+      {%- unless is_current_category -%}
+        <li class="ccs__item" {{ block.shopify_attributes }}>
+          <a class="ccs__link" href="{{ url | default: '#' }}">
+            {%- if image != blank -%}
+              {{
+                image
+                | image_url: width: 1000
+                | image_tag:
+                  class: 'ccs__image',
+                  widths: '300, 450, 600, 800, 1000',
+                  sizes: '(min-width: 750px) 33vw, 90vw',
+                  loading: 'lazy',
+                  alt: label
+              }}
+            {%- else -%}
+              {{ 'collection-1' | placeholder_svg_tag: 'ccs__image ccs__image--placeholder' }}
+            {%- endif -%}
+            <span class="ccs__scrim" aria-hidden="true"></span>
+            <span class="ccs__label">{{ label }}</span>
+          </a>
+        </li>
+        {%- assign shown = shown | plus: 1 -%}
+      {%- endunless -%}
+    {%- endfor -%}
+  </ul>
+</div>
+
+<style>
+  .ccs {
+    width: 100%;
+    max-width: var(--ccs-width, 1040px);
+    margin-inline: auto;
+    padding-block: var(--ccs-padding-start, 0px) var(--ccs-padding-end, 0px);
+    padding-inline: var(--ccs-padding-inline, 12px);
+  }
+
+  .ccs__heading {
+    margin: 0 0 var(--ccs-gap, 16px);
+    text-align: center;
+    font-family: var(--font-heading--family);
+    font-weight: var(--font-heading--weight);
+    font-size: clamp(2.2rem, 2.6vw, 3rem);
+    line-height: 1.2;
+    color: var(--color-foreground-heading);
+  }
+
+  .ccs__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--ccs-gap, 16px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ccs__link {
+    position: relative;
+    display: block;
+    aspect-ratio: var(--ccs-ratio, 1 / 1);
+    overflow: hidden;
+    border-radius: var(--ccs-radius, 14px);
+    text-decoration: none;
+  }
+
+  .ccs__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--hover-transition-duration, 0.3s) var(--hover-transition-timing, ease);
+  }
+
+  .ccs__link:hover .ccs__image {
+    transform: scale(1.04);
+  }
+
+  /* the category photos are pale, so the label needs a scrim to read */
+  .ccs__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.1) 42%, rgb(0 0 0 / 0) 70%);
+    pointer-events: none;
+  }
+
+  .ccs__label {
+    position: absolute;
+    inset-inline-start: 20px;
+    inset-block-end: 18px;
+    z-index: 1;
+    color: #fff;
+    font-size: 1.8rem;
+    line-height: 1.2;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ccs__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ccs__item:nth-child(3) {
+      grid-column: 1 / -1;
+    }
+
+    .ccs__label {
+      inset-inline-start: 14px;
+      inset-block-end: 12px;
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Category cross-sell",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Explore Other Category"
+    },
+    {
+      "type": "range",
+      "id": "max_items",
+      "label": "Categories to show",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content width",
+      "min": 600,
+      "max": 2000,
+      "step": 20,
+      "unit": "px",
+      "default": 1040,
+      "visible_if": "{{ section.settings.full_width == false }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_inline",
+      "label": "Side padding",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "tile_ratio",
+      "label": "Tile shape",
+      "options": [
+        { "value": "1 / 1", "label": "Square" },
+        { "value": "4 / 5", "label": "Portrait" },
+        { "value": "5 / 4", "label": "Landscape" },
+        { "value": "16 / 9", "label": "Wide" }
+      ],
+      "default": "1 / 1"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "info": "Defaults to the collection title."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Defaults to the collection's featured image."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Defaults to the collection URL."
+        },
+        {
+          "type": "text",
+          "id": "match_handles",
+          "label": "Also counts as this category",
+          "info": "Comma-separated collection handles. If the product is in any of them, this tile is hidden. E.g. engagement-rings, bridal-sets"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category cross-sell",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -137,3 +137,39 @@
 [id$="__section_A6t9V8"] .section {
   margin-block: 0 !important;
 }
+
+/* Multicolumn rows — column count ---------------------------------- */
+
+/* These rows are multicolumn overflow-scrollers, whose desktop count
+   kicks in at 1025px (base.css). The Signature Edit alongside them is
+   a swiper whose breakpoints are 768:tablet, 1024:tablet, 1400:desktop,
+   so between 1025 and 1399 the rows disagreed — 6 here, 3 there.
+   Hold these at their tablet count until 1400px to match.
+   section_tXNYd8 = Stunning Engagement Rings
+   section_mEH6j6 = Shop by Category */
+@media screen and (min-width: 1025px) and (max-width: 1399px) {
+  [id$="__section_tXNYd8"] .grid-layout.grid-layout--overflow-scroll > .grid__item,
+  [id$="__section_mEH6j6"] .grid-layout.grid-layout--overflow-scroll > .grid__item {
+    --overflow-cols: var(--overflow-cols-tablet, 3);
+  }
+}
+
+/* Moments That Shine Forever — row width --------------------------- */
+
+/* The shoppable-reel row is an app block. sections/apps.liquid carries
+   class "section", so the wrapper itself is the three-column section
+   grid AND (with include_margins on) wraps the block in .page-width —
+   two nested constraints. include_margins is off in the template now;
+   this collapses the grid so the row matches the 12px inline padding
+   the other product rows use. */
+[id$="__1777450991e048d40c"] {
+  grid-template-columns: 1fr;
+  padding-inline: 12px;
+}
+
+[id$="__1777450991e048d40c"] > * {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: none;
+}
+

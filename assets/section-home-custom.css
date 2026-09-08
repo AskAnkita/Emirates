@@ -128,3 +128,12 @@
     border-radius: 0;
   }
 }
+
+/* the consultation band and the promise strap sit directly against
+   each other — no stray margin from either wrapper */
+[id$="__section_rh36pJ"],
+[id$="__section_rh36pJ"] .section,
+[id$="__section_A6t9V8"],
+[id$="__section_A6t9V8"] .section {
+  margin-block: 0 !important;
+}

@@ -129,11 +129,25 @@
   }
 }
 
-/* the consultation band and the promise strap sit directly against
-   each other — no stray margin from either wrapper */
-[id$="__section_rh36pJ"],
-[id$="__section_rh36pJ"] .section,
-[id$="__section_A6t9V8"],
+/* Breathing room above the consultation band, but none below it — it
+   still meets the promise strap flush. Scales with the viewport so it
+   does not swallow small screens. */
+[id$="__section_rh36pJ"] {
+  margin-block-start: clamp(40px, 5.5vw, 80px) !important;
+  margin-block-end: 0 !important;
+}
+
+[id$="__section_rh36pJ"] .section {
+  margin-block: 0 !important;
+}
+
+/* the strap follows the shoppable-reel row now, not the consultation
+   band, so it needs the same separation rather than sitting flush */
+[id$="__section_A6t9V8"] {
+  margin-block-start: clamp(40px, 5.5vw, 80px) !important;
+  margin-block-end: 0 !important;
+}
+
 [id$="__section_A6t9V8"] .section {
   margin-block: 0 !important;
 }
@@ -171,5 +185,70 @@
   grid-column: 1 / -1;
   width: 100%;
   max-width: none;
+}
+
+/* Signature Collections (product template) ------------------------- */
+
+/* Two halves filling one tall band, like the reference layout: photo
+   left, copy panel right, no gap and no letterboxing. */
+[id$="__section_GDVLqq"] {
+  --signature-band-height: min(68vh, 620px);
+}
+
+@media screen and (min-width: 750px) {
+  [id$="__section_GDVLqq"] .section-content-wrapper {
+    align-items: stretch;
+    justify-content: flex-start;
+    min-height: var(--signature-band-height);
+  }
+
+  [id$="__section_GDVLqq"] .section-content-wrapper > .image-block,
+  [id$="__section_GDVLqq"] .section-content-wrapper > .group-block {
+    flex: 0 0 50%;
+    width: 50%;
+    max-width: 50%;
+  }
+
+  /* the source image's own aspect-ratio would otherwise beat height:100%
+     and reintroduce bands above and below the photo */
+  [id$="__section_GDVLqq"] .image-block__image {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover;
+  }
+}
+
+/* The copy is one rich-text block (h1 + h4 + p), so its scale comes
+   from the theme's rte styles. Give the heading real display size and
+   hold the paragraph to a readable measure. */
+[id$="__section_GDVLqq"] .text-block h1,
+[id$="__section_GDVLqq"] .text-block h2 {
+  font-size: clamp(3.4rem, 4vw, 5.4rem);
+  line-height: 1.06;
+}
+
+[id$="__section_GDVLqq"] .text-block h4 {
+  font-size: 1.3rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+[id$="__section_GDVLqq"] .text-block p {
+  max-width: 46ch;
+  margin-inline: auto;
+  line-height: 1.7;
+  opacity: 0.88;
+}
+
+@media screen and (max-width: 749px) {
+  /* stacked: photo above, panel below at a fixed crop */
+  [id$="__section_GDVLqq"] .image-block__image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
 }
 

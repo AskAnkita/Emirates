@@ -4548,7 +4548,7 @@
             "text_nBTYhc": {
               "type": "text",
               "settings": {
-                "text": "<h2>Signature Collections</h2><h4>Every detail matters</h4><p>Hand-set by master jewellers with the world's finest diamonds — designs made to be worn for a lifetime, and passed on.</p>",
+                "text": "<h1>Signature Collections</h1><h4>Every detail matters</h4><p>Hand-set by master jewellers with the world's finest diamonds — designs made to be worn for a lifetime, and passed on.</p>",
                 "collection_description_only": false,
                 "collapse_text": false,
                 "typing_text": false,
@@ -5300,7 +5300,7 @@
           "settings": {
             "content_direction": "row",
             "content_direction_mobile": "column",
-            "horizontal_alignment": "space-between",
+            "horizontal_alignment": "center",
             "vertical_alignment": "flex-end",
             "align_baseline": true,
             "horizontal_alignment_flex_direction_column": "flex-start",

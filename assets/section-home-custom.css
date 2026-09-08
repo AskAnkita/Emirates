@@ -1,0 +1,130 @@
+/* ------------------------------------------------------------------
+   Homepage section refinements.
+   Scoped by section id so they never leak into other sections that
+   share the same colour scheme or block types.
+   ------------------------------------------------------------------ */
+
+/* Our Promise / Expert Jewelry Care ------------------------------- */
+
+[id$="__section_A6t9V8"] {
+  --promise-rule: rgb(255 255 255 / 0.14);
+}
+
+/* scheme-4's border is solid white, which reads as a hard bar between
+   the pillars. Soften it and inset it top and bottom so it sits as a
+   hairline. .grid__item needs a positioning context for the ::before. */
+[id$="__section_A6t9V8"] .grid__item {
+  position: relative;
+}
+
+[id$="__section_A6t9V8"] .border-separator-item + .border-separator-item::before {
+  top: 8%;
+  height: 84%;
+  background-color: var(--promise-rule);
+}
+
+/* line-art icons on a dark ground: hold them back a touch so the
+   letterspaced labels stay the loudest thing in each column */
+[id$="__section_A6t9V8"] .icon-block__media {
+  opacity: 0.85;
+}
+
+@media screen and (max-width: 749px) {
+  /* the 48/56px desktop grid spacing is far too wide at two columns */
+  [id$="__section_A6t9V8"] .grid-layout {
+    --grid-desktop-horizontal-spacing: 16px;
+    --grid-desktop-vertical-spacing: 40px;
+  }
+
+  [id$="__section_A6t9V8"] .border-separator-item + .border-separator-item::before {
+    display: none;
+  }
+}
+
+/* Personalized Jewelry Consultation ------------------------------- */
+
+/* Two solid halves that meet in the middle and run the full height of
+   the band: a tonal panel carrying the copy, and a full-bleed image.
+   Change --consult-panel to retint the left half. */
+[id$="__section_rh36pJ"] {
+  --consult-panel: #e3dfd2;
+  --consult-band-height: min(76vh, 720px);
+}
+
+/* True edge-to-edge. The section lays itself out on a three-column
+   grid whose outer tracks are the page margin, so collapse it to one
+   track and clear every inline padding, margin and max-width on the
+   way down to the two halves. !important because these fight several
+   base.css rules of equal-or-higher specificity. */
+[id$="__section_rh36pJ"] .section {
+  grid-template-columns: 1fr !important;
+  padding-inline: 0 !important;
+}
+
+[id$="__section_rh36pJ"] .section > * {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+[id$="__section_rh36pJ"] .custom-section-content,
+[id$="__section_rh36pJ"] .section-content-wrapper {
+  padding-inline: 0 !important;
+}
+
+@media screen and (min-width: 750px) {
+  /* the row centres its children and centres them vertically, which
+     left the halves floating with white on every side */
+  [id$="__section_rh36pJ"] .section-content-wrapper {
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: var(--consult-band-height);
+  }
+
+  /* pin each half to exactly 50% so together they fill the row and
+     there is nothing left for justify-content to distribute */
+  [id$="__section_rh36pJ"] .section-content-wrapper > .group-block,
+  [id$="__section_rh36pJ"] .section-content-wrapper > .image-block {
+    flex: 0 0 50%;
+    width: 50%;
+    max-width: 50%;
+  }
+
+  [id$="__section_rh36pJ"] .section-content-wrapper > .group-block {
+    background-color: var(--consult-panel);
+  }
+
+  [id$="__section_rh36pJ"] .image-block {
+    height: auto;
+  }
+
+  /* aspect-ratio is set from the source image and would otherwise win
+     over height:100%, reintroducing the gaps */
+  [id$="__section_rh36pJ"] .image-block__image {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover;
+    border-radius: 0;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  /* stacked: panel on top, image below at a fixed crop */
+  [id$="__section_rh36pJ"] .section-content-wrapper > .group-block {
+    background-color: var(--consult-panel);
+    --padding-inline-start-mobile: 24px;
+    --padding-inline-end-mobile: 24px;
+    --padding-block-start-mobile: 48px;
+    --padding-block-end-mobile: 48px;
+  }
+
+  [id$="__section_rh36pJ"] .image-block__image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 0;
+  }
+}

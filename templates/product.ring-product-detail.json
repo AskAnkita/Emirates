@@ -38,7 +38,6 @@
           "type": "_product-media-gallery",
           "static": true,
           "settings": {
-            "show_skin_tone_controller": false,
             "media_presentation": "grid",
             "media_columns": "two",
             "image_gap": 10,
@@ -55,6 +54,8 @@
             "dot_appearance": false,
             "dot_background": "#ffffff",
             "dot_border_radius": 0,
+            "show_skin_tone_controller": false,
+            "skin_tone_image_index": 2,
             "aspect_ratio": "adapt",
             "constrain_to_viewport": false,
             "media_fit": "cover",
@@ -4986,8 +4987,8 @@
                 "scheme_border": "#e6e6e6",
                 "scheme_shadow": "#000000",
                 "background_media": "image",
-                "background_image": "shopify://shop_images/Product_Details.png",
                 "video_position": "cover",
+                "background_image": "shopify://shop_images/Product_Details.png",
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
@@ -5228,7 +5229,7 @@
         "image_KnWAtA": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/Product_Details.png",
+            "image": "shopify://shop_images/5dc795e5-b2f6-4f7d-a29c-962030f32db8.png",
             "link": "",
             "hide_on_mobile": false,
             "image_ratio": "landscape",
@@ -5297,8 +5298,8 @@
             "scheme_border": "#e6e6e6",
             "scheme_shadow": "#000000",
             "background_media": "image",
-            "background_image": "shopify://shop_images/Product_Details.png",
             "video_position": "cover",
+            "background_image": "shopify://shop_images/f6cc54f0-29f2-472c-942b-eeab914fbaf5.png",
             "background_image_position": "cover",
             "content_overlay": true,
             "content_match_height": true,
@@ -5752,7 +5753,7 @@
                     "scheme_foreground": "#000000",
                     "scheme_primary": "#000f9f",
                     "scheme_primary_hover": "#000000",
-                    "scheme_border": "#A9A9A9",
+                    "scheme_border": "#a9a9a9",
                     "scheme_shadow": "rgba(0,0,0,0)",
                     "margin-block-start-row": 0,
                     "margin-block-start-mobile-row": 0,
@@ -5866,7 +5867,7 @@
                     "scheme_foreground": "#000000",
                     "scheme_primary": "#000f9f",
                     "scheme_primary_hover": "#000000",
-                    "scheme_border": "#A9A9A9",
+                    "scheme_border": "#a9a9a9",
                     "scheme_shadow": "rgba(0,0,0,0)",
                     "margin-block-start-row": 0,
                     "margin-block-start-mobile-row": 0,
@@ -6020,6 +6021,7 @@
         "group_H3Vd8h",
         "image_NFJBpn"
       ],
+      "disabled": true,
       "custom_css": [
         ".spacing-style.layout-panel-flex.layout-panel-flex--row.mobile-column.section-content-wrapper {background: #f9f9f9; padding: 60px; border-radius: 24px;}",
         "@media screen and (max-width: 767px) {.spacing-style.layout-panel-flex.layout-panel-flex--row.mobile-column.section-content-wrapper {background: #f9f9f9; padding: 50px 18px; border-radius: 24px; }}"
@@ -6076,10 +6078,10 @@
       "block_order": [
         "judge_me_reviews_review_widget_dVbbk7"
       ],
+      "disabled": true,
       "settings": {
         "include_margins": true
-      },
-      "disabled": true
+      }
     },
     "media_with_text_C6mnew": {
       "type": "media-with-text",
@@ -6091,8 +6093,8 @@
           "settings": {
             "content_direction": "row",
             "content_direction_mobile": "column",
-            "horizontal_alignment": "space-between",
-            "vertical_alignment": "flex-end",
+            "horizontal_alignment": "center",
+            "vertical_alignment": "center",
             "align_baseline": true,
             "horizontal_alignment_flex_direction_column": "flex-start",
             "vertical_alignment_flex_direction_column": "center",
@@ -6313,7 +6315,7 @@
                 "scheme_shadow": "#000000",
                 "background_media": "image",
                 "video_position": "cover",
-                "background_image": "shopify://shop_images/1.png",
+                "background_image": "shopify://shop_images/bb0b37f5-7b20-493f-9db8-749d0917668c.png",
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
@@ -6559,7 +6561,7 @@
                 "scheme_shadow": "#000000",
                 "background_media": "image",
                 "video_position": "cover",
-                "background_image": "shopify://shop_images/2_fcaa1f69-7598-427f-a910-96b326b1df31.png",
+                "background_image": "shopify://shop_images/ChatGPT_Image_Aug_21_2026_06_18_04_PM.png",
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,
@@ -6805,7 +6807,7 @@
                 "scheme_shadow": "#000000",
                 "background_media": "image",
                 "video_position": "cover",
-                "background_image": "shopify://shop_images/1.png",
+                "background_image": "shopify://shop_images/890b66f0-1741-4a22-81b5-3711a41c76b6_bf62bc72-c30a-4c8f-bfec-879262370255.png",
                 "background_image_position": "cover",
                 "content_overlay": true,
                 "content_match_height": false,

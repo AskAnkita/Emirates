@@ -6084,6 +6084,69 @@
         "include_margins": true
       }
     },
+    "category_cross_sell": {
+      "type": "category-cross-sell",
+      "blocks": {
+        "category_rings": {
+          "type": "category",
+          "settings": {
+            "collection": "rings",
+            "label": "Rings",
+            "image": "shopify://shop_images/e6dcb9ba-df14-404e-a802-84db22fe3d7e.png",
+            "link": "/collections/rings",
+            "match_handles": "engagement-rings, new-rings, vintage-rings, bridal-sets, round-engagement-rings, oval-engagement-rings, emerald-engagement-rings, princess-cut-engagement-rings, pear-engagement-rings, cushion-engagement-rings, heart-engagement-rings, marquise-engagement-rings, trillion-engagement-rings, 3-stone-engagement-rings, diamond-solitaire-engagement-rings, diamond-halo-engagement-rings"
+          }
+        },
+        "category_necklaces": {
+          "type": "category",
+          "settings": {
+            "collection": "necklaces",
+            "label": "Necklaces",
+            "image": "shopify://shop_images/ef098819-c42b-4ea0-9cfb-61ee5187048a.png",
+            "link": "/collections/necklaces",
+            "match_handles": "tennis-necklaces, solitaire-pendants-necklaces"
+          }
+        },
+        "category_bracelets": {
+          "type": "category",
+          "settings": {
+            "collection": "bracelets",
+            "label": "Bracelets",
+            "image": "shopify://shop_images/e6364d15-38b3-4b7b-aabd-1e0f4fdf1414.png",
+            "link": "/collections/bracelets",
+            "match_handles": "tennis-bracelets"
+          }
+        },
+        "category_earrings": {
+          "type": "category",
+          "settings": {
+            "collection": "earrings",
+            "label": "Earrings",
+            "image": "shopify://shop_images/bd231e8f-3f84-4975-b837-73f3e5d07f9e.png",
+            "link": "/collections/earrings",
+            "match_handles": ""
+          }
+        }
+      },
+      "block_order": [
+        "category_rings",
+        "category_necklaces",
+        "category_bracelets",
+        "category_earrings"
+      ],
+      "settings": {
+        "heading": "Explore Other Category",
+        "max_items": 3,
+        "full_width": true,
+        "content_width": 1600,
+        "padding_inline": 12,
+        "tile_ratio": "1 / 1",
+        "gap": 16,
+        "border_radius": 0,
+        "padding_top": 90,
+        "padding_bottom": 4
+      }
+    },
     "recently_viewed_products_WcH46k": {
       "type": "recently-viewed-products",
       "blocks": {
@@ -6849,69 +6912,6 @@
         "padding-block-end": 4,
         "padding-inline-start": 0,
         "padding-inline-end": 0
-      }
-    },
-    "category_cross_sell": {
-      "type": "category-cross-sell",
-      "blocks": {
-        "category_rings": {
-          "type": "category",
-          "settings": {
-            "collection": "rings",
-            "label": "Rings",
-            "image": "shopify://shop_images/ChatGPT_Image_Aug_26_2026_05_48_16_PM.png",
-            "link": "/collections/rings",
-            "match_handles": "engagement-rings, new-rings, vintage-rings, bridal-sets, round-engagement-rings, oval-engagement-rings, emerald-engagement-rings, princess-cut-engagement-rings, pear-engagement-rings, cushion-engagement-rings, heart-engagement-rings, marquise-engagement-rings, trillion-engagement-rings, 3-stone-engagement-rings, diamond-solitaire-engagement-rings, diamond-halo-engagement-rings"
-          }
-        },
-        "category_necklaces": {
-          "type": "category",
-          "settings": {
-            "collection": "necklaces",
-            "label": "Necklaces",
-            "image": "shopify://shop_images/f707647d-a04a-4054-9372-415e93310833_1da1b17c-38a0-47a3-8797-6643b0146bcf.png",
-            "link": "/collections/necklaces",
-            "match_handles": "tennis-necklaces, solitaire-pendants-necklaces"
-          }
-        },
-        "category_bracelets": {
-          "type": "category",
-          "settings": {
-            "collection": "bracelets",
-            "label": "Bracelets",
-            "image": "shopify://shop_images/ChatGPT_Image_Aug_25_2026_at_11_47_27_PM_4.png",
-            "link": "/collections/bracelets",
-            "match_handles": "tennis-bracelets"
-          }
-        },
-        "category_earrings": {
-          "type": "category",
-          "settings": {
-            "collection": "earrings",
-            "label": "Earrings",
-            "image": "shopify://shop_images/ChatGPT_Image_Aug_26_2026_06_01_13_PM_1.png",
-            "link": "/collections/earrings",
-            "match_handles": ""
-          }
-        }
-      },
-      "block_order": [
-        "category_rings",
-        "category_necklaces",
-        "category_bracelets",
-        "category_earrings"
-      ],
-      "settings": {
-        "heading": "Explore Other Category",
-        "max_items": 3,
-        "content_width": 1600,
-        "gap": 16,
-        "border_radius": 0,
-        "padding_top": 90,
-        "padding_bottom": 4,
-        "padding_inline": 12,
-        "tile_ratio": "1 / 1",
-        "full_width": true
       }
     }
   },

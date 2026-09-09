@@ -32,10 +32,20 @@ if (!customElements.get('skin-tone-controller')) {
    *   - DEEPENING (above 50) is a pure multiply, offset 0. Multiplying moves towards
    *     black, which it can never overshoot, and dropping B fastest is what stops a
    *     darkened photo from reading grey instead of richer.
-   *   - LIGHTENING (below 50) is a lift towards white, `scale = 1 - k, offset = k`.
+   *   - LIGHTENING (below 50) is a lift towards white, `scale = 1 - k, offset = k`. Every
+   *     lightening stop below therefore keeps `scale + offset === 1` per channel; break
+   *     that and the transform stops being a blend towards white and can overshoot.
    *     Multiplying by >1 would blow the red channel out on skin that is already fair
    *     (#F5DCC8 * 1.15 clips to #FFF6D8, a flat yellow patch); lifting cannot clip,
    *     because it interpolates towards white rather than scaling past it.
+   */
+  /*
+   * These ends were deliberately widened once (0.36 lift / 0.25 multiply) and pulled back:
+   * a linear ramp stops looking photographic well before it runs out of numerical room.
+   * Multiplying far enough to reach genuinely deep skin crushes the shadow side to near
+   * black and flattens the midtone separation that reads as skin; lifting far enough to
+   * reach porcelain washes the warmth out into grey. Widening THIS transform is the wrong
+   * lever -- see the note under the table for the one that would work.
    */
   const STOPS = [
     { at: 0, scale: [0.78, 0.8, 0.84], offset: [0.22, 0.2, 0.16] },
@@ -44,6 +54,13 @@ if (!customElements.get('skin-tone-controller')) {
     { at: 75, scale: [0.8, 0.7, 0.6], offset: [0.0, 0.0, 0.0] },
     { at: 100, scale: [0.58, 0.45, 0.34], offset: [0.0, 0.0, 0.0] },
   ];
+
+  /*
+   * To extend the range without losing realism the ramp has to stop being linear: a gamma
+   * curve (feComponentTransfer type="gamma") moves the midtones while leaving the shadow
+   * and highlight ends comparatively alone, which is what keeps the skin reading as lit
+   * rather than dimmed. That is a change to the filter in the snippet, not to this table.
+   */
 
   const lerp = (from, to, t) => from.map((channel, index) => channel + (to[index] - channel) * t);
 

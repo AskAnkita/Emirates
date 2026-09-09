@@ -6905,9 +6905,9 @@
         "max_items": 3,
         "content_width": 1600,
         "gap": 16,
-        "border_radius": 14,
-        "padding_top": 40,
-        "padding_bottom": 40,
+        "border_radius": 0,
+        "padding_top": 90,
+        "padding_bottom": 4,
         "padding_inline": 12,
         "tile_ratio": "1 / 1",
         "full_width": true

@@ -129,22 +129,21 @@
   }
 }
 
-/* Breathing room above the consultation band, but none below it — it
-   still meets the promise strap flush. Scales with the viewport so it
-   does not swallow small screens. */
+/* Spacing above these bands is carried by the neighbouring sections'
+   own padding-block (the 90/4 rhythm the templates use), so no margin
+   here — stacking the two produced a ~174px dead zone. */
 [id$="__section_rh36pJ"] {
-  margin-block-start: clamp(40px, 5.5vw, 80px) !important;
-  margin-block-end: 0 !important;
+  margin-block: 0 !important;
 }
 
 [id$="__section_rh36pJ"] .section {
   margin-block: 0 !important;
 }
 
-/* the strap follows the shoppable-reel row now, not the consultation
-   band, so it needs the same separation rather than sitting flush */
+/* the app section above the strap exposes no padding settings, so this
+   is the only place the gap above it can come from */
 [id$="__section_A6t9V8"] {
-  margin-block-start: clamp(40px, 5.5vw, 80px) !important;
+  margin-block-start: 90px !important;
   margin-block-end: 0 !important;
 }
 

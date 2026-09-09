@@ -5,14 +5,25 @@
 }
 
 .skin-tone-controller {
+  /* The slider is a horizontal <input type="range"> rotated by 90deg rather than a
+     `writing-mode`/`slider-vertical` one, because the direction a vertical range runs in
+     still differs between engines. Rotating keeps "value 0 at the top" true everywhere,
+     and lets the track gradient be authored left-to-right.
+
+     rotate(90deg) maps +x to +y, so the 0 end lands at the TOP and 100 at the BOTTOM:
+     the gradient therefore runs `to right` from lightest to deepest. */
   --skin-tone-track: linear-gradient(
-    to top,
-    #4d2b20 0%,
-    #8f5c43 22%,
-    #c58b6d 45%,
-    #e3b295 68%,
-    #f6d4bf 100%
+    to right,
+    #f6d4bf 0%,
+    #e3b295 25%,
+    #c58b6d 50%,
+    #8f5c43 75%,
+    #4d2b20 100%
   );
+  --skin-tone-track-length: 13rem;
+  --skin-tone-track-thickness: 0.45rem;
+  --skin-tone-thumb-size: 1.5rem;
+
   position: absolute;
   z-index: 2;
   top: 50%;
@@ -20,7 +31,6 @@
   transform: translateY(-50%);
   display: flex;
   width: 3.8rem;
-  min-height: 15rem;
   padding: 1rem 0.7rem;
   flex-direction: column;
   align-items: center;
@@ -30,6 +40,14 @@
   background: rgb(var(--color-background-rgb) / 0.88);
   box-shadow: 0 0.5rem 1.8rem rgb(0 0 0 / 0.12);
   backdrop-filter: blur(0.8rem);
+}
+
+/* The SVG only carries the filter definition; it must never take up layout space. */
+.skin-tone-controller__filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .skin-tone-controller__label,
@@ -51,33 +69,53 @@
   font-size: 0.75rem;
 }
 
+/* Reserves the rotated slider's on-screen footprint. Without a wrapper the rotated
+   input still occupies its pre-rotation box and has to be dragged back into place with
+   negative margins, which breaks as soon as the track length changes. */
+.skin-tone-controller__track {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--skin-tone-thumb-size);
+  height: var(--skin-tone-track-length);
+}
+
 .skin-tone-controller__input {
-  width: 13rem;
-  height: 1.2rem;
-  margin: 5.8rem -5.8rem;
+  width: var(--skin-tone-track-length);
+  height: var(--skin-tone-thumb-size);
+  margin: 0;
   appearance: none;
+  -webkit-appearance: none;
   background: transparent;
-  cursor: pointer;
-  transform: rotate(-90deg);
+  cursor: grab;
+  transform: rotate(90deg);
+  /* Keep a drag on the slider from being claimed by the gallery's swipe handling. */
+  touch-action: none;
+}
+
+.skin-tone-controller__input:active {
+  cursor: grabbing;
 }
 
 .skin-tone-controller__input::-webkit-slider-runnable-track {
-  height: 0.45rem;
+  height: var(--skin-tone-track-thickness);
   border-radius: 1rem;
   background: var(--skin-tone-track);
 }
 
 .skin-tone-controller__input::-moz-range-track {
-  height: 0.45rem;
+  height: var(--skin-tone-track-thickness);
   border-radius: 1rem;
   background: var(--skin-tone-track);
 }
 
 .skin-tone-controller__input::-webkit-slider-thumb {
-  width: 1.5rem;
-  height: 1.5rem;
-  margin-top: -0.52rem;
+  width: var(--skin-tone-thumb-size);
+  height: var(--skin-tone-thumb-size);
+  /* Centre the thumb on the track: half the height difference, negated. */
+  margin-top: calc((var(--skin-tone-track-thickness) - var(--skin-tone-thumb-size)) / 2);
   appearance: none;
+  -webkit-appearance: none;
   border: 2px solid #fff;
   border-radius: 50%;
   background: #9f684c;
@@ -85,8 +123,8 @@
 }
 
 .skin-tone-controller__input::-moz-range-thumb {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: var(--skin-tone-thumb-size);
+  height: var(--skin-tone-thumb-size);
   border: 2px solid #fff;
   border-radius: 50%;
   background: #9f684c;
@@ -101,6 +139,6 @@
 @media screen and (max-width: 749px) {
   .skin-tone-controller {
     right: 1rem;
-    min-height: 13rem;
+    --skin-tone-track-length: 11rem;
   }
 }

@@ -1,19 +1,128 @@
 {%- doc -%}
-  Skin tone control for a single product image.
+  Skin tone control for a single product image (the hand / on-model shot).
 
-  Rendered INSIDE one media container so the filter can only ever reach that
-  container's own image - never the rest of the gallery.
+  Rendered INSIDE one media container so the filter can only ever reach that container's
+  own image -- never the rest of the gallery. Which image gets it is the merchant's
+  "Skin tone image" setting on the product media gallery block.
+
+  WHY AN SVG FILTER AND NOT A CSS ONE
+  -----------------------------------
+  There is only one photograph, so the tone shift has to be computed in the browser. A
+  flat CSS filter (`sepia() saturate() hue-rotate()`) tints the WHOLE frame, including
+  the metal and the diamond -- on a jewellery PDP that turns white gold yellow and drags
+  the diamond grey, which is worse than having no control at all.
+
+  So the filter below builds a *skin mask* first and only re-tones through that mask:
+
+    1. A colour matrix writes a "skin-ness" score, `R - 1.5G + 0.5B`, into the alpha
+       channel. Everything neutral -- the white sweep, the diamond, white gold, sterling
+       silver -- scores 0.00, because the expression cancels when R = G = B. Yellow gold
+       scores *negative* (-0.05 to -0.09): it has a huge G-B gap (~0.47) next to skin's
+       (~0.16) at comparable redness, and negative results are clamped away to 0 by the
+       filter pipeline. Rose gold scores *high* (+0.28 to +0.31), being far redder than
+       skin. Skin itself, across the full Fitzpatrick range from very fair to deepest,
+       sits in a narrow band between +0.04 and +0.15.
+    2. `feComponentTransfer` is therefore a BAND-PASS, not a threshold: off at or below
+       0.0125 (which keeps photographic noise on a white background out), fully on from
+       0.05 to 0.20, then rolling back off to nothing by 0.275 to shed rose gold.
+    3. A small blur feathers the mask edge so the boundary does not alias against the ring.
+    4. The mask is intersected with the source alpha so transparent PNGs stay transparent.
+    5. Only inside the mask is the toned copy composited back over the original.
+
+  Measured against representative swatches, every skin tone lands at 0.86-1.00 mask while
+  yellow gold, rose gold, white gold, sterling silver, the diamond and the background all
+  land at 0.00 and come out byte-identical at every slider position. The one residual
+  overlap is a light pinkish rose-gold highlight (around #E0A899), which is genuinely the
+  same colour as pink skin and cannot be separated by a linear operator; the band is tuned
+  to favour full skin coverage, since patchy skin is far more visible than a faintly toned
+  highlight on a small ring.
+
+  Specular highlights on skin score low (0.02-0.04) and so stay largely untoned. That is
+  deliberate -- a blown highlight is the light source, not pigment, and holding it keeps
+  the re-toned skin from going flat.
+
+  TUNING
+  ------
+  `mask_table` below is the band. Each entry covers 0.0125 of the score, so entry N sits at
+  a score of N * 0.0125. If skin looks patchy or under-covered, widen the plateau by setting
+  more entries to 1; if the ring starts shifting, pull the trailing entries down sooner.
+  The tone ramp itself lives in STOPS in assets/skin-tone-controller.js.
+
+  @param {string} [uid] - unique suffix for the filter id, so two controls on one page
+    cannot collide. Pass the gallery block's id.
 {%- enddoc -%}
 
-<skin-tone-controller class="skin-tone-controller" aria-label="Skin tone controller">
+{%- liquid
+  # The band-pass described above, as 81 stops spaced 0.0125 apart across the score.
+  # Fully off at 0, full across 0.05-0.20 (all skin), back to 0 by 0.275 (sheds rose gold).
+  # The lower edge is ramped over three entries rather than one: low-chroma olive and cool
+  # deep skin score only ~0.043, and a single-entry ramp left them at 0.77 mask while
+  # saturated skin beside them sat at 1.00 -- enough of a gap to read as patchy.
+  assign mask_table = '0 0.05 0.45 0.85 1 1 1 1 1 1 1 1 1 1 1 1 1 0.83 0.67 0.5 0.33 0.17 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'
+
+  # How far the mask is feathered, in CSS pixels of the rendered image.
+  assign mask_feather = 1
+
+  # `default` on the appended string would never fire (the prefix is always truthy),
+  # so the fallback has to be applied to uid itself.
+  assign stc_uid = uid | default: 'default'
+  assign filter_id = 'skin-tone-filter-' | append: stc_uid
+-%}
+
+<skin-tone-controller
+  class="skin-tone-controller"
+  filter-id="{{ filter_id }}"
+  aria-label="Skin tone controller"
+>
+  <svg class="skin-tone-controller__filter" aria-hidden="true" focusable="false" width="0" height="0">
+    <filter id="{{ filter_id }}" color-interpolation-filters="sRGB">
+      {%- comment -%} The re-toned copy of the whole image. JS rewrites these values live. {%- endcomment -%}
+      <feColorMatrix
+        in="SourceGraphic"
+        type="matrix"
+        data-tone-matrix
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 1 0"
+        result="toned"
+      />
+
+      {%- comment -%} Skin-ness score -> alpha. See the note above for the coefficients. {%- endcomment -%}
+      <feColorMatrix
+        in="SourceGraphic"
+        type="matrix"
+        values="0 0 0 0 0
+                0 0 0 0 0
+                0 0 0 0 0
+                1 -1.5 0.5 0 0"
+        result="skinScore"
+      />
+      <feComponentTransfer in="skinScore" result="skinMaskHard">
+        <feFuncA type="table" tableValues="{{ mask_table }}" />
+      </feComponentTransfer>
+      <feGaussianBlur in="skinMaskHard" stdDeviation="{{ mask_feather }}" result="skinMaskSoft" />
+      {%- comment -%} Never paint outside the source's own alpha (transparent PNGs). {%- endcomment -%}
+      <feComposite in="skinMaskSoft" in2="SourceGraphic" operator="in" result="skinMask" />
+
+      <feComposite in="toned" in2="skinMask" operator="in" result="tonedSkin" />
+      <feComposite in="tonedSkin" in2="SourceGraphic" operator="over" />
+    </filter>
+  </svg>
+
   <span class="skin-tone-controller__label">Skin tone</span>
-  <input
-    class="skin-tone-controller__input"
-    type="range"
-    min="0"
-    max="100"
-    value="50"
-    aria-label="Adjust skin tone"
-  >
+
+  <div class="skin-tone-controller__track">
+    <input
+      class="skin-tone-controller__input"
+      type="range"
+      min="0"
+      max="100"
+      step="1"
+      value="50"
+      aria-label="Adjust skin tone"
+    >
+  </div>
+
   <span class="skin-tone-controller__value" aria-live="polite">Natural</span>
 </skin-tone-controller>

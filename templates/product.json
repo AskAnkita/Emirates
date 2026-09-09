@@ -3975,7 +3975,7 @@
         "gap": 24,
         "color_scheme": "scheme-1",
         "padding-block-start": 0,
-        "padding-block-end": 90
+        "padding-block-end": 4
       }
     },
     "quick_order_list_XTrabM": {
@@ -3992,8 +3992,8 @@
         "font_size_info": "1.4rem",
         "padding_left": 0,
         "padding_right": 0,
-        "padding_top": 36,
-        "padding_bottom": 36
+        "padding_top": 90,
+        "padding_bottom": 4
       }
     },
     "section_product_tabs_U8mYg9": {
@@ -4075,8 +4075,8 @@
         "page_width_custom": 1260,
         "padding_left": 0,
         "padding_right": 0,
-        "padding_top": 50,
-        "padding_bottom": 20
+        "padding_top": 90,
+        "padding_bottom": 4
       }
     },
     "media_banner_JK7iCf": {
@@ -4426,7 +4426,7 @@
         "media_height": "custom",
         "media_height_custom": 50,
         "color_scheme": "scheme-1",
-        "padding-block-start": 0,
+        "padding-block-start": 90,
         "padding-block-end": 0
       }
     },
@@ -4717,7 +4717,7 @@
         "gradient_direction": "to top",
         "image_behavior": "none",
         "padding-block-start": 0,
-        "padding-block-end": 0,
+        "padding-block-end": 4,
         "padding-inline-start": 0,
         "padding-inline-end": 0
       }
@@ -4755,7 +4755,7 @@
         "gradient_direction": "to top",
         "image_behavior": "none",
         "padding-block-start": 90,
-        "padding-block-end": 10,
+        "padding-block-end": 4,
         "padding-inline-start": 0,
         "padding-inline-end": 0
       }
@@ -5263,8 +5263,8 @@
         "overlay_style": "solid",
         "gradient_direction": "to top",
         "image_behavior": "none",
-        "padding-block-start": 0,
-        "padding-block-end": 0,
+        "padding-block-start": 90,
+        "padding-block-end": 4,
         "padding-inline-start": 65,
         "padding-inline-end": 65
       }
@@ -6065,7 +6065,7 @@
           "settings": {
             "collection": "rings",
             "label": "Rings",
-            "image": "shopify://shop_images/ChatGPT_Image_Aug_26_2026_05_48_16_PM.png",
+            "image": "shopify://shop_images/e6dcb9ba-df14-404e-a802-84db22fe3d7e.png",
             "link": "/collections/rings",
             "match_handles": "engagement-rings, new-rings, vintage-rings, bridal-sets, round-engagement-rings, oval-engagement-rings, emerald-engagement-rings, princess-cut-engagement-rings, pear-engagement-rings, cushion-engagement-rings, heart-engagement-rings, marquise-engagement-rings, trillion-engagement-rings, 3-stone-engagement-rings, diamond-solitaire-engagement-rings, diamond-halo-engagement-rings"
           }
@@ -6075,7 +6075,7 @@
           "settings": {
             "collection": "necklaces",
             "label": "Necklaces",
-            "image": "shopify://shop_images/f707647d-a04a-4054-9372-415e93310833_1da1b17c-38a0-47a3-8797-6643b0146bcf.png",
+            "image": "shopify://shop_images/ef098819-c42b-4ea0-9cfb-61ee5187048a.png",
             "link": "/collections/necklaces",
             "match_handles": "tennis-necklaces, solitaire-pendants-necklaces"
           }
@@ -6085,7 +6085,7 @@
           "settings": {
             "collection": "bracelets",
             "label": "Bracelets",
-            "image": "shopify://shop_images/ChatGPT_Image_Aug_25_2026_at_11_47_27_PM_4.png",
+            "image": "shopify://shop_images/e6364d15-38b3-4b7b-aabd-1e0f4fdf1414.png",
             "link": "/collections/bracelets",
             "match_handles": "tennis-bracelets"
           }
@@ -6095,7 +6095,7 @@
           "settings": {
             "collection": "earrings",
             "label": "Earrings",
-            "image": "shopify://shop_images/ChatGPT_Image_Aug_26_2026_06_01_13_PM_1.png",
+            "image": "shopify://shop_images/bd231e8f-3f84-4975-b837-73f3e5d07f9e.png",
             "link": "/collections/earrings",
             "match_handles": ""
           }
@@ -6110,14 +6110,14 @@
       "settings": {
         "heading": "Explore Other Category",
         "max_items": 3,
+        "full_width": true,
         "content_width": 1600,
-        "gap": 16,
-        "border_radius": 14,
-        "padding_top": 40,
-        "padding_bottom": 40,
         "padding_inline": 12,
         "tile_ratio": "1 / 1",
-        "full_width": true
+        "gap": 16,
+        "border_radius": 0,
+        "padding_top": 90,
+        "padding_bottom": 4
       }
     }
   },
@@ -6131,8 +6131,8 @@
     "section_XGCFja",
     "section_e8fJMV",
     "17748735548bd1f660",
-    "category_cross_sell",
     "recently_viewed_products_WcH46k",
-    "product_recommendations_ecaxGU"
+    "product_recommendations_ecaxGU",
+    "category_cross_sell"
   ]
 }

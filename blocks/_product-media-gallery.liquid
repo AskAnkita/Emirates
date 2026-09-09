@@ -545,7 +545,7 @@
               and media.media_type == 'image'
               and forloop.index == skin_tone_index
             -%}
-              {%- render 'skin-tone-controller' -%}
+              {%- render 'skin-tone-controller', uid: block.id -%}
             {%- endif -%}
           </li>
         {% elsif media.media_type != 'video' and media.media_type != 'external_video' and bl_stts.video_type == 'dialog' %}
@@ -623,7 +623,7 @@
               and media.media_type == 'image'
               and skin_tone_position == skin_tone_index
             -%}
-              {%- render 'skin-tone-controller' -%}
+              {%- render 'skin-tone-controller', uid: block.id -%}
             {%- endif -%}
           </li>
           {% assign index = index | plus: 1 %}

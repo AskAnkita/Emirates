@@ -71,16 +71,25 @@
 
 /* Reserves the rotated slider's on-screen footprint. Without a wrapper the rotated
    input still occupies its pre-rotation box and has to be dragged back into place with
-   negative margins, which breaks as soon as the track length changes. */
+   negative margins, which breaks as soon as the track length changes.
+
+   The input is taken OUT OF FLOW rather than centred by the wrapper's own layout. Before
+   rotation the input is track-length wide -- far wider than this wrapper -- and in a flow
+   layout (grid/flex included) that overflow is resolved to one side, not shared: the
+   wrapper's single auto column sizes to the input's 13rem max-content contribution and
+   spills to the right, so the rotated slider lands half a track-length clear of the pill
+   and disappears against the image. Absolute centring is measured from the wrapper box
+   itself, so it holds whatever the input's pre-rotation width is. */
 .skin-tone-controller__track {
   position: relative;
-  display: grid;
-  place-items: center;
   width: var(--skin-tone-thumb-size);
   height: var(--skin-tone-track-length);
 }
 
 .skin-tone-controller__input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: var(--skin-tone-track-length);
   height: var(--skin-tone-thumb-size);
   margin: 0;
@@ -88,7 +97,9 @@
   -webkit-appearance: none;
   background: transparent;
   cursor: grab;
-  transform: rotate(90deg);
+  /* Translate first, then rotate: the pre-rotation box is centred on the wrapper, and the
+     rotation is about that same (now shared) centre. */
+  transform: translate(-50%, -50%) rotate(90deg);
   /* Keep a drag on the slider from being claimed by the gallery's swipe handling. */
   touch-action: none;
 }

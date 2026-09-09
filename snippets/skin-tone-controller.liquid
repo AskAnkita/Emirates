@@ -49,8 +49,45 @@
   The tone ramp itself lives in STOPS in assets/skin-tone-controller.js.
 
   @param {string} [uid] - unique suffix for the filter id, so two controls on one page
-    cannot collide. Pass the gallery block's id.
+    cannot collide. Pass the gallery block's id; the media id is appended here, so several
+    matching images each get their own filter.
+  @param {object} [media] - the media item this is being considered for. Non-images are
+    skipped. Omit to render unconditionally.
+  @param {number} [position] - this media's 1-based position in the gallery, used only by
+    the positional fallback.
+  @param {string} [keywords] - comma-separated keywords; the control renders on any image
+    whose alt text or filename contains one of them, case-insensitively. Takes precedence
+    over `index`.
+  @param {number} [index] - positional fallback, used only when `keywords` is empty.
 {%- enddoc -%}
+
+{%- liquid
+  # Which images get the control. Keywords are checked against the alt text and the
+  # filename together, because merchants label on-model shots in whichever of the two
+  # they happen to control -- alt text in the admin, or the filename at upload.
+  assign stc_render = true
+
+  if media
+    if media.media_type != 'image'
+      assign stc_render = false
+    elsif keywords != blank
+      assign stc_render = false
+      assign stc_haystack = media.alt | default: '' | append: ' ' | append: media.preview_image.src | downcase
+      assign stc_needles = keywords | downcase | split: ','
+      for needle in stc_needles
+        assign stc_needle = needle | strip
+        if stc_needle != blank and stc_haystack contains stc_needle
+          assign stc_render = true
+          break
+        endif
+      endfor
+    elsif index and position != index
+      assign stc_render = false
+    endif
+  endif
+-%}
+
+{%- if stc_render -%}
 
 {%- liquid
   # The band-pass described above, as 81 stops spaced 0.0125 apart across the score.
@@ -64,8 +101,12 @@
   assign mask_feather = 1
 
   # `default` on the appended string would never fire (the prefix is always truthy),
-  # so the fallback has to be applied to uid itself.
+  # so the fallback has to be applied to uid itself. The media id disambiguates the
+  # instances when a keyword matches more than one image.
   assign stc_uid = uid | default: 'default'
+  if media
+    assign stc_uid = stc_uid | append: '-' | append: media.id
+  endif
   assign filter_id = 'skin-tone-filter-' | append: stc_uid
 -%}
 
@@ -126,3 +167,4 @@
 
   <span class="skin-tone-controller__value" aria-live="polite">Natural</span>
 </skin-tone-controller>
+{%- endif -%}

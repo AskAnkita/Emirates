@@ -476,6 +476,10 @@
 
   {%- liquid
     assign skin_tone_index = bl_stts.skin_tone_image_index | default: 2
+    # Keyword match wins over the positional fallback, so re-ordering or filtering the
+    # gallery cannot move the control onto the wrong photo. Comma-separated; matched
+    # case-insensitively against each image's alt text AND its filename.
+    assign skin_tone_keywords = bl_stts.skin_tone_image_keywords
   -%}
 
   {% if bl_stts.media_presentation == 'grid' %}
@@ -541,11 +545,14 @@
                 {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first, bl_stts: bl_stts -%}
               {%- endif-%}
             {% endif %}
-            {%- if bl_stts.show_skin_tone_controller
-              and media.media_type == 'image'
-              and forloop.index == skin_tone_index
-            -%}
-              {%- render 'skin-tone-controller', uid: block.id -%}
+            {%- if bl_stts.show_skin_tone_controller -%}
+              {%- render 'skin-tone-controller',
+                uid: block.id,
+                media: media,
+                position: forloop.index,
+                keywords: skin_tone_keywords,
+                index: skin_tone_index
+              -%}
             {%- endif -%}
           </li>
         {% elsif media.media_type != 'video' and media.media_type != 'external_video' and bl_stts.video_type == 'dialog' %}
@@ -618,12 +625,15 @@
                 -%}
               </div>
             {% endif %}
-            {%- assign skin_tone_position = index | plus: 1 -%}
-            {%- if bl_stts.show_skin_tone_controller
-              and media.media_type == 'image'
-              and skin_tone_position == skin_tone_index
-            -%}
-              {%- render 'skin-tone-controller', uid: block.id -%}
+            {%- if bl_stts.show_skin_tone_controller -%}
+              {%- assign skin_tone_position = index | plus: 1 -%}
+              {%- render 'skin-tone-controller',
+                uid: block.id,
+                media: media,
+                position: skin_tone_position,
+                keywords: skin_tone_keywords,
+                index: skin_tone_index
+              -%}
             {%- endif -%}
           </li>
           {% assign index = index | plus: 1 %}
@@ -1155,10 +1165,18 @@
       "default": false
     },
     {
+      "type": "text",
+      "id": "skin_tone_image_keywords",
+      "label": "Skin tone image keywords",
+      "info": "Show the control on any image whose alt text or filename contains one of these words. Comma-separated, not case sensitive — e.g. hand, on-model. Leave empty to fall back to the fixed position below.",
+      "default": "hand",
+      "visible_if": "{{ block.settings.show_skin_tone_controller }}"
+    },
+    {
       "type": "range",
       "id": "skin_tone_image_index",
-      "label": "Skin tone image",
-      "info": "Which gallery image the control applies to. 1 = first image. Only that image is affected.",
+      "label": "Skin tone image position",
+      "info": "Only used when no keywords are set above. Which gallery image the control applies to. 1 = first image.",
       "min": 1,
       "max": 12,
       "step": 1,

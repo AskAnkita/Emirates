@@ -14,6 +14,15 @@ if (!customElements.get('skin-tone-controller')) {
   const DEFAULT_VALUE = 50;
 
   /*
+   * A keyword can match several images, so a gallery can show more than one control at
+   * once. They are the same choice, not independent ones -- dragging either has to move
+   * the rest, or the page reads as broken. Broadcast rather than have each instance hunt
+   * for its siblings, so controls in the zoom dialog or a re-rendered gallery join in
+   * without any registry to keep current.
+   */
+  const SYNC_EVENT = 'skin-tone:change';
+
+  /*
    * The tone ramp, as a per-channel affine transform `out = scale * in + offset` that the
    * SVG colour matrix applies to skin pixels. Position 50 is the photograph exactly as
    * shot, so the filter is detached entirely there.
@@ -119,6 +128,21 @@ if (!customElements.get('skin-tone-controller')) {
           this.addEventListener(type, (event) => event.stopPropagation(), { signal });
         }
 
+        document.addEventListener(
+          SYNC_EVENT,
+          (event) => {
+            if (event.detail?.source === this) return;
+
+            const next = String(event.detail?.value ?? '');
+            if (next === '' || this.input.value === next) return;
+
+            this.input.value = next;
+            // persist: false -- the originating control already stored and broadcast it.
+            this.update(false);
+          },
+          { signal }
+        );
+
         this.input.value = String(readStoredValue());
         this.update(false);
       }
@@ -150,7 +174,10 @@ if (!customElements.get('skin-tone-controller')) {
         if (this.valueLabel) this.valueLabel.textContent = label;
         this.input.setAttribute('aria-valuetext', label);
 
-        if (persist) writeStoredValue(value);
+        if (persist) {
+          writeStoredValue(value);
+          document.dispatchEvent(new CustomEvent(SYNC_EVENT, { detail: { value, source: this } }));
+        }
       }
     }
   );

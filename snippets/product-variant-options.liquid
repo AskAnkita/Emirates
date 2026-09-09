@@ -31,7 +31,8 @@
         
         assign variant_for_value = null
         assign variant_image_group = ''
-        
+        assign variant_filter_handle = value | handle
+
         if show_variant_media_grouped
           for color in product.options_with_values[index].values
             if color == value
@@ -41,6 +42,17 @@
               endif
               break
             endif
+          endfor
+
+          # Karat is a purity/price difference, not a visual one: 14k and 18k yellow gold
+          # are photographed identically, so both have to point at ONE image group or the
+          # merchant is made to upload and label the same shots twice. Dropping the karat
+          # from the filter handle means an image labelled "Yellow Gold" serves every
+          # yellow-gold variant. A `custom.variant_image_group` metafield still overrides
+          # this entirely, for the cases where the karats really do differ.
+          assign karat_suffixes = '-9k,-10k,-14k,-18k,-21k,-22k,-24k' | split: ','
+          for suffix in karat_suffixes
+            assign variant_filter_handle = variant_filter_handle | remove_last: suffix
           endfor
         endif
       -%}
@@ -61,7 +73,7 @@
         data-product-url="{{ value.product_url }}"
         data-option-value-id="{{ value.id }}"
         {% if show_variant_media_grouped %}
-          data-filter=".filter-{{ value | handle }}"
+          data-filter=".filter-{{ variant_filter_handle }}"
           {% if variant_image_group != blank %}
             data-variant-image-grouped="{{ variant_image_group }}"
           {% endif %}

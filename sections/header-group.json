@@ -779,6 +779,7 @@
         },
         "luxury_mega_menu_QMPPda": {
           "type": "luxury_mega_menu",
+          "name": "Necklaces Mega Menu",
           "settings": {
             "nav_label": "Necklaces",
             "nav_link": "",
@@ -878,6 +879,7 @@
         },
         "luxury_mega_menu_m7nNfj": {
           "type": "luxury_mega_menu",
+          "name": "Gifting section",
           "settings": {
             "nav_label": "Gifting",
             "nav_link": "",
@@ -929,9 +931,9 @@
             "col3_link3_url": "",
             "col3_link4_label": "Anniversary",
             "col3_link4_url": "",
-            "featured_image1": "shopify://shop_images/36ecac19-afd2-41dc-9dc2-143744d7b83d.png",
+            "featured_image1": "shopify://shop_images/ea1c0bdd-d775-43c5-9490-913a929e63a5.png",
             "featured_image1_url": "",
-            "featured_image2": "shopify://shop_images/acfbf73b-591c-4922-96d5-722d7e0a5153.png",
+            "featured_image2": "shopify://shop_images/4f0b1148-d071-48e9-8e43-e67a536a37a2.png",
             "featured_image2_url": "",
             "buttons_heading": "BEST SELLERS",
             "button1_label": "Engagement Rings",

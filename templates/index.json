@@ -1110,11 +1110,7 @@
         "icon_dLEgDz",
         "text_9RrVLF"
       ],
-      "custom_css": [
-        ".marquee__repeated-items > *:nth-child(2n) {margin-inline-end: 40px; /* space AFTER each text label, before next icon */}",
-        " /* Target all text inside the marquee */marquee-component .marquee__repeated-items p,marquee-component .marquee__repeated-items span {font-family: var(--font-body--family); font-size: 16px; font-weight: 400; /* regular */}",
-        " /* Target all icons/SVGs inside the marquee */marquee-component .marquee__repeated-items svg,marquee-component .marquee__repeated-items img {width: 20px; height: 20px;}"
-      ],
+      "custom_css": [],
       "name": "t:names.marquee",
       "settings": {
         "movement_direction": "normal",
@@ -2863,7 +2859,7 @@
         "horizontal_alignment_flex_direction_column": "center",
         "vertical_alignment_flex_direction_column": "flex-start",
         "gap": 20,
-        "section_width": "full-width",
+        "section_width": "page-width",
         "page_width_custom": 1820,
         "section_height": "",
         "section_height_custom": 50,
@@ -2884,8 +2880,8 @@
         "image_behavior": "none",
         "padding-block-start": 90,
         "padding-block-end": 4,
-        "padding-inline-start": 12,
-        "padding-inline-end": 12
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
       }
     },
     "section_r47nVY": {
@@ -4938,7 +4934,7 @@
         "horizontal_alignment_flex_direction_column": "center",
         "vertical_alignment_flex_direction_column": "flex-start",
         "gap": 20,
-        "section_width": "full-width",
+        "section_width": "page-width",
         "page_width_custom": 1570,
         "section_height": "",
         "section_height_custom": 50,
@@ -4959,8 +4955,8 @@
         "image_behavior": "none",
         "padding-block-start": 90,
         "padding-block-end": 4,
-        "padding-inline-start": 65,
-        "padding-inline-end": 65
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
       }
     },
     "section_tXNYd8": {
@@ -6500,7 +6496,7 @@
         "horizontal_alignment_flex_direction_column": "center",
         "vertical_alignment_flex_direction_column": "flex-start",
         "gap": 20,
-        "section_width": "full-width",
+        "section_width": "page-width",
         "page_width_custom": 1820,
         "section_height": "",
         "section_height_custom": 50,
@@ -6521,8 +6517,8 @@
         "image_behavior": "none",
         "padding-block-start": 90,
         "padding-block-end": 4,
-        "padding-inline-start": 12,
-        "padding-inline-end": 12
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
       }
     },
     "featured_collection_list_YeVaRD": {
@@ -6939,7 +6935,7 @@
         "pagination_type": "dynamic",
         "dots_top_offset": 40,
         "progress_top_offset": 40,
-        "section_width": "full-width",
+        "section_width": "page-width",
         "page_width_custom": 1570,
         "color_scheme": "",
         "tabs_header_style": "inside_section_header",
@@ -7025,8 +7021,8 @@
         "content_button_link": "",
         "padding-block-start": 90,
         "padding-block-end": 4,
-        "padding-inline-start": 65,
-        "padding-inline-end": 65
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
       }
     },
     "featured_collection_list_9sezjk": {
@@ -9099,7 +9095,7 @@
         "horizontal_alignment_flex_direction_column": "center",
         "vertical_alignment_flex_direction_column": "flex-start",
         "gap": 0,
-        "section_width": "full-width",
+        "section_width": "page-width",
         "page_width_custom": 1570,
         "section_height": "",
         "section_height_custom": 50,
@@ -9120,8 +9116,8 @@
         "image_behavior": "none",
         "padding-block-start": 94,
         "padding-block-end": 0,
-        "padding-inline-start": 12,
-        "padding-inline-end": 12
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
       }
     },
     "1777450991e048d40c": {

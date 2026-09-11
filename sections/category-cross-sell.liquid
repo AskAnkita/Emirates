@@ -94,7 +94,8 @@
     max-width: var(--ccs-width, 1040px);
     margin-inline: auto;
     padding-block: var(--ccs-padding-start, 0px) var(--ccs-padding-end, 0px);
-    padding-inline: var(--ccs-padding-inline, 12px);
+    /* never tighter than the theme page margin, so the tiles line up with the header and footer */
+    padding-inline: max(var(--page-margin), var(--ccs-padding-inline, 0px));
   }
 
   .ccs__heading {
@@ -214,6 +215,7 @@
       "type": "range",
       "id": "padding_inline",
       "label": "Side padding",
+      "info": "Never smaller than the theme page margin, so the tiles line up with the header and footer.",
       "min": 0,
       "max": 80,
       "step": 2,

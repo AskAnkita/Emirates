@@ -38,6 +38,49 @@
   /* line the toolbar up with the product grid's left / right gutter */
   padding-inline: var(--padding-inline-start, 1.5rem) var(--padding-inline-end, 1.5rem);
 }
+@media screen and (max-width: 749px) {
+  .facets-block-wrapper--horizontal .facets-container {
+    gap: 1rem;
+    padding-inline: 1.5rem;
+  }
+
+  .facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper,
+  .facets-block-wrapper--horizontal .facets-container > facet-filters-form.facets {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 0;
+    margin: 0 !important;
+  }
+
+  .facets-block-wrapper--horizontal .facets-container > facet-filters-form.facets .facets__form,
+  .facets-block-wrapper--horizontal .sorting-wrapper,
+  .facets-block-wrapper--horizontal .facet-filters.sorting,
+  .facets-block-wrapper--horizontal .mobile-facets__disclosure,
+  .facets-block-wrapper--horizontal .mobile-facets__open-wrapper,
+  .facets-block-wrapper--horizontal .mobile-facets__open,
+  .facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field > div {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  .facets-block-wrapper--horizontal .mobile-facets__open-wrapper {
+    background: transparent !important;
+  }
+
+  .facets-block-wrapper--horizontal .mobile-facets__open,
+  .facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field > div {
+    min-height: 4.4rem;
+    padding-inline: 1.2rem;
+    justify-content: center;
+  }
+
+  .facets-block-wrapper--horizontal .sorting-wrapper .results-count {
+    flex: 1 0 100%;
+    order: 3;
+    text-align: center;
+    white-space: normal;
+  }
+}
 @media screen and (min-width: 750px) {
   .facets-block-wrapper--horizontal .facets-container {
     padding-inline: var(--padding-inline-start, 3rem) var(--padding-inline-end, 3rem);
@@ -135,7 +178,8 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 .facets-block-wrapper--horizontal .mobile-facets__open,
 .facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field > div {
   box-sizing: border-box;
-  min-height: 4rem;
+  height: 4.4rem;
+  min-height: 4.4rem;
   display: flex;
   align-items: center;
   gap: 0.8rem;
@@ -143,6 +187,21 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
   font-size: 1.3rem;
   line-height: 1;
   white-space: nowrap;
+}
+/* Same label type on both — otherwise the theme's .button-label makes "Filter" 16px
+   and the sort markup's inline --font-size makes "Sort by" 12px. */
+.facets-block-wrapper--horizontal .mobile-facets__open-label,
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field-label,
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__sort > summary > span {
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+/* the theme gives the sort <summary> a 45px touch-target min-height, which stretched the box */
+.facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__sort > summary {
+  min-height: 0;
+  height: 100%;
 }
 
 /* Left: the "Filter" button — solid fill, label then icon.
@@ -186,7 +245,6 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 .facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field-label {
   color: var(--color-foreground);
   white-space: nowrap;
-  text-transform: capitalize;
 }
 
 /* value stays next to the label; caret is pushed to the right edge */

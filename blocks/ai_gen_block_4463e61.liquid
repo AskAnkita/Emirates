@@ -336,12 +336,8 @@
       width: calc((100% - ({{ block.settings.tablet_columns | minus: 1 }} * {{ block.settings.column_gap }}px)) / {{ block.settings.tablet_columns }});
     }
 
-    .ai-diamond-shape-carousel-arrow-prev-{{ ai_gen_id }} {
-      left: 10px;
-    }
-
-    .ai-diamond-shape-carousel-arrow-next-{{ ai_gen_id }} {
-      right: 10px;
+    .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} {
+      display: none !important;
     }
   }
 
@@ -354,23 +350,6 @@
       width: calc((100% - ({{ block.settings.mobile_columns | minus: 1 }} * {{ block.settings.column_gap }}px)) / {{ block.settings.mobile_columns }});
     }
 
-    .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} {
-      width: 36px;
-      height: 36px;
-    }
-
-    .ai-diamond-shape-carousel-arrow-{{ ai_gen_id }} svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    .ai-diamond-shape-carousel-arrow-prev-{{ ai_gen_id }} {
-      left: 5px;
-    }
-
-    .ai-diamond-shape-carousel-arrow-next-{{ ai_gen_id }} {
-      right: 5px;
-    }
   }
 {% endstyle %}
 

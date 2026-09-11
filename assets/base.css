@@ -2666,6 +2666,7 @@ deferred-media {
 }
 
 .button,
+.button-secondary,
 .button-label,
 .shopify-challenge__button,
 .customer button {
@@ -2883,7 +2884,9 @@ button.shopify-payment-button__button--unbranded {
 .button-secondary {
   --button-font-family: var(--button-font-family-secondary);
   --button-font-size: var(--button-font-size-secondary);
-  --button-font-weight: var(--button-font-weight-secondary);
+  /* Same weight as the primary button so outlined and filled CTAs read as one family
+     (the secondary weight setting has no 500 option). */
+  --button-font-weight: var(--button-font-weight-primary);
   --button-text-case: var(--button-text-case-secondary);
   --button-border-radius: var(--style-border-radius-buttons-secondary);
   --button-color: var(--color-secondary-button-text);
@@ -19625,20 +19628,11 @@ display: block;
 /* Mobile More Filter Hide */
 
 
-/* Breadcrumb left Padding */
-.spacing-style.layout-panel-flex.layout-panel-flex--.mobile-column.section-content-wrapper {
-    padding-left: 65px;
+/* Breadcrumb: start on the page-margin line shared with the header and footer.
+   Page-width breadcrumbs already sit there; full-width ones need the margin added. */
+.section--full-width .section-content-wrapper:has(> nav.breadcrumbs) {
+  padding-inline-start: var(--page-margin);
 }
-/* Breadcrumb left Padding */
-
-
-/* Mobile Breadcrumb left Padding */
-@media (max-width: 767px) {
-  .spacing-style.layout-panel-flex.layout-panel-flex--.mobile-column.section-content-wrapper {
-    padding-left: 16px !important;
-}
-}
-/* Mobile Breadcrumb left Padding */
 /* ------- reducing image size and put in the  center product detail image --------- */
 .dialog-zoomed-gallery .product-media {
     display: flex;
@@ -19686,12 +19680,16 @@ button .custom-typography{
 }
 }
 
-.tabs-component-panel-trigger.button :hover{
-  font-size: 13px !important;
-}
-
-.tabs-component-panel-trigger.button {
-  font-size: 13px !important;
+@media screen and (max-width: 749px) {
+  .tabs-component-panel-trigger.button,
+  .tabs-component-panel-trigger.button-secondary {
+    min-height: 4.8rem;
+    padding: 1rem 1.2rem !important;
+    font-size: 1.2rem !important;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 
 
@@ -19781,5 +19779,48 @@ details[open] .icon-caret {
   max-width: 700px;
   text-align: center;
   z-index: 10;
-  background: red !important; /* temporary test color — remove once confirmed */
+}
+
+@media screen and (max-width: 749px) {
+  [data-shopify-editor-block*="group_QQkUjp"] {
+    position: static !important;
+    transform: none !important;
+    width: 100%;
+    max-width: none;
+    padding-inline: 1.6rem;
+    background: transparent !important;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  body.template-index [id$="__section_7XcF39"] .section-content-wrapper {
+    align-items: center !important;
+    padding-top: 5.6rem !important;
+  }
+
+  body.template-index [id$="__section_7XcF39"] h1 {
+    font-size: clamp(2.8rem, 9vw, 3.8rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  body.template-index [id$="__section_7XcF39"] .button {
+    padding: 1rem 2.4rem !important;
+  }
+}
+
+body.template-index [id$="__marquee_PKziKG"] .marquee__repeated-items > *:nth-child(2n) {
+  margin-inline-end: 40px;
+}
+
+body.template-index [id$="__marquee_PKziKG"] marquee-component .marquee__repeated-items p,
+body.template-index [id$="__marquee_PKziKG"] marquee-component .marquee__repeated-items span {
+  font-family: var(--font-body--family);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+body.template-index [id$="__marquee_PKziKG"] marquee-component .marquee__repeated-items svg,
+body.template-index [id$="__marquee_PKziKG"] marquee-component .marquee__repeated-items img {
+  width: 20px;
+  height: 20px;
 }

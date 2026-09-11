@@ -361,7 +361,7 @@
 <div class="luxury-mm-{{ uid }}">
   <div class="luxury-mm-trigger-{{ uid }}">
     <a
-      href="{{ link.url }}"
+      href="{{ es.nav_link | default: link.url }}"
       {% if link.current %}aria-current="page"{% endif %}
     >
       {{ link.title | escape }}

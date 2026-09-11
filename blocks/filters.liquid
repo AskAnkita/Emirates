@@ -687,6 +687,14 @@
       "visible_if": "{{ block.settings.enable_filtering == true and block.settings.show_filter_by_tags_sidebar == true and block.settings.number_filters == 5 }}"
     },
     {
+      "type": "text",
+      "id": "fbt_image_headings",
+      "label": "Headings shown with round images",
+      "default": "Gemstone",
+      "info": "Comma-separated, e.g. Gemstone. Upload images to Files named gemstone-diamond.png, gemstone-emerald.png, etc. Without an image, a colour dot is shown.",
+      "visible_if": "{{ block.settings.enable_filtering == true and block.settings.show_filter_by_tags_sidebar == true }}"
+    },
+    {
       "type": "header",
       "content": "t:settings.enable_sorting"
     },

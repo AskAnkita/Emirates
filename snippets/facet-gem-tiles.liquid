@@ -1,0 +1,110 @@
+{%- comment -%}
+  Renders one "filter by tags" group as round gemstone tiles, laid out like the
+  Metal Type image filter: gem image above the name, no visible checkbox.
+
+  Tags appear in the order they're listed in the Filters block. A tag that no
+  product in the current results carries is still shown, greyed out and not
+  selectable, so the full gemstone range is always visible.
+
+  Accepts:
+  - filter: {Object} The tag filter (filter.p.tag)
+  - tags: {String} Comma-separated tags for this group, from the Filters block
+  - list_class: {String} Extra classes for the <ul>
+  - label_class: {String} Base classes for each option label
+  - input_class: {String} Classes for the hidden checkbox
+  - id_prefix: {String} Prefix for input ids (must be unique per group)
+  - text_label_case: {String} Label case class from the Filters block
+  - text_label_font_size: {String} Label font size from the Filters block
+
+  Usage:
+    {% render 'facet-gem-tiles',
+      filter: filter,
+      tags: gem_tags_setting,
+      list_class: 'facets__list',
+      label_class: 'facets__label facet-checkbox',
+      input_class: '',
+      id_prefix: gem_id_prefix,
+      text_label_case: text_label_case,
+      text_label_font_size: text_label_font_size
+    %}
+{%- endcomment -%}
+
+{%- assign gem_tags = tags | split: ',' -%}
+
+<ul
+  class="facets-layout facets-layout-grid facets-layout-grid--image facets-gem-grid list-unstyled {{ list_class }}"
+  role="list"
+>
+  {%- for gem_tag in gem_tags -%}
+    {%- liquid
+      assign gem_tag = gem_tag | strip
+      if gem_tag == blank
+        continue
+      endif
+
+      assign gem_tag_downcase = gem_tag | downcase
+      assign gem_value = blank
+      for value in filter.values
+        assign value_downcase = value.value | downcase
+        if value_downcase == gem_tag_downcase
+          assign gem_value = value
+          break
+        endif
+      endfor
+    -%}
+    <li class="list-menu__item facets__item">
+      {%- if gem_value != blank -%}
+        {%- liquid
+          assign input_id = id_prefix | append: forloop.index
+          assign is_disabled = false
+          if gem_value.count == 0 and gem_value.active == false
+            assign is_disabled = true
+          endif
+        -%}
+        <label
+          for="{{ input_id }}"
+          class="{{ label_class }}{% if is_disabled %} disabled{% endif %}{% if gem_value.active %} active{% endif %}"
+          style="--font-size: {{ text_label_font_size }};"
+        >
+          <input
+            type="checkbox"
+            {% if input_class != blank %}
+              class="{{ input_class }}"
+            {% endif %}
+            name="{{ gem_value.param_name }}"
+            value="{{ gem_value.value }}"
+            id="{{ input_id }}"
+            {% if gem_value.active %}
+              checked
+            {% endif %}
+            {% if is_disabled %}
+              disabled
+            {% endif %}
+          >
+          <span class="facets__image-wrapper">
+            {%- render 'facet-gem-swatch', tag: gem_value.value -%}
+          </span>
+          <span class="facet-checkbox__text" aria-hidden="true">
+            <span class="facet-checkbox__text-label {{ text_label_case }}">{{- gem_value.label | escape -}}</span>
+          </span>
+          <span class="visually-hidden">
+            {{- gem_value.label | escape }} ({{ 'products.facets.product_count_simple' | t: count: gem_value.count }})
+          </span>
+        </label>
+      {%- else -%}
+        <span
+          class="{{ label_class }} disabled"
+          style="--font-size: {{ text_label_font_size }};"
+          aria-disabled="true"
+        >
+          <span class="facets__image-wrapper">
+            {%- render 'facet-gem-swatch', tag: gem_tag -%}
+          </span>
+          <span class="facet-checkbox__text">
+            <span class="facet-checkbox__text-label {{ text_label_case }}">{{- gem_tag | escape -}}</span>
+          </span>
+        </span>
+      {%- endif -%}
+    </li>
+  {%- endfor -%}
+</ul>

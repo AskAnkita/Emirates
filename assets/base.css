@@ -2338,7 +2338,9 @@ details[open] > summary .icon-plus-wrapper {
   display: block;
 }
 
-.multicolumn-scroller--no-nav .swiper-btns-wrap {
+/* The extra .swiper-btns-wrap--outside class is needed to beat the
+   `display: flex` that component-slider.css (loaded later) sets on it. */
+.multicolumn-scroller--no-nav .swiper-btns-wrap.swiper-btns-wrap--outside {
   display: none;
 }
 
@@ -2349,9 +2351,9 @@ details[open] > summary .icon-plus-wrapper {
   }
 }
 
-/* Mobile: no arrows, touch-swipe only */
-@media screen and (max-width: 749px) {
-  .multicolumn-scroller .swiper-btns-wrap {
+/* Phones and tablets: no arrows, touch-swipe only (they would sit on top of the text) */
+@media screen and (max-width: 1024px) {
+  .multicolumn-scroller .swiper-btns-wrap.swiper-btns-wrap--outside {
     display: none;
   }
 }
@@ -2756,7 +2758,9 @@ button.shopify-payment-button__button--unbranded {
   --shadow-blur-radius: var(--buttons-shadow-blur-radius);
   --text-align: center;
   display: inline-grid;
+  place-items: center;
   align-content: center;
+  gap: 0.8rem;
   text-decoration: none;
   text-align: var(--text-align);
   color: var(--button-color);
@@ -2777,9 +2781,12 @@ button.shopify-payment-button__button--unbranded {
     background-color var(--animation-speed) var(--animation-easing);
   cursor: pointer;
   width: fit-content;
+  min-height: 4.6rem;
+  box-sizing: border-box;
   box-shadow: var(--shadow-horizontal-offset) var(--shadow-vertical-offset) var(--shadow-blur-radius) var(--color-shadow);
   padding-block:  var(--button-padding-vertical-mobile, var(--button-padding-vertical));
   padding-inline: var(--button-padding-horizontal-mobile, var(--button-padding-horizontal));
+  overflow-wrap: anywhere;
 
   @media screen and (max-width: 749px) {
     font-size: min(var(--button-font-size, var(--font-size--paragraph-md)), var(--font-size--2xl));
@@ -6070,12 +6077,16 @@ summary {
     justify-content: var(--vertical-alignment-tablet);
   }
 
+  /* Longhands on purpose: if --flex-wrap holds an invalid value (e.g. a legacy
+     "no-wrap" setting) only the wrap is dropped, not the chosen tablet direction. */
   .layout-panel-flex.tablet-layout-panel-flex--row {
-    flex-flow: row var(--flex-wrap);
+    flex-direction: row;
+    flex-wrap: var(--flex-wrap);
   }
 
   .layout-panel-flex.tablet-layout-panel-flex--column {
-    flex-flow: column var(--flex-wrap);
+    flex-direction: column;
+    flex-wrap: var(--flex-wrap);
   }
 }
 
@@ -12409,7 +12420,7 @@ product-recommendations:has([data-has-recommendations='false']) {
     transform var(--animation-speed) var(--animation-easing);
 
   &:not(.deferred-media__poster, .prevent-active, .search-block__button):active {
-    transform: scale(0.9);
+    transform: scale(0.98);
   }
 }
 
@@ -12436,7 +12447,19 @@ product-recommendations:has([data-has-recommendations='false']) {
     transition: var(--tss);
   }
 
+  &:hover .button-text-main {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  &:hover .button-overflow:after {
+    transform: translateY(0);
+  }
+
   .button-overflow {
+    display: inline-block;
+    max-width: 100%;
+
     &:after {
       content: attr(data-button-text);
       transform: translateY(100%);
@@ -16579,6 +16602,11 @@ body:has(> #header-group:empty) {
 
   > .header__column-action.header__column-action--icon:last-child {
     margin-inline-end: -1.2rem;
+
+    /* Phones: the header grid runs edge to edge, so the pull pushes the cart icon off-screen */
+    @media screen and (max-width: 749px) {
+      margin-inline-end: 0;
+    }
   }
 }
 

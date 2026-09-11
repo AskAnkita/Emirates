@@ -3,20 +3,25 @@
     Create a custom Shopify theme section that visually reproduces the store’s existing Featured article editorial layout as closely as possible, but without requiring a blog article. It should let the merchant choose an image, heading, body text, and optional link/button manually. Preserve the original layout’s proportions, typography hierarchy, spacing, image placement, alignment, and responsive behavior so it matches the existing Featured article section rather than the standard Image with text section. Make all content editable in the theme editor.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% if block.settings.text_alignment == 'center' %}
+  {% assign ai_gen_align = 'center' %}
+{% else %}
+  {% assign ai_gen_align = 'flex-start' %}
+{% endif %}
 
 {% style %}
   .ai-editorial-feature-{{ ai_gen_id }} {
     display: block;
     width: {{ block.settings.desktop_width_percent }}%;
     max-width: 100%;
-    margin: 0 auto;
+    margin: {{ block.settings.margin_top }}px auto 0;
     background: {{ block.settings.background_color }};
     color: {{ block.settings.text_color }};
   }
 
   .ai-editorial-feature__inner-{{ ai_gen_id }} {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, {{ block.settings.image_width_percent }}fr) minmax(0, {{ 100 | minus: block.settings.image_width_percent }}fr);
     align-items: stretch;
     min-height: {{ block.settings.image_height }}px;
   }
@@ -61,8 +66,8 @@
   .ai-editorial-feature__content-{{ ai_gen_id }} {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: {{ block.settings.content_alignment }};
+    justify-content: {{ block.settings.content_alignment }};
+    align-items: {{ ai_gen_align }};
     padding: {{ block.settings.content_padding }}px;
     text-align: {{ block.settings.text_alignment }};
     order: 2;
@@ -104,30 +109,30 @@
     margin-bottom: 0;
   }
 
-  .ai-editorial-feature__link-{{ ai_gen_id }} {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    margin-top: 30px;
-    padding: 12px 24px;
-    border: 1px solid {{ block.settings.button_color }};
-    background: {{ block.settings.button_background }};
-    color: {{ block.settings.button_color }};
-    font-size: 12px;
-    letter-spacing: .12em;
-    line-height: 1.2;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: background-color .2s ease, color .2s ease;
+  .ai-editorial-feature__actions-{{ ai_gen_id }} {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: {{ ai_gen_align }};
+    gap: 16px;
+    margin-top: 32px;
   }
 
-  .ai-editorial-feature__link-{{ ai_gen_id }}:hover,
-  .ai-editorial-feature__link-{{ ai_gen_id }}:focus-visible {
-    background: {{ block.settings.button_color }};
-    color: {{ block.settings.button_background }};
+  /* Filled primary CTA (inverted primary button colours) so it stands apart from the outlined secondary */
+  .ai-editorial-feature__actions-{{ ai_gen_id }} .button.ai-editorial-feature__cta--primary-{{ ai_gen_id }} {
+    --button-color: var(--color-primary-button-background);
+    --button-border-color: var(--color-primary-button-text);
+    background-color: var(--color-primary-button-text);
+  }
+
+  .ai-editorial-feature__actions-{{ ai_gen_id }} .button.ai-editorial-feature__cta--primary-{{ ai_gen_id }}:hover {
+    background-color: var(--color-primary-button-hover-background);
   }
 
   @media screen and (max-width: 749px) {
+    .ai-editorial-feature-{{ ai_gen_id }} {
+      margin-top: {{ block.settings.mobile_margin_top }}px;
+    }
+
     .ai-editorial-feature__inner-{{ ai_gen_id }} {
       grid-template-columns: 1fr;
       min-height: 0;
@@ -149,6 +154,10 @@
     .ai-editorial-feature__heading-{{ ai_gen_id }} {
       font-size: {{ block.settings.mobile_heading_size }}px;
     }
+
+    .ai-editorial-feature__actions-{{ ai_gen_id }} {
+      justify-content: center;
+    }
   }
 {% endstyle %}
 
@@ -168,7 +177,28 @@
       {% if block.settings.eyebrow != blank %}<p class="ai-editorial-feature__eyebrow-{{ ai_gen_id }}">{{ block.settings.eyebrow }}</p>{% endif %}
       {% if block.settings.heading != blank %}<h2 class="ai-editorial-feature__heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>{% endif %}
       {% if block.settings.body != blank %}<div class="ai-editorial-feature__body-{{ ai_gen_id }}">{{ block.settings.body }}</div>{% endif %}
-      {% if block.settings.button_label != blank and block.settings.button_link != blank %}<a class="ai-editorial-feature__link-{{ ai_gen_id }}" href="{{ block.settings.button_link }}">{{ block.settings.button_label }}</a>{% endif %}
+      {% assign ai_gen_show_primary = false %}
+      {% assign ai_gen_show_secondary = false %}
+      {% if block.settings.button_label != blank and block.settings.button_link != blank %}{% assign ai_gen_show_primary = true %}{% endif %}
+      {% if block.settings.secondary_button_label != blank and block.settings.secondary_button_link != blank %}{% assign ai_gen_show_secondary = true %}{% endif %}
+      {% if ai_gen_show_primary or ai_gen_show_secondary %}
+        <div class="ai-editorial-feature__actions-{{ ai_gen_id }}">
+          {% if ai_gen_show_primary %}
+            <a class="button ai-editorial-feature__cta--primary-{{ ai_gen_id }}" href="{{ block.settings.button_link }}">
+              <span class="button-overflow relative overflow-hidden" data-button-text="{{ block.settings.button_label | escape }}">
+                <span class="button-text-main inline-block relative z-1">{{ block.settings.button_label }}</span>
+              </span>
+            </a>
+          {% endif %}
+          {% if ai_gen_show_secondary %}
+            <a class="button-secondary" href="{{ block.settings.secondary_button_link }}">
+              <span class="button-overflow relative overflow-hidden" data-button-text="{{ block.settings.secondary_button_label | escape }}">
+                <span class="button-text-main inline-block relative z-1">{{ block.settings.secondary_button_label }}</span>
+              </span>
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -182,28 +212,31 @@
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The edit" },
     { "type": "text", "id": "heading", "label": "Heading", "default": "A considered expression" },
     { "type": "richtext", "id": "body", "label": "Body text", "default": "<p>Discover the details, craftsmanship and quiet beauty behind every piece.</p>" },
-    { "type": "text", "id": "button_label", "label": "Button label", "default": "Discover more" },
-    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "text", "id": "button_label", "label": "Primary button label", "default": "Our story" },
+    { "type": "url", "id": "button_link", "label": "Primary button link" },
+    { "type": "text", "id": "secondary_button_label", "label": "Secondary button label", "default": "Shop collections" },
+    { "type": "url", "id": "secondary_button_link", "label": "Secondary button link", "default": "/collections" },
     { "type": "header", "content": "Layout" },
     { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "range", "id": "image_width_percent", "label": "Image width", "min": 30, "max": 70, "step": 5, "unit": "%", "default": 50 },
+    { "type": "range", "id": "margin_top", "label": "Top margin", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 64 },
+    { "type": "range", "id": "mobile_margin_top", "label": "Mobile top margin", "min": 0, "max": 96, "step": 8, "unit": "px", "default": 40 },
     { "type": "range", "id": "image_height", "label": "Image height", "min": 300, "max": 900, "step": 10, "unit": "px", "default": 600 },
     { "type": "range", "id": "content_padding", "label": "Content spacing", "min": 24, "max": 120, "step": 8, "unit": "px", "default": 64 },
     { "type": "range", "id": "mobile_content_padding", "label": "Mobile spacing", "min": 24, "max": 96, "step": 8, "unit": "px", "default": 48 },
-    { "type": "select", "id": "text_alignment", "label": "Text alignment", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }], "default": "left" },
+    { "type": "select", "id": "text_alignment", "label": "Text alignment", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }], "default": "center" },
     { "type": "select", "id": "content_alignment", "label": "Content position", "options": [{ "value": "flex-start", "label": "Top" }, { "value": "center", "label": "Center" }, { "value": "flex-end", "label": "Bottom" }], "default": "center" },
     { "type": "header", "content": "Typography" },
     { "type": "range", "id": "heading_size", "label": "Heading size", "min": 24, "max": 72, "step": 2, "unit": "px", "default": 48 },
     { "type": "range", "id": "mobile_heading_size", "label": "Mobile heading size", "min": 24, "max": 52, "step": 2, "unit": "px", "default": 36 },
     { "type": "range", "id": "body_size", "label": "Body size", "min": 12, "max": 24, "step": 1, "unit": "px", "default": 16 },
     { "type": "header", "content": "Colors" },
-    { "type": "color", "id": "background_color", "label": "Background", "default": "#F7F6F2" },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#FFFFFF" },
     { "type": "color", "id": "heading_color", "label": "Heading", "default": "#1A1A1A" },
     { "type": "color", "id": "text_color", "label": "Text", "default": "#333333" },
     { "type": "color", "id": "accent_color", "label": "Accent", "default": "#6B5B4B" },
     { "type": "color", "id": "placeholder_color", "label": "Placeholder", "default": "#E8E5DE" },
-    { "type": "color", "id": "muted_color", "label": "Muted text", "default": "#555555" },
-    { "type": "color", "id": "button_background", "label": "Button background", "default": "#F7F6F2" },
-    { "type": "color", "id": "button_color", "label": "Button text", "default": "#1A1A1A" }
+    { "type": "color", "id": "muted_color", "label": "Muted text", "default": "#555555" }
   ],
   "presets": [{ "name": "Editorial feature" }],
   "tag": null,

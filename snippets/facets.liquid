@@ -233,6 +233,15 @@
                         {%- capture tags_list -%}fbt_tags_list_{{ i }}{%- endcapture -%}
                         {%- liquid
                           assign list_tag_heading = bl_stts[heading]
+                          assign list_tag_heading_downcase = list_tag_heading | downcase | strip
+                          assign is_gem_group = false
+                          assign gem_headings = bl_stts.fbt_image_headings | downcase | split: ','
+                          for gem_heading in gem_headings
+                            assign gem_heading = gem_heading | strip
+                            if gem_heading != blank and gem_heading == list_tag_heading_downcase
+                              assign is_gem_group = true
+                            endif
+                          endfor
                           assign list_tags = bl_stts[tags_list] | escape | append: ',' | prepend: ','
                           assign list_tags_render = ''
                           for value in filter.values
@@ -336,6 +345,27 @@
                                   endif
                                   assign value_index = 0
                                 -%}
+                                {%- if is_gem_group -%}
+                                  {%- liquid
+                                    assign gem_id_prefix = 'Filter-' | append: filter.param_name | escape | append: '-gem-' | append: i | append: '-'
+                                    assign gem_tags_setting = bl_stts[tags_list]
+                                    if filter_type == 'vertical'
+                                      assign gem_list_class = 'facets__list--vertical'
+                                    else
+                                      assign gem_list_class = 'facets__list'
+                                    endif
+                                  -%}
+                                  {% render 'facet-gem-tiles',
+                                    filter: filter,
+                                    tags: gem_tags_setting,
+                                    list_class: gem_list_class,
+                                    label_class: 'facets__label facet-checkbox',
+                                    input_class: '',
+                                    id_prefix: gem_id_prefix,
+                                    text_label_case: text_label_case,
+                                    text_label_font_size: text_label_font_size
+                                  %}
+                                {%- else -%}
                                 <ul
                                   class="{{ visual_layout_class }}{% if filter_type == 'vertical' %} facets__list--vertical {% else %} facets__list{% endif %} list-unstyled{% if is_swatch %} flex flex-wrap gap-xs{% endif %} "
                                   role="list"
@@ -461,6 +491,7 @@
                                     {%- endif -%}
                                   {%- endfor -%}
                                 </ul>
+                                {%- endif -%}
                               </fieldset>
                               {%- if value_index > show_more_number and filter_type == 'vertical' -%}
                                 <show-more-button>
@@ -1138,6 +1169,15 @@
                             {%- capture tags_list -%}fbt_tags_list_{{ i }}{%- endcapture -%}
                             {%- liquid
                               assign list_tag_heading = bl_stts[heading]
+                              assign list_tag_heading_downcase = list_tag_heading | downcase | strip
+                              assign is_gem_group = false
+                              assign gem_headings = bl_stts.fbt_image_headings | downcase | split: ','
+                              for gem_heading in gem_headings
+                                assign gem_heading = gem_heading | strip
+                                if gem_heading != blank and gem_heading == list_tag_heading_downcase
+                                  assign is_gem_group = true
+                                endif
+                              endfor
                               assign list_tags = bl_stts[tags_list] | escape | append: ',' | prepend: ','
                               assign list_tags_render = ''
                               for value in filter.values
@@ -1186,6 +1226,22 @@
                                     id="FacetMobile-{{ forloop.index }}-{{ section.id }}"
                                     class="mobile-facets__submenu details-content"
                                   >
+                                    {%- if is_gem_group -%}
+                                      {%- liquid
+                                        assign gem_id_prefix = 'Filter-' | append: filter.param_name | escape | append: '-gem-mobile-' | append: i | append: '-'
+                                        assign gem_tags_setting = bl_stts[tags_list]
+                                      -%}
+                                      {% render 'facet-gem-tiles',
+                                        filter: filter,
+                                        tags: gem_tags_setting,
+                                        list_class: 'mobile-facets__list cus-scrollbar',
+                                        label_class: 'facets__label mobile-facets__label',
+                                        input_class: 'mobile-facets__checkbox',
+                                        id_prefix: gem_id_prefix,
+                                        text_label_case: text_label_case,
+                                        text_label_font_size: text_label_font_size
+                                      %}
+                                    {%- else -%}
                                     <ul
                                       class="{{ visual_layout_class }} mobile-facets__list list-unstyled cus-scrollbar{% if is_swatch %} facets-layout-list--swatch flex flex-wrap gap-xs{% endif %}"
                                       role="list"
@@ -1322,6 +1378,7 @@
 
                                       {%- endfor -%}
                                     </ul>
+                                    {%- endif -%}
                                   </div>
                                 </details>
                               </accordion-custom>

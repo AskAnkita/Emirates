@@ -485,7 +485,7 @@
           "name": "Engagement Mega Menu",
           "settings": {
             "nav_label": "Engagement",
-            "nav_link": "/pages/engagement",
+            "nav_link": "/collections/engagement-rings",
             "col1_heading1": "STYLE",
             "col1_link1_label": "All Engagement",
             "col1_link1_url": "/collections/all-engagement-rings",

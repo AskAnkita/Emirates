@@ -285,7 +285,8 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
   justify-content: center;
   width: 100%;
   min-height: 5.2rem;
-  padding: 0 2rem;
+  padding: 0 1.2rem;
+  white-space: nowrap;
   border: 1px solid rgb(var(--color-foreground-rgb) / 0.35);
   color: var(--color-foreground);
   font-size: 1.3rem;
@@ -304,7 +305,8 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
   min-height: 5.2rem;
   width: 100%;
   margin: 0;
-  padding: 0 2rem;
+  padding: 0 1.2rem;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -370,8 +372,100 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 /* the price block has no Apply button (it auto-applies) — just give the
    amount fields a little breathing room before the next section */
 .facets-block-wrapper--horizontal .mobile-facets__submenu .facets__priceblock {
-  margin-bottom: 0;
+  --price-accent: rgb(30 60 50);
+  /* amount boxes on top, slider, then the currency note — compact and centred
+     instead of spanning the whole drawer (<price-range> is a custom element,
+     inline by default, so it needs a display for max-width / centring) */
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  max-width: 32rem;
+  margin: 0 auto;
   padding-bottom: 0.4rem;
+}
+
+/* the "highest price is …" line is replaced by the currency note under the slider */
+.facets-block-wrapper--horizontal .mobile-facets__submenu:has(.facets__priceblock) .mobile-facets__info {
+  display: none;
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .facets-price__input {
+  order: -1;
+  gap: 1.2rem;
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .field-to-price {
+  display: none;
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .field {
+  flex: 1;
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .field::before,
+.facets-block-wrapper--horizontal .facets__priceblock .field::after {
+  display: none;
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .field__input.filter__price_number {
+  height: 4.8rem;
+  padding: 0 1.2rem 0 3.2rem;
+  text-align: left;
+  font-size: 1.6rem;
+  border: 0.1rem solid rgb(var(--color-foreground-rgb) / 0.15);
+  border-radius: 0.8rem;
+  box-shadow: none;
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .field .field-currency {
+  left: 1.4rem;
+  font-size: 1.6rem;
+  color: var(--color-foreground);
+}
+
+/* slider: theme green between the handles, light grey outside them */
+.facets-block-wrapper--horizontal .facets__priceblock .facets-price__range {
+  margin-inline: 0.9rem; /* room for the diamond handles at each end */
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .facets-price__range::before,
+.facets-block-wrapper--horizontal .facets__priceblock .facets-price__range::after {
+  background: rgb(var(--color-foreground-rgb) / 0.12);
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .filter__price_change::-webkit-slider-runnable-track {
+  background: var(--price-accent);
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .filter__price_change::-moz-range-track {
+  background: var(--price-accent);
+}
+
+/* diamond-shaped handles */
+.facets-block-wrapper--horizontal .facets__priceblock .filter__price_change::-webkit-slider-thumb {
+  width: 1.8rem;
+  height: 1.8rem;
+  min-width: 1.8rem;
+  min-height: 1.8rem;
+  margin-top: -0.6rem;
+  border: 0.2rem solid var(--price-accent);
+  border-radius: 0.2rem;
+  background: #fff;
+  transform: rotate(45deg);
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .filter__price_change::-moz-range-thumb {
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 0.2rem solid var(--price-accent);
+  border-radius: 0.2rem;
+  background: #fff;
+  transform: rotate(45deg);
+}
+
+.facets-block-wrapper--horizontal .facets__priceblock .facets-price__note {
+  margin: 0;
+  font-size: 1.3rem;
 }
 
 /* don't show an empty "Clear all" pills row on the toolbar when nothing

@@ -1,8 +1,29 @@
-<div class="{% if section.settings.include_margins %}page-width{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+{%- capture app_blocks -%}
   {%- for block in section.blocks -%}
     {% render block %}
   {%- endfor -%}
+{%- endcapture -%}
+
+{% comment %}
+  min-width: 0 keeps wide app content (e.g. a horizontal carousel) inside the section grid
+  instead of stretching the grid past the viewport, so the app's own scroller can scroll.
+{% endcomment %}
+<div
+  class="{% if section.settings.include_margins %}page-width{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+  style="min-width: 0; max-width: 100%;"
+>
+  {%- if section.settings.auto_scroll -%}
+    <app-auto-scroll class="block" data-speed="{{ section.settings.auto_scroll_speed }}">
+      {{ app_blocks }}
+    </app-auto-scroll>
+  {%- else -%}
+    {{ app_blocks }}
+  {%- endif -%}
 </div>
+
+{%- if section.settings.auto_scroll -%}
+  <script src="{{ 'app-auto-scroll.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
 
 {% schema %}
 {
@@ -15,6 +36,28 @@
       "id": "include_margins",
       "default": true,
       "label": "t:settings.make_section_margins_the_same_as_theme"
+    },
+    {
+      "type": "header",
+      "content": "Carousel"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_scroll",
+      "default": false,
+      "label": "Auto-scroll carousel",
+      "info": "Slowly scrolls the app's horizontal carousel and lets desktop visitors drag it. Pauses on hover and touch."
+    },
+    {
+      "type": "range",
+      "id": "auto_scroll_speed",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40,
+      "label": "Auto-scroll speed (pixels per second)",
+      "visible_if": "{{ section.settings.auto_scroll }}"
     }
   ],
   "blocks": [

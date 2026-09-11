@@ -67,9 +67,8 @@
   {% if link_reveal and style_class == 'link' %}
     data-text="{{ label }}"
   {% endif %}
-  {{ shopify_attributes }}
 >
-  {%- if style_class == 'button' -%}
+  {%- if style_class == 'button' or style_class == 'button-secondary' -%}
     <span class="button-overflow relative overflow-hidden" data-button-text="{{ label }}">
       <span class="button-text-main inline-block relative z-1">
         {{ label }}

@@ -1,0 +1,30 @@
+{%- comment -%}
+  Small round gemstone image for a gemstone tag filter option.
+
+  Uses a Files image named "gemstone-<tag handle>.png" (e.g. gemstone-diamond.png)
+  when one has been uploaded; otherwise falls back to a colour dot styled per
+  gemstone in component-facets.css.
+
+  Accepts:
+  - tag: {String} The gemstone tag, e.g. "Diamond"
+
+  Usage:
+    {% render 'facet-gem-swatch', tag: 'Diamond' %}
+{%- endcomment -%}
+
+{%- liquid
+  assign gem_handle = tag | handleize
+  assign gem_file = 'gemstone-' | append: gem_handle | append: '.png'
+  assign gem_image_url = ''
+  if images[gem_file] != blank
+    assign gem_image_url = gem_file | file_url
+  endif
+-%}
+
+<span
+  class="facet-gem facet-gem--{{ gem_handle }}"
+  {% if gem_image_url != blank %}
+    style="--gem-image: url({{ gem_image_url }});"
+  {% endif %}
+  aria-hidden="true"
+></span>

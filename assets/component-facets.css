@@ -3113,3 +3113,59 @@ body:not(.firefox) .facets-price__range:before {
 .facets-price__apply {
   margin-top: var(--margin-xl);
 }
+
+/* Round gemstone images for the Gemstone tag filter (snippets/facet-gem-swatch.liquid).
+   An uploaded Files image (gemstone-<name>.png) wins; otherwise a colour dot per gem. */
+.facet-gem {
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background-color: #e6e6e6;
+  background-image: var(--gem-image, var(--gem-color, none));
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 0.1rem rgb(0 0 0 / 0.08);
+}
+
+.facet-gem--diamond {
+  --gem-color: radial-gradient(circle at 35% 30%, #ffffff 0 20%, #e8edf1 45%, #aeb9c3 100%);
+}
+
+.facet-gem--emerald {
+  --gem-color: radial-gradient(circle at 35% 30%, #8fe0b0 0 12%, #1f8a5b 55%, #0b4d31 100%);
+}
+
+.facet-gem--sapphire {
+  --gem-color: radial-gradient(circle at 35% 30%, #8fb2ff 0 12%, #1f4fb8 55%, #0b2566 100%);
+}
+
+.facet-gem--ruby {
+  --gem-color: radial-gradient(circle at 35% 30%, #ff9aa8 0 12%, #b3122e 55%, #5c0614 100%);
+}
+
+.facet-gem--tanzanite {
+  --gem-color: radial-gradient(circle at 35% 30%, #c3b5ff 0 12%, #5b4bc4 55%, #2c1f6e 100%);
+}
+
+/* Gemstone tiles: same layout as the Metal Type image filter (snippets/facet-gem-tiles.liquid) */
+.facets-gem-grid .facets__image-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.facets-gem-grid .facets__label:not(.disabled) {
+  cursor: pointer;
+}
+
+.facets-gem-grid .facets__label.active .facet-gem {
+  box-shadow: 0 0 0 0.2rem var(--color-background, #fff), 0 0 0 0.3rem rgb(30 60 50);
+}
+
+.facets-price__note {
+  margin: 0.8rem 0 0;
+  font-size: 1.2rem;
+  color: rgb(var(--color-foreground-rgb) / 0.7);
+}

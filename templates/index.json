@@ -3066,7 +3066,7 @@
             "column_gap": 14,
             "gap": 16,
             "loop": false,
-            "navigation": "arrows",
+            "navigation": "none",
             "pagination_type": "dynamic",
             "dots_top_offset": 40,
             "progress_top_offset": 40,

@@ -1132,6 +1132,109 @@
               {%- endif -%}
               <div id="FacetsWrapperMobile" class="mobile-facets__main has-submenu cus-scrollbar">
                 {{ sidebar_categories }}
+                {%- liquid
+                  assign render_tag_filter_fallback = false
+                  assign has_configured_tag_filter = false
+                  if show_filter_by_tags_sidebar and results.all_tags != blank
+                    for filter_check in results.filters
+                      assign filter_check_label = filter_check.label | escape
+                      if filter_check_label == filter_label_all
+                        assign has_configured_tag_filter = true
+                      endif
+                    endfor
+                    unless has_configured_tag_filter
+                      assign render_tag_filter_fallback = true
+                    endunless
+                  endif
+                -%}
+                {%- if render_tag_filter_fallback -%}
+                  {%- for i in (1..number_filters) -%}
+                    {%- capture heading -%}fbt_heading_{{ i }}{%- endcapture -%}
+                    {%- capture tags_list -%}fbt_tags_list_{{ i }}{%- endcapture -%}
+                    {%- liquid
+                      assign list_tag_heading = bl_stts[heading]
+                      assign configured_tags = bl_stts[tags_list] | split: ','
+                      assign fallback_tags_rendered = ''
+                    -%}
+                    {%- capture fallback_filter_options -%}
+                      {%- for configured_tag in configured_tags -%}
+                        {%- liquid
+                          assign configured_tag = configured_tag | strip
+                          assign configured_tag_key = configured_tag | escape | append: ','
+                          assign tag_exists = false
+                          for collection_tag in results.all_tags
+                            if collection_tag == configured_tag
+                              assign tag_exists = true
+                            endif
+                          endfor
+                        -%}
+                        {%- assign tag_already_rendered = false -%}
+                        {%- if fallback_tags_rendered contains configured_tag_key -%}
+                          {%- assign tag_already_rendered = true -%}
+                        {%- endif -%}
+                        {%- if configured_tag != blank and tag_exists and tag_already_rendered == false -%}
+                          {%- liquid
+                            assign fallback_tags_rendered = fallback_tags_rendered | append: configured_tag_key
+                            assign tag_active = false
+                            if current_tags contains configured_tag
+                              assign tag_active = true
+                            endif
+                          -%}
+                          {%- capture generated_tag_link -%}
+                            {%- if tag_active -%}
+                              {{ configured_tag | link_to_remove_tag: configured_tag }}
+                            {%- else -%}
+                              {{ configured_tag | link_to_add_tag: configured_tag }}
+                            {%- endif -%}
+                          {%- endcapture -%}
+                          {%- assign tag_url = generated_tag_link | split: 'href="' | last | split: '"' | first -%}
+                          <li class="mobile-facets__item list-menu__item">
+                            <a
+                              href="{{ tag_url }}"
+                              class="facets__label mobile-facets__label{% if tag_active %} active{% endif %}"
+                              style="--font-size: {{ text_label_font_size }};"
+                            >
+                              <span class="facet-checkbox__text" aria-hidden="true">
+                                <span class="facet-checkbox__text-label {{ text_label_case }}">{{ configured_tag }}</span>
+                              </span>
+                            </a>
+                          </li>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    {%- endcapture -%}
+                    {%- if list_tag_heading != blank and fallback_filter_options != blank -%}
+                      <accordion-custom>
+                        <details
+                          id="Details-Mobile-Tag-Fallback-{{ section.id }}-{{ i }}"
+                          class="mobile-facets__details js-filter"
+                          data-index="tag-fallback-{{ i }}"
+                        >
+                          <summary class="mobile-facets__summary focus-inset">
+                            <div
+                              class="flex items-center justify-between w-full"
+                              style="
+                                {%- if heading_label_case == 'uppercase' -%}
+                                  --facet-label-transform: uppercase;
+                                {%- endif -%}
+                                --font-size: {{ heading_label_font_size }};
+                              "
+                            >
+                              <span>{{ list_tag_heading }}</span>
+                              <span class="mobile-facets__arrow svg-wrapper">
+                                {{- 'icon-caret.svg' | inline_asset_content -}}
+                              </span>
+                            </div>
+                          </summary>
+                          <div class="mobile-facets__submenu details-content">
+                            <ul class="facets-layout facets-layout-list facets-layout-list--text mobile-facets__list list-unstyled cus-scrollbar" role="list">
+                              {{ fallback_filter_options }}
+                            </ul>
+                          </div>
+                        </details>
+                      </accordion-custom>
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
                 {%- if enable_filtering -%}
                   {%- for filter in results.filters -%}
                     {% liquid

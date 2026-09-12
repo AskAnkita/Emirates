@@ -44,7 +44,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
     gap: 1rem;
-    padding-inline: 1.5rem;
+    box-sizing: border-box;
+    padding-inline: 1.5rem clamp(3rem, 8vw, 4rem);
   }
 
   .facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper,
@@ -121,7 +122,7 @@
 .facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper {
   order: -1;
   flex: 0 0 auto;
-  margin-inline-start: 0.8rem;
+  margin-inline-start: 0;
 }
 @media screen and (min-width: 750px) {
   .facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper {
@@ -487,9 +488,10 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
      inline by default, so it needs a display for max-width / centring) */
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  max-width: none;
-  margin: 0;
+  gap: 1.6rem;
+  width: min(100%, 56rem);
+  max-width: calc(100% - 3rem);
+  margin: 0 auto;
   padding: 1.2rem 0 0.6rem;
   background: transparent;
   border: 0;
@@ -516,8 +518,10 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
   flex: 1;
   min-width: 0;
   background: #fff;
-  border: 1px solid rgb(var(--color-foreground-rgb) / 0.12);
-  border-radius: 0.4rem;
+  border: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
+  /* every colour scheme in settings_data.json is buttons_radius: 0 — a
+     rounded field here was the only curved element on the page */
+  border-radius: 0;
   box-shadow: none;
   overflow: hidden;
 }
@@ -528,8 +532,10 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 }
 
 .facets-block-wrapper--horizontal .facets__priceblock .field__input.filter__price_number {
-  height: 5rem;
-  padding: 0 1rem 0 3.4rem;
+  /* same height as the FILTER / SORT BY controls */
+  height: 4.4rem;
+  /* was 3.4rem, which left the $ floating a long way from the number */
+  padding: 0 1.2rem 0 2.6rem;
   text-align: left;
   font-size: 1.6rem;
   font-weight: 500;
@@ -540,57 +546,106 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 }
 
 .facets-block-wrapper--horizontal .facets__priceblock .field .field-currency {
-  left: 1.2rem;
-  font-size: 1.6rem;
+  left: 1.1rem;
+  font-size: 1.5rem;
   color: rgb(var(--color-foreground-rgb) / 0.55);
 }
 
-/* slider: theme green between the handles, light grey outside them */
+/* --------------------------------------------------------------------------
+   Price slider — a plain two-handle range: one grey bar, one green fill
+   between the handles, two round handles.
+
+   Geometry comes from --min-ratio / --max-ratio-inv (0-1), set by
+   PriceRange.updateDisplay() in facets.js. A native range input insets the
+   thumb's travel by half a thumb at each end, so the fill is placed as
+     ratio * (100% - thumb) + thumb / 2
+   which lands exactly on the handle centre at every value and every width.
+   No pixel measurement, so it survives resizes and drawer re-renders.
+   -------------------------------------------------------------------------- */
 .facets-block-wrapper--horizontal .facets__priceblock .facets-price__range {
+  --price-thumb: 1.8rem;
+  --price-track: 0.4rem;
+  --price-track-bg: #e4e4e4;
+  position: relative;
   height: 2.4rem;
-  margin: 0.2rem 1rem 0;
+  /* flush with the two fields above */
+  margin: 0.2rem 0 0;
 }
 
 .facets-block-wrapper--horizontal .facets__priceblock .facets-price__range::before,
 .facets-block-wrapper--horizontal .facets__priceblock .facets-price__range::after {
-  background: rgb(var(--color-foreground-rgb) / 0.12);
-  top: 1.7rem;
-  height: 0.4rem;
+  content: '';
+  position: absolute;
+  top: calc(50% - var(--price-track) / 2);
+  height: var(--price-track);
   border-radius: 999px;
+}
+
+/* the bar */
+.facets-block-wrapper--horizontal .facets__priceblock .facets-price__range::before {
+  left: 0;
+  right: 0;
+  width: auto;
+  background: var(--price-track-bg);
+  z-index: 1;
+}
+
+/* the selected range */
+.facets-block-wrapper--horizontal .facets__priceblock .facets-price__range::after {
+  left: var(--price-left, 0%);
+  right: var(--price-right, 0%);
+  width: auto;
+  background: var(--price-accent);
+  z-index: 2;
+}
+
+/* both inputs sit above the bars, or the bars would cover the handles */
+.facets-block-wrapper--horizontal .facets__priceblock .filter__price_change {
+  top: calc(50% - var(--price-thumb) / 2);
+  bottom: auto;
+  height: var(--price-thumb);
+  pointer-events: none;
   z-index: 3;
 }
 
+/* the native tracks paint nothing — the two bars above are the slider */
 .facets-block-wrapper--horizontal .facets__priceblock .filter__price_change::-webkit-slider-runnable-track {
-  height: 0.4rem;
-  background: var(--price-accent);
+  height: var(--price-track);
+  background: transparent;
   border-radius: 999px;
 }
 
 .facets-block-wrapper--horizontal .facets__priceblock .filter__price_change::-moz-range-track {
-  height: 0.4rem;
-  background: var(--price-accent);
+  height: var(--price-track);
+  background: transparent;
   border-radius: 999px;
 }
 
+/* the handles */
 .facets-block-wrapper--horizontal .facets__priceblock .filter__price_change::-webkit-slider-thumb {
-  width: 2rem;
-  height: 2rem;
-  min-width: 2rem;
-  min-height: 2rem;
-  margin-top: -0.8rem;
-  border: 0.2rem solid var(--price-accent);
+  width: var(--price-thumb);
+  height: var(--price-thumb);
+  min-width: var(--price-thumb);
+  min-height: var(--price-thumb);
+  margin-top: calc((var(--price-thumb) - var(--price-track)) / -2);
+  border: 0.25rem solid var(--price-accent);
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0.4rem 1.2rem rgb(var(--color-foreground-rgb) / 0.18);
+  box-shadow: 0 0.2rem 0.8rem rgb(var(--color-foreground-rgb) / 0.12);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-appearance: none;
 }
 
 .facets-block-wrapper--horizontal .facets__priceblock .filter__price_change::-moz-range-thumb {
-  width: 1.8rem;
-  height: 1.8rem;
-  border: 0.2rem solid var(--price-accent);
+  width: var(--price-thumb);
+  height: var(--price-thumb);
+  border: 0.25rem solid var(--price-accent);
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0.4rem 1.2rem rgb(var(--color-foreground-rgb) / 0.18);
+  box-shadow: 0 0.2rem 0.8rem rgb(var(--color-foreground-rgb) / 0.12);
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .facets-block-wrapper--horizontal .facets__priceblock .facets-price__note {
@@ -703,4 +758,112 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
 }
 @media (prefers-reduced-motion: reduce) {
   .facets-block-wrapper--horizontal .mobile-facets__loading-spinner { animation-duration: 1.8s; }
+}
+
+/* ==========================================================================
+   OVERRIDES for the hand-written mobile block in base.css (~L462-541).
+
+   That block hard-codes this same toolbar with high-specificity `!important`
+   rules, which is why the two controls never matched:
+
+     .mobile-facets__wrapper details.mobile-facets__disclosure…
+        max-width: 130px !important;   <- caps FILTER at 130px
+        margin-left: auto !important;  <- shoves it right inside its cell
+        height: 40px !important;
+        margin-bottom: 15px !important;
+     side-drawer-opener.mobile-facets__open
+        padding: 0.5rem 20px !important;
+     .mobile-facets__open-wrapper
+        flex-direction: column !important;
+        background-color: #183e40 !important;
+     .mobile-facets__open .svg-wrapper      { 20px }
+     span.mobile-facets__open-label…        { font-size: 12px }
+
+   FILTER was pinned to 130px while SORT BY was left free to size to its
+   label, so it grew past the screen edge. Everything below is scoped to
+   `.facets-block-wrapper--horizontal` — one class more specific than the
+   base.css rules — so the other filter layouts (vertical / drawer) keep
+   their existing styling untouched.
+   ========================================================================== */
+
+@media screen and (max-width: 749px) {
+  /* two equal columns, aligned to the product grid's gutters */
+  .facets-block-wrapper--horizontal .facets-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch;
+    gap: 1rem;
+    /* identical gutter on both sides */
+    padding-inline: 1.5rem clamp(3rem, 8vw, 4rem) !important;
+  }
+
+  /* the whole FILTER chain has to stretch, or the button sizes to its label
+     and the markup's own `justify-end` parks it at the right of its column —
+     which is what left a fat gap on the left and a thin one on the right.
+     menu-drawer > details > summary > side-drawer-opener, all full width. */
+  .facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper {
+    display: flex !important;
+    align-items: stretch !important;
+  }
+  .facets-block-wrapper--horizontal .mobile-facets__wrapper details.mobile-facets__disclosure.disclosure-has-popup.relative.flex.justify-end {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    margin: 0 !important;
+    /* `stretch` is not a valid flex justify value — it resolves to flex-start
+       and leaves the summary at its content width */
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+  }
+
+  /* label + icon back on one row; the fill colour is owned by
+     --filter-button-bg above, not by base.css's #183e40 */
+  .facets-block-wrapper--horizontal .mobile-facets__open-wrapper {
+    flex: 1 1 auto !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    max-width: none !important;
+    background-color: transparent !important;
+  }
+
+  /* identical box on both halves */
+  .facets-block-wrapper--horizontal side-drawer-opener.mobile-facets__open,
+  .facets-block-wrapper--horizontal .facet-filters.sorting .facet-filters__field > div {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 4.4rem !important;
+    min-height: 4.4rem !important;
+    padding: 0 1.4rem !important;
+  }
+
+  /* identical label type on both halves (base.css sets 12px on one only) */
+  .facets-block-wrapper--horizontal span.mobile-facets__open-label.button-label.medium-hide,
+  .facets-block-wrapper--horizontal span.facet-filters__field-label.shrink-0.normal-case {
+    font-size: 1.2rem !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  /* icon sized to the label, not the 20px square base.css forces */
+  .facets-block-wrapper--horizontal .mobile-facets__wrapper .mobile-facets__open .svg-wrapper {
+    width: 1.4rem !important;
+    height: 1.4rem !important;
+  }
+}
+
+/* base.css:19756 (the "sort filter in mobile cut issue fixed" block) forces
+   the open sort panel to `right: auto; width: auto; min-width: max-content`
+   on mobile with !important, so it sizes to its longest option
+   ("Alphabetically, A-Z") instead of matching the control above it. Same
+   properties, higher specificity, also !important. */
+@media screen and (max-width: 749px) {
+  .facets-block-wrapper--horizontal #Details-SortBy[open] #SortByDropdown.facets__list {
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
 }

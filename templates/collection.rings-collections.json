@@ -2348,7 +2348,9 @@
       "block_order": [
         "multicolumn_x8kfPe"
       ],
-      "custom_css": [],
+      "custom_css": [
+
+      ],
       "name": "t:names.multicolumn",
       "settings": {
         "content_direction": "column",
@@ -2426,14 +2428,14 @@
             "number_filters": 5,
             "fbt_heading_1": "Gemstone",
             "fbt_tags_list_1": "Diamond,Emerald,Sapphire,Ruby,Tanzanite",
-            "fbt_heading_2": "Bracelet Style",
-            "fbt_tags_list_2": "Tennis,General Bracelets,Halo,Bangle,Cuban,Cluster",
+            "fbt_heading_2": "Ring Style",
+            "fbt_tags_list_2": "Solitaire,Halo,Three Stone,3 Stone Trilogy,Side Stone,Sidestone,Vintage,Promise,Trilogy,Cocktail",
             "fbt_heading_3": "Stone Nature",
-            "fbt_tags_list_3": "Lab Grown,Mined",
-            "fbt_heading_4": "Setting",
-            "fbt_tags_list_4": "Claw,Pave,Rub Over,Illusion,Grain,Channel,Mixed,Tension",
+            "fbt_tags_list_3": "Lab Grown,Mined,Natural Diamond,Lab-Grown Diamond",
+            "fbt_heading_4": "Metal Type",
+            "fbt_tags_list_4": "Yellow Gold,White Gold,Rose Gold,Platinum,Silver",
             "fbt_heading_5": "Stone Cut",
-            "fbt_tags_list_5": "Round,Oval,Emerald,Pear,Marquise,Princess,Radiant,Baguette",
+            "fbt_tags_list_5": "Round,Oval,Emerald,Pear,Marquise,Princess,Radiant,Cushion,Heart,Baguette",
             "enable_divider_sorting_vertical": false,
             "enable_sorting": true,
             "enable_count": true,
@@ -2463,7 +2465,9 @@
               "blocks": {}
             }
           },
-          "block_order": []
+          "block_order": [
+
+          ]
         },
         "collection-header": {
           "type": "_collection-header",
@@ -2899,7 +2903,9 @@
               ]
             }
           },
-          "block_order": []
+          "block_order": [
+
+          ]
         }
       },
       "custom_css": [

@@ -36,9 +36,14 @@
     assign max_value = filter.max_value.value | money_without_currency | replace: "'", ''
     assign range_max = filter.range_max | money_without_currency | replace: "'", '' | ceil
   endif
+
+  assign selected_min = min_value | default: 0 | plus: 0
+  assign selected_max = max_value | default: range_max | plus: 0
+  assign price_left = selected_min | times: 100.0 | divided_by: range_max
+  assign price_right = range_max | minus: selected_max | times: 100.0 | divided_by: range_max
 -%}
 
-<div class="facets-price__range relative" style="--lg-m: 0 0 3rem; --m: 0 0 1rem;">
+<div class="facets-price__range relative" style="--lg-m: 0 0 3rem; --m: 0 0 1rem; --price-left: {{ price_left }}%; --price-right: {{ price_right }}%;">
   <input
     class="filter__price_change filter__price_min"
     min="0"

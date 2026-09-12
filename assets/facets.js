@@ -547,6 +547,20 @@ class PriceRange extends HTMLElement {
 
     rangeS.forEach(element => {
       element.oninput = () => {
+        // Push whatever the two sliders ACTUALLY hold into the number fields
+        // and the track fill. The code below clamps the handles to keep a
+        // minimum gap, but `slide1` / `slide2` are read once at the top and
+        // are stale afterwards -- writing those to the inputs is what made
+        // both boxes show the same number while the handles sat apart, and
+        // fed updateDisplay() two equal values so the green fill collapsed.
+        const sync = () => {
+          const lo = Math.min(Number(lowerSlider.value), Number(upperSlider.value));
+          const hi = Math.max(Number(lowerSlider.value), Number(upperSlider.value));
+          numberS[0].value = lo;
+          numberS[1].value = hi;
+          this.updateDisplay(lo, hi);
+        };
+
         let slide1 = Math.floor(rangeS[0].value),
           slide2 = Math.ceil(rangeS[1].value),
           slide = Math.round(Number(this.querySelector('.filter__price_change').max) / 100 * (72 / (this.offsetWidth / 100)));
@@ -565,7 +579,7 @@ class PriceRange extends HTMLElement {
         }
 
         if (slide2 < slide1 + slide) {
-          if (slide1 == lowerSlider.min) return;
+          if (slide1 == lowerSlider.min) return sync();
           lowerSlider.value = slide2 - slide;
           numberS[0].value = slide2 - slide;
           numberS[1].value = upperSlider.value;
@@ -576,11 +590,9 @@ class PriceRange extends HTMLElement {
           }
         }
 
-        if (slide2 < slide1 + slide && slide2 == upperSlider.max) return;
+        if (slide2 < slide1 + slide && slide2 == upperSlider.max) return sync();
 
-        numberS[0].value = slide1;
-        numberS[1].value = slide2;
-        if (!isFireFox) this.updateDisplay(numberS[0].value, numberS[1].value);
+        sync();
       }
     });
 
@@ -600,9 +612,9 @@ class PriceRange extends HTMLElement {
         }
 
         if (number1 > number2) {
-          if (!isFireFox) this.updateDisplay(number2, number1);
+          this.updateDisplay(number2, number1);
         } else {
-          if (!isFireFox) this.updateDisplay(number1, number2);
+          this.updateDisplay(number1, number2);
         }
       }
     });
@@ -610,11 +622,27 @@ class PriceRange extends HTMLElement {
 
   updateDisplay(value1, value2) {
     const priceRange = this.querySelector('.facets-price__range');
-    const max = this.querySelector('.filter__price_change').max;
+    const max = parseInt(this.querySelector('.filter__price_change').max);
     const width = priceRange.clientWidth;
 
-    priceRange.style.setProperty('--left-space', (parseInt(value1) / parseInt(max)) * width + 'px');
-    priceRange.style.setProperty('--right-space', (width - (parseInt(value2) / parseInt(max)) * width) + 'px');
+    // Legacy pixel offsets, still consumed by the stock horizontal/vertical
+    // facet CSS. Kept so other filter styles keep rendering as before.
+    priceRange.style.setProperty('--left-space', (parseInt(value1) / max) * width + 'px');
+    priceRange.style.setProperty('--right-space', (width - (parseInt(value2) / max) * width) + 'px');
+
+    // Resolution-independent ratios (0-1). These are what a correct track fill
+    // needs: a native range input insets the thumb's travel by half a thumb at
+    // each end, so the fill has to be placed as
+    //   ratio * (100% - thumbWidth) + thumbWidth / 2
+    // which CSS can express from a unitless ratio but not from a pixel width
+    // measured against the full track. Measuring in px is why the fill never
+    // lined up with the handles.
+    const minRatio = Math.min(Math.max(parseInt(value1) / max, 0), 1);
+    const maxRatio = Math.min(Math.max(parseInt(value2) / max, 0), 1);
+    priceRange.style.setProperty('--min-ratio', minRatio);
+    priceRange.style.setProperty('--max-ratio-inv', 1 - maxRatio);
+    priceRange.style.setProperty('--price-left', `${minRatio * 100}%`);
+    priceRange.style.setProperty('--price-right', `${(1 - maxRatio) * 100}%`);
   }
 }
 if (!customElements.get('price-range')) customElements.define('price-range', PriceRange);

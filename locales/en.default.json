@@ -716,7 +716,7 @@
       "clear_filter": "Remove filter",
       "filter_and_operator_subtitle": "Match all",
       "filter_and_sort": "Filter and sort",
-      "filter_button": "Filter",
+      "filter_button": "Filters",
       "filter_by_label": "Refined by:",
       "filter_selected_accessibility": "{{ type }} ({{ count }} filters selected)",
       "filters_selected": {
@@ -730,14 +730,14 @@
         "other": "{{ product_count }} of {{ count }} products"
       },
       "product_count_simple": {
-        "one": "{{ count }} product",
-        "other": "{{ count }} products"
+        "one": "{{ count }} Result",
+        "other": "{{ count }} Results"
       },
       "reset": "Reset",
       "show_less": "Show less",
       "show_more": "Show more",
       "sort_button": "Sort",
-      "sort_by_label": "Sort by:",
+      "sort_by_label": "Sort By",
       "to": "To"
     },
     "modal": {

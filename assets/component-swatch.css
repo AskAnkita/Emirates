@@ -33,7 +33,7 @@
 }
 
 .swatch {
-  --swatch--size: var(--swatch-input--size, 4.4rem);
+  --swatch--size: var(--swatch-input--size, 10.4rem);
 
   width: var(--swatch--size);
   aspect-ratio: 1 / 1;

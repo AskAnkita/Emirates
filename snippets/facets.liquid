@@ -120,23 +120,11 @@
                         <span>{{ 'products.facets.clear_all' | t }}</span>
                       </a>
                     </facet-remove>
-                    {% if enable_count %}
-                      <div class="results-count w-full">
-                        {%- if results.results_count -%}
-                          {{
-                            'content.results_with_count'
-                            | t: terms: results.terms, count: results.results_count
-                          }}
-                        {%- elsif results.products_count == results.all_products_count -%}
-                          {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
-                        {%- else -%}
-                          {{
-                            'products.facets.product_count'
-                            | t: product_count: results.products_count, count: results.all_products_count
-                          }}
-                        {%- endif -%}
-                      </div>
-                    {% endif %}
+                    {%- comment -%}
+                      Results count now renders once, in the toolbar row
+                      next to Filters and Sort By (see the sibling of the
+                      drawer <details> below) — not duplicated here.
+                    {%- endcomment -%}
                   </div>
                   {%- for filter in results.filters -%}
                     {%- for value in filter.active_values -%}
@@ -215,6 +203,16 @@
                     assign is_swatch = true
                   endif
 
+                  assign is_shape_group = false
+                  if filter_label_downcase == 'shape' or filter_label_downcase == 'stone cut'
+                    assign is_shape_group = true
+                  endif
+
+                  assign is_round_image_group = false
+                  if filter_label_downcase contains 'metal'
+                    assign is_round_image_group = true
+                  endif
+
                   if filter_type == 'horizontal'
                     assign element_label = 'span'
                   else
@@ -235,6 +233,14 @@
                           assign list_tag_heading = bl_stts[heading]
                           assign list_tag_heading_downcase = list_tag_heading | downcase | strip
                           assign is_gem_group = false
+                          assign is_shape_group = false
+                          if list_tag_heading_downcase == 'shape' or list_tag_heading_downcase == 'stone cut'
+                            assign is_shape_group = true
+                          endif
+                          assign is_round_image_group = false
+                          if list_tag_heading_downcase contains 'metal'
+                            assign is_round_image_group = true
+                          endif
                           assign gem_headings = bl_stts.fbt_image_headings | downcase | split: ','
                           for gem_heading in gem_headings
                             assign gem_heading = gem_heading | strip
@@ -367,7 +373,7 @@
                                   %}
                                 {%- else -%}
                                 <ul
-                                  class="{{ visual_layout_class }}{% if filter_type == 'vertical' %} facets__list--vertical {% else %} facets__list{% endif %} list-unstyled{% if is_swatch %} flex flex-wrap gap-xs{% endif %} "
+                                  class="{{ visual_layout_class }}{% if is_round_image_group %} facets-layout-grid--round-image{% endif %}{% if filter_type == 'vertical' %} facets__list--vertical {% else %} facets__list{% endif %} list-unstyled{% if is_swatch %} flex flex-wrap gap-xs{% endif %} "
                                   role="list"
                                 >
                                   {%- for value in sorted_values -%}
@@ -385,7 +391,10 @@
                                     {%- endcapture -%}
 
                                     {%- capture text_value -%}
-                                      <span class="facet-checkbox__text" aria-hidden="true">
+                                      <span class="facet-checkbox__text{% if is_shape_group %} facets__shape-label{% endif %}" aria-hidden="true">
+                                        {%- if is_shape_group -%}
+                                          {% render 'facet-shape-icon', shape: value.label %}
+                                        {%- endif -%}
                                         <span class="facet-checkbox__text-label {{ text_label_case }}{% if is_swatch %} lowercase{% endif %}">{{- value.label | escape }}</span>
                                         {% if block.settings.show_filter_count %}
                                           ({{- value.count -}})
@@ -615,7 +624,7 @@
                             assign value_index = 0
                           -%}
                           <ul
-                            class="{{ visual_layout_class }}{% if filter_type == 'vertical' %} facets__list--vertical {% else %} facets__list{% endif %} list-unstyled{% if is_swatch %} flex flex-wrap gap-xs{% endif %} "
+                            class="{{ visual_layout_class }}{% if is_round_image_group %} facets-layout-grid--round-image{% endif %}{% if filter_type == 'vertical' %} facets__list--vertical {% else %} facets__list{% endif %} list-unstyled{% if is_swatch %} flex flex-wrap gap-xs{% endif %} "
                             role="list"
                           >
                             {%- for value in sorted_values -%}
@@ -633,7 +642,10 @@
                               {%- endcapture -%}
 
                               {%- capture text_value -%}
-                                <span class="facet-checkbox__text" aria-hidden="true">
+                                <span class="facet-checkbox__text{% if is_shape_group %} facets__shape-label{% endif %}" aria-hidden="true">
+                                  {%- if is_shape_group -%}
+                                    {% render 'facet-shape-icon', shape: value.label %}
+                                  {%- endif -%}
                                   <span class="facet-checkbox__text-label {{ text_label_case }}{% if is_swatch %} lowercase{% endif %}">{{- value.label | escape }}</span>
                                   {% if block.settings.show_filter_count %}
                                     ({{- value.count -}})
@@ -831,11 +843,6 @@
               {% comment %} Pills after filtes on filter type horizontal {% endcomment %}
               {%- if filter_type == 'horizontal' -%}
                 <div class="active-facets flex flex-wrap items-center w-full active-facets-desktop">
-                  <facet-remove class="active-facets__button-wrapper">
-                    <a href="{{ results_url }}" class="active-facets__button-remove underlined-link">
-                      <span>{{ 'products.facets.clear_all' | t }}</span>
-                    </a>
-                  </facet-remove>
                   {%- for filter in results.filters -%}
                     {%- for value in filter.active_values -%}
                       <facet-remove>
@@ -1040,41 +1047,7 @@
                 </div>
               </div>
 
-              {%- if enable_sorting -%}
-                <div
-                  id="Details-Mobile-SortBy-{{ section.id }}"
-                  class="mobile-facets__details js-filter{% if filter_type == 'drawer' %} large-up-hide{% endif %}"
-                  data-index="mobile-{{ forloop.index }}"
-                >
-                  <div class="mobile-facets__summary">
-                    <div class="mobile-facets__sort">
-                      <label for="SortBy-mobile">{{ 'products.facets.sort_by_label' | t }}</label>
-                      <div class="select global-settings-popup">
-                        <select
-                          name="sort_by"
-                          class="select__select"
-                          id="SortBy-mobile"
-                          aria-describedby="a11y-refresh-page-message"
-                        >
-                          {%- for option in results.sort_options -%}
-                            <option
-                              value="{{ option.value | escape }}"
-                              {% if option.value == sort_by %}
-                                selected="selected"
-                              {% endif %}
-                            >
-                              {{ option.name | escape }}
-                            </option>
-                          {%- endfor -%}
-                        </select>
-                        <span class="svg-wrapper">
-                          {{- 'icon-caret.svg' | inline_asset_content -}}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              {%- endif -%}
+
 
               {%- if filter_type == 'vertical' -%}
                 <div class="active-facets flex flex-wrap w-full active-facets-mobile large-up-hide">
@@ -1131,6 +1104,66 @@
                 </div>
               {%- endif -%}
               <div id="FacetsWrapperMobile" class="mobile-facets__main has-submenu cus-scrollbar">
+              {%- comment -%}
+                Sort By sits inside the drawer as an ordinary collapsible
+                filter row on small screens, rather than a bare <select>
+                pinned above the filters. The options are radios named
+                sort_by, which FacetFiltersForm serialises with
+                `new FormData(form)` exactly as it did the select, so the
+                submit path is unchanged.
+              {%- endcomment -%}
+              {%- if enable_sorting -%}
+                <accordion-custom>
+                  <details
+                    id="Details-Mobile-SortBy-{{ section.id }}"
+                    class="mobile-facets__details mobile-facets__details--sort js-filter"
+                    data-index="mobile-{{ forloop.index }}"
+                  >
+                    <summary class="mobile-facets__summary focus-inset">
+                      <div
+                        class="flex items-center justify-between w-full"
+                        style="
+                          {%- if heading_label_case == 'uppercase' -%}
+                            --facet-label-transform: uppercase;
+                          {%- endif -%}
+                          --font-size: {{ heading_label_font_size }};
+                        "
+                      >
+                        <span>{{ 'products.facets.sort_by_label' | t }}</span>
+                        <span class="mobile-facets__arrow svg-wrapper">
+                          {{- 'icon-caret.svg' | inline_asset_content -}}
+                        </span>
+                      </div>
+                    </summary>
+                    <div
+                      id="FacetMobile-SortBy-{{ section.id }}"
+                      class="mobile-facets__submenu details-content"
+                    >
+                      <ul class="facets-layout facets-layout-list facets-layout-list--text mobile-facets__list mobile-facets__list--sort list-unstyled" role="list">
+                        {%- for option in results.sort_options -%}
+                          <li class="mobile-facets__item list-menu__item">
+                            <label
+                              for="SortBy-mobile-{{ forloop.index }}"
+                              class="facets__label mobile-facets__label mobile-facets__label--sort"
+                            >
+                              <input
+                                type="radio"
+                                name="sort_by"
+                                class="mobile-facets__radio"
+                                value="{{ option.value | escape }}"
+                                id="SortBy-mobile-{{ forloop.index }}"
+                                {% if option.value == sort_by %}checked{% endif %}
+                              >
+                              <span class="mobile-facets__radio-mark" aria-hidden="true"></span>
+                              <span class="facet-checkbox__text">{{ option.name | escape }}</span>
+                            </label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  </details>
+                </accordion-custom>
+              {%- endif -%}
                 {{ sidebar_categories }}
                 {%- liquid
                   assign render_tag_filter_fallback = false
@@ -1153,6 +1186,11 @@
                     {%- capture tags_list -%}fbt_tags_list_{{ i }}{%- endcapture -%}
                     {%- liquid
                       assign list_tag_heading = bl_stts[heading]
+                      assign list_tag_heading_downcase = list_tag_heading | downcase | strip
+                      assign is_shape_group = false
+                      if list_tag_heading_downcase == 'shape' or list_tag_heading_downcase == 'stone cut'
+                        assign is_shape_group = true
+                      endif
                       assign configured_tags = bl_stts[tags_list] | split: ','
                       assign fallback_tags_rendered = ''
                     -%}
@@ -1194,7 +1232,10 @@
                               class="facets__label mobile-facets__label{% if tag_active %} active{% endif %}"
                               style="--font-size: {{ text_label_font_size }};"
                             >
-                              <span class="facet-checkbox__text" aria-hidden="true">
+                              <span class="facet-checkbox__text{% if is_shape_group %} facets__shape-label{% endif %}" aria-hidden="true">
+                                {%- if is_shape_group -%}
+                                  {% render 'facet-shape-icon', shape: configured_tag %}
+                                {%- endif -%}
                                 <span class="facet-checkbox__text-label {{ text_label_case }}">{{ configured_tag }}</span>
                               </span>
                             </a>
@@ -1258,6 +1299,16 @@
                       if filter_swatch contains filter_label_downcase
                         assign is_swatch = true
                       endif
+
+                      assign is_shape_group = false
+                      if filter_label_downcase == 'shape' or filter_label_downcase == 'stone cut'
+                        assign is_shape_group = true
+                      endif
+
+                      assign is_round_image_group = false
+                      if filter_label_downcase contains 'metal'
+                        assign is_round_image_group = true
+                      endif
                     %}
 
                     {% case filter.type %}
@@ -1274,6 +1325,14 @@
                               assign list_tag_heading = bl_stts[heading]
                               assign list_tag_heading_downcase = list_tag_heading | downcase | strip
                               assign is_gem_group = false
+                              assign is_shape_group = false
+                              if list_tag_heading_downcase == 'shape' or list_tag_heading_downcase == 'stone cut'
+                                assign is_shape_group = true
+                              endif
+                              assign is_round_image_group = false
+                              if list_tag_heading_downcase contains 'metal'
+                                assign is_round_image_group = true
+                              endif
                               assign gem_headings = bl_stts.fbt_image_headings | downcase | split: ','
                               for gem_heading in gem_headings
                                 assign gem_heading = gem_heading | strip
@@ -1346,7 +1405,7 @@
                                       %}
                                     {%- else -%}
                                     <ul
-                                      class="{{ visual_layout_class }} mobile-facets__list list-unstyled cus-scrollbar{% if is_swatch %} facets-layout-list--swatch flex flex-wrap gap-xs{% endif %}"
+                                      class="{{ visual_layout_class }}{% if is_round_image_group %} facets-layout-grid--round-image{% endif %} mobile-facets__list list-unstyled cus-scrollbar{% if is_swatch %} facets-layout-list--swatch flex flex-wrap gap-xs{% endif %}"
                                       role="list"
                                     >
                                       {%- liquid
@@ -1373,7 +1432,10 @@
                                         {%- endcapture -%}
 
                                         {%- capture text_value -%}
-                                          <span class="facet-checkbox__text" aria-hidden="true">
+                                          <span class="facet-checkbox__text{% if is_shape_group %} facets__shape-label{% endif %}" aria-hidden="true">
+                                            {%- if is_shape_group -%}
+                                              {% render 'facet-shape-icon', shape: value.label %}
+                                            {%- endif -%}
                                             <span class="facet-checkbox__text-label {{ text_label_case }}{% if presentation == 'swatch' %} lowercase{% endif %}">{{- value.label | escape }}</span>
                                             {% if block.settings.show_filter_count %}
                                               ({{- value.count -}})
@@ -1515,7 +1577,7 @@
                               class="mobile-facets__submenu details-content"
                             >
                               <ul
-                                class="{{ visual_layout_class }} mobile-facets__list list-unstyled cus-scrollbar{% if is_swatch %} facets-layout-list--swatch flex flex-wrap gap-xs{% endif %}"
+                                class="{{ visual_layout_class }}{% if is_round_image_group %} facets-layout-grid--round-image{% endif %} mobile-facets__list list-unstyled cus-scrollbar{% if is_swatch %} facets-layout-list--swatch flex flex-wrap gap-xs{% endif %}"
                                 role="list"
                               >
                                 {%- liquid
@@ -1540,7 +1602,10 @@
                                   {%- endcapture -%}
 
                                   {%- capture text_value -%}
-                                    <span class="facet-checkbox__text" aria-hidden="true">
+                                    <span class="facet-checkbox__text{% if is_shape_group %} facets__shape-label{% endif %}" aria-hidden="true">
+                                      {%- if is_shape_group -%}
+                                        {% render 'facet-shape-icon', shape: value.label %}
+                                      {%- endif -%}
                                       <span class="facet-checkbox__text-label {{ text_label_case }}{% if presentation == 'swatch' %} lowercase{% endif %}">{{- value.label | escape }}</span>
                                       {% if block.settings.show_filter_count %}
                                         ({{- value.count -}})
@@ -1733,16 +1798,63 @@
           </form>
         </facet-filters-form>
       </details>
+
+      {%- comment -%}
+        Results count and Sort By as siblings of the drawer <details>, not
+        inside it, so they sit in the toolbar row regardless of whether
+        the drawer is open. Both used to render elsewhere — the count
+        inside active-facets-vertical-filter below, the Sort By form as
+        an unrelated block-level sibling from blocks/filters.liquid — with
+        no shared flex parent, which is why they landed on their own line.
+      {%- endcomment -%}
+      {%- if filter_type == 'vertical' -%}
+        {%- if enable_count -%}
+          <div class="results-count facet-toolbar__count">
+            {%- if results.results_count -%}
+              {{ 'content.results_with_count' | t: terms: results.terms, count: results.results_count }}
+            {%- elsif results.products_count == results.all_products_count -%}
+              {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
+            {%- else -%}
+              {{
+                'products.facets.product_count'
+                | t: product_count: results.products_count, count: results.all_products_count
+              }}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+        {{ vertical_sort_markup }}
+      {%- endif -%}
     </menu-drawer>
   {%- endif -%}
 
   {%- if filter_type == 'horizontal' -%}
+    {%- liquid
+      assign has_active_filters = false
+      for filter in results.filters
+        if filter.active_values.size > 0
+          assign has_active_filters = true
+        endif
+        if filter.type == 'price_range'
+          if filter.min_value.value != null or filter.max_value.value != null
+            assign has_active_filters = true
+          endif
+        endif
+      endfor
+    -%}
     <div class="active-facets flex flex-wrap w-full active-facets-mobile large-up-hide">
-      <facet-remove class="active-facets__button-wrapper">
-        <a href="{{ results_url }}" class="active-facets__button-remove underlined-link">
-          <span>{{ 'products.facets.clear_all' | t }}</span>
-        </a>
-      </facet-remove>
+      {% if enable_count %}
+        <span class="active-facets__results-count">
+          {%- liquid
+            assign mobile_results_count = results.results_count | default: results.products_count
+            echo mobile_results_count
+            if mobile_results_count == 1
+              echo ' Result'
+            else
+              echo ' Results'
+            endif
+          -%}
+        </span>
+      {% endif %}
       {%- for filter in results.filters -%}
         {%- for value in filter.active_values -%}
           <facet-remove>
@@ -1751,7 +1863,7 @@
               class="active-facets__button block decoration-none active-facets__button--light"
             >
               <span class="active-facets__button-inner button button--tertiary button-unstyled">
-                {{ filter.label | escape }}: {{ value.label | escape }}
+                {{ value.label | escape }}
                 <span class="svg-wrapper">
                   {{- 'icon-close-small.svg' | inline_asset_content -}}
                 </span>

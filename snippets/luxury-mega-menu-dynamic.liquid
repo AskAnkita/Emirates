@@ -326,9 +326,14 @@
   }
 
   .luxury-mm-button-{{ uid }}:hover {
-    background-color: {{ button_hover_bg }};
-    color: {{ button_hover_text }};
-    border-color: {{ button_hover_border }};
+    background-color: #f3f3f3;
+    color: {{ button_text_color }};
+    border-color: #9a9a9a;
+  }
+
+  .luxury-mm-button-{{ uid }}:focus-visible {
+    outline: 2px solid #bdbdbd;
+    outline-offset: 2px;
   }
 
   @media screen and (max-width: 1199px) {

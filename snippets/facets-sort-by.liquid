@@ -3,57 +3,114 @@
     {%- assign results = results -%}
     {%- assign sort_by = results.sort_by | default: results.default_sort_by -%}
     {%- assign selected_sort_by = results.sort_options | where: 'value', sort_by | first -%}
-    <div class="flex items-center gap-lg">
-<span class="facet-filters__field-label shrink-0 {{ text_label_case }}" style="--font-size: {{ heading_label_font_size }}; color: var(--color, var(--color-foreground-heading)) ">{{ 'products.facets.sort_by_label' | t }}</span>      <details
-        id="Details-SortBy"
-        class="facets__panel facets__panel--{{ style }} details--dropdown facet-filters__sort relative caption-large"
-        is="dropdown-details"
+
+    {%- comment -%}
+      Shopify's own sort_options names ("Price, low to high") are fixed,
+      comma-joined strings this theme can't restyle — they're what
+      produced the "SORT BY  PRICE, LOW TO HIGH" run-on. sort_by's
+      *value* (price-ascending, created-descending, …) is stable across
+      stores and locales, so map it to a "Title (Modifier)" label we
+      control. Anything not in the map (an app-added sort option) falls
+      back to Shopify's own name rather than showing blank.
+    {%- endcomment -%}
+    {%- capture sort_by_display -%}
+      {%- case sort_by -%}
+        {%- when 'manual' or 'best-selling' -%}
+          Best Sellers
+        {%- when 'title-ascending' -%}
+          Alphabetically (A-Z)
+        {%- when 'title-descending' -%}
+          Alphabetically (Z-A)
+        {%- when 'price-ascending' -%}
+          Price (Low to High)
+        {%- when 'price-descending' -%}
+          Price (High to Low)
+        {%- when 'created-ascending' -%}
+          Date (Old to New)
+        {%- when 'created-descending' -%}
+          Newest
+        {%- else -%}
+          {{- selected_sort_by.name -}}
+      {%- endcase -%}
+    {%- endcapture -%}
+
+    <details
+      id="Details-SortBy"
+      class="facets__panel facets__panel--{{ style }} facet-filters__sort facet-filters__sort--boxed details--dropdown relative caption-large"
+      is="dropdown-details"
+      activate-event="hover"
+      data-index="0"
+      {% if enable_hover_reveal %}
         activate-event="hover"
-        data-index="0"
-        {% if enable_hover_reveal %}
-          activate-event="hover"
-        {% endif %}
+      {% endif %}
+    >
+      <summary class="details__summary facets__summary facet-filters__sort-summary focus-inset">
+        <span class="flex items-center gap-xs facet-filters__sort-label">
+          {{ 'products.facets.sort_by_label' | t }}:
+          <span class="facet-filters__sort-value">{{ sort_by_display | strip }}</span>
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      </summary>
+      <div
+        id="SortByDropdown"
+        class="details__list facets__list absolute top-full right-0 z-1 global-settings-popup bg-background"
+        style="--min-w: 20rem;"
+        tabindex="-1"
       >
-        <summary class="details__summary facets__summary focus-inset">
-          <span class="flex items-center gap-xl {{ text_label_case }}" style="--font-size: {{ text_label_font_size }}; color: var(--color, var(--color-foreground-heading))">
-            {{ selected_sort_by.name }}
-            {{- 'icon-caret.svg' | inline_asset_content -}}
-          </span>
-        </summary>
-        <div
-          id="SortByDropdown"
-          class="details__list facets__list absolute top-full right-0 z-1 global-settings-popup bg-background"
-          style="--min-w: 20rem;"
-          tabindex="-1"
+        <ul
+          class="list-unstyled"
+          role="list"
         >
-          <ul
-            class="list-unstyled"
-            role="list"
-          >
-            {%- for option in results.sort_options -%}
-              <li
-                class="facet-filters__sort_item relative{% if option.value == sort_by %} selected{% endif %}"
-                style="--p: 0.5rem 0;"
-                tabindex="-1"
+          {%- comment -%}
+            Every option the collection actually offers, same as the
+            mobile drawer's Sort By list — not a fixed subset. A prior
+            edit had hardcoded this to four values (best-selling,
+            created-descending, price-ascending, price-descending),
+            which is why desktop was missing options mobile had.
+          {%- endcomment -%}
+          {%- for option in results.sort_options -%}
+            {%- capture option_display -%}
+              {%- case option.value -%}
+                {%- when 'manual' or 'best-selling' -%}
+                  Best Sellers
+                {%- when 'title-ascending' -%}
+                  Alphabetically (A-Z)
+                {%- when 'title-descending' -%}
+                  Alphabetically (Z-A)
+                {%- when 'price-ascending' -%}
+                  Price (Low to High)
+                {%- when 'price-descending' -%}
+                  Price (High to Low)
+                {%- when 'created-ascending' -%}
+                  Date (Old to New)
+                {%- when 'created-descending' -%}
+                  Newest
+                {%- else -%}
+                  {{- option.name -}}
+              {%- endcase -%}
+            {%- endcapture -%}
+            <li
+              class="facet-filters__sort_item relative{% if option.value == sort_by %} selected{% endif %}"
+              style="--p: 0.5rem 0;"
+              tabindex="-1"
+            >
+              <label
+                for="Filter-{{ option.value | escape }}-{{ forloop.index }}"
+                class="facet-checkbox cursor-pointer"
               >
-                <label
-                  for="Filter-{{ option.value | escape }}-{{ forloop.index }}"
-                  class="facet-checkbox cursor-pointer"
+                <input
+                  type="checkbox"
+                  name="sort_by"
+                  value="{{ option.value | escape }}"
+                  id="Filter-{{ option.value | escape }}-{{ forloop.index }}"
+                  class="visually-hidden"
                 >
-                  <input
-                    type="checkbox"
-                    name="sort_by"
-                    value="{{ option.value | escape }}"
-                    id="Filter-{{ option.value | escape }}-{{ forloop.index }}"
-                    class="visually-hidden"
-                  >
-                  <span class="label full-unstyled-link {{ text_label_case }}">{{ option.name | escape }}</span>
-                </label>
-              </li>
-            {%- endfor -%}
-          </ul>
-        </div>
-      </details>
-    </div>
+                <span class="label full-unstyled-link">{{ option_display | strip }}</span>
+              </label>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </details>
   </div>
 </div>

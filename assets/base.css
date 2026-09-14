@@ -19571,432 +19571,426 @@ summary.mobile-facets__summary.focus-inset{
 .facet-checkbox__text {
   font-family: var(-- heading_label_font_size)!important;
 }
-.mobile-facets__main .list-menu__item .facets__image-wrapper{
-  height: 42px;
-  width: 42px;
-  margin: 0 auto;
-}
-ul.facets-layout.facets-layout-grid.facets-layout-grid--image.mobile-facets__list.list-unstyled.cus-scrollbar{
+/* Filter drawer — image / swatch tiles ------------------------------
+
+   Values that carry an image render as a tile: the artwork centred on a
+   light panel with its label underneath, rather than a 32px thumbnail on
+   a checkbox row. The selected tile is marked with a border, so the
+   choice survives at a glance while scrolling a long list.
+
+   The native checkbox is hidden (not removed) — it is still the form
+   control FacetFiltersForm serialises. */
+
+.mobile-facets__list.facets-layout-grid--image {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.4rem 0.8rem;
   padding: 2rem 0 !important;
 }
-/* Filter CSS */
 
-
-/* Mobile */
-@media (max-width: 767px) {
-  .facets-layout.facets-layout-grid.facets-layout-grid--image.mobile-facets__list {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-/* Mobile */
-
-/* Desktop */
-@media (min-width: 767px) {
-.facets__image-wrapper {
-height:32px !important;
-width:32px !important;
-object-fit: contain;
-margin: 0 auto;
-display: block;
-}
-}
-@media (max-width: 767px) {
-.facets__image-wrapper {
-height:32px !important;
-width:32px !important;
-object-fit: contain;
-margin: 0 auto;
-display: block;
-}
-}
-/* desktop */
-
-
-/* More Filter Hide */
-.facets__panel.js-filter:has(summary[aria-label*="More filters"]) {
-  display: none !important;
-}
-/* More Filter Hide */
-
-
-/* Mobile More Filter Hide */
-@media screen and (max-width: 749px) {
-  details[data-index="mobile-4"] {
-    display: none !important;
-  }
-}
-/* Mobile More Filter Hide */
-
-
-/* Breadcrumb: start on the page-margin line shared with the header and footer.
-   Page-width breadcrumbs already sit there; full-width ones need the margin added. */
-.section--full-width .section-content-wrapper:has(> nav.breadcrumbs) {
-  padding-inline-start: var(--page-margin);
-}
-/* ------- reducing image size and put in the  center product detail image --------- */
-.dialog-zoomed-gallery .product-media {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height:100vh;
+.mobile-facets__list.facets-layout-grid--image .list-menu__item,
+.mobile-facets__list.facets-gem-grid .list-menu__item {
+  margin: 0;
+  padding: 0;
 }
 
-.dialog-zoomed-gallery .product-media__image {
-    width: 500px;
-    height: 500px;
-    object-fit: contain;
+.mobile-facets__list.facets-layout-grid--image .facets__label,
+.mobile-facets__list.facets-gem-grid .facets__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0;
+  text-align: center;
+  cursor: pointer;
 }
 
-/* change fiont size of produycty detail pages of product type and metal type */
-.product-info-item .product-info-name{
-  
-font-size:14px !important
-  
-}
-.product-info-item .product-info-value{
-  font-size:14px !important
+/* the checkbox still submits; only its box is out of the way */
+.mobile-facets__list.facets-layout-grid--image .mobile-facets__checkbox,
+.mobile-facets__list.facets-gem-grid .mobile-facets__checkbox {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
-button .custom-typography{
-  font-size:14px !important
+.mobile-facets__list.facets-layout-grid--image .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .facets__image-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Explicit size, matched to the rendered gemstone swatch. Sizing from
+     --swatch-input--size resolved far smaller here than it does for the
+     swatch component, so it is not a safe shared token at this scope. */
+  width: 4rem;
+  height: 4rem;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  transition: border-color var(--animation-speed) var(--animation-easing);
 }
 
-/* Product list 4 Card view */
-/* @media (min-width: 1920px) {
-  #shopify-section-template--22480356540652__product-grid .product-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-} */
-
-@media (min-width: 2560px) {
-  #shopify-section-template--22480356540652__product-grid .product-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
+.mobile-facets__list.facets-layout-grid--image .facets__image,
+.mobile-facets__list.facets-gem-grid .facets__image,
+.mobile-facets__list.facets-layout-grid--image .facets__image-wrapper svg,
+.mobile-facets__list.facets-gem-grid .facets__image-wrapper svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
-/* Product list 4 Card view */
-@media (max-width: 768px) {
- .product-details{
+
+/* selection marker */
+.mobile-facets__list.facets-layout-grid--image .mobile-facets__checkbox:checked ~ .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .mobile-facets__checkbox:checked ~ .facets__image-wrapper,
+.mobile-facets__list.facets-layout-grid--image .facets__label.active .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .facets__label.active .facets__image-wrapper {
+  border-color: #1a1a1a;
+}
+
+.mobile-facets__list.facets-layout-grid--image .facet-checkbox__text,
+.mobile-facets__list.facets-gem-grid .facet-checkbox__text,
+.mobile-facets__list.facets-layout-grid--image .facet-checkbox__text-label,
+.mobile-facets__list.facets-gem-grid .facet-checkbox__text-label {
+  display: block;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* out-of-stock / zero-count values stay readable but recede */
+.mobile-facets__list.facets-layout-grid--image .visually-disabled ~ .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .visually-disabled ~ .facets__image-wrapper {
+  opacity: 0.55;
+}
+
+/* Outside the drawer the old compact thumbnail is still the right size. */
+.facets__list .facets__image-wrapper,
+.facets__list--vertical .facets__image-wrapper {
+  height: 3.2rem;
+  width: 3.2rem;
+  object-fit: contain;
+  margin: 0 auto;
   display: block;
 }
+
+/* Filter drawer — image / swatch tiles ------------------------------
+
+   Values that carry an image render as a tile: the artwork centred on a
+   light panel with its label underneath, rather than a 32px thumbnail on
+   a checkbox row. The selected tile is marked with a border, so the
+   choice survives at a glance while scrolling a long list.
+
+   The native checkbox is hidden (not removed) — it is still the form
+   control FacetFiltersForm serialises. */
+
+.mobile-facets__list.facets-layout-grid--image {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.4rem 0.8rem;
+  padding: 2rem 0 !important;
 }
 
-@media screen and (max-width: 749px) {
-  .tabs-component-panel-trigger.button,
-  .tabs-component-panel-trigger.button-secondary {
-    min-height: 4.8rem;
-    padding: 1rem 1.2rem !important;
-    font-size: 1.2rem !important;
-    line-height: 1.25;
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
+.mobile-facets__list.facets-layout-grid--image .list-menu__item,
+.mobile-facets__list.facets-gem-grid .list-menu__item {
+  margin: 0;
+  padding: 0;
 }
 
-
- /* sorting  */
-
-.sorting-wrapper .switcher-grid{
-  display:none;
-}
-/* arrow icon rotate */
-.icon-caret {
-  transition: transform .3s ease;
-}
-
-details[open] .icon-caret {
-  transform: rotate(-180deg);
-}
-
-/* quick view fix align cenetr issue */
-
-@media screen and (max-width: 767px) {
-  #QuickViewModal product-info,
-  #QuickViewModal .product-information,
-  #QuickViewModal .spacing-style,
-  #QuickViewModal [id*="quickview-template"] {
-    --padding-inline-start: 0px !important;
-    --padding-inline-end: 0px !important;
-    padding-inline-start: 0px !important;
-    padding-inline-end: 0px !important;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-  }
-}
-
-/* change rings circle to square */
-.variant-option--pill label,
-.variant-option--pill label:before,
-.variant-option--pill label:after {
-  border-radius: 0 !important;
-}
-.variant-option--pill label {
-  width: 42px !important;
-  height: 42px !important;
-  display: grid !important;
-  place-items: center !important;
-  padding: 0 !important;
-  min-width: auto !important;
-}
-
-/* margin */
-.collection .collection-carousel-swiper-component .swiper .swiper-wrapper {
-  margin-top: 20px;
-}
-
-
-/* .accordion .block .details .details__header {
-  border-top: 2px solid rgb(var(--color-border-rgb) ) !important;
-}
-
-.accordion .block:last-child .details .details__header {
-  border-bottom: 2px solid rgb(var(--color-border-rgb)) !important;
-} */
-
-
-/* sort filter in mobile cut issue fixed */
-@media screen and (max-width: 749px) {
-  #SortByDropdown.facets__list {
-    right: auto !important;
-    left: 0 !important;
-    min-width: max-content !important;
-    width: auto !important;
-  }
-  
-  #SortByDropdown.facets__list .label {
-    white-space: nowrap !important;
-  }
-}
-.section--full-width-margin {
-  position: relative;
-}
-
-[data-shopify-editor-block*="group_QQkUjp"] {
-  position: absolute !important;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 700px;
+.mobile-facets__list.facets-layout-grid--image .facets__label,
+.mobile-facets__list.facets-gem-grid .facets__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0;
   text-align: center;
-  z-index: 10;
+  cursor: pointer;
 }
 
+/* the checkbox still submits; only its box is out of the way */
+.mobile-facets__list.facets-layout-grid--image .mobile-facets__checkbox,
+.mobile-facets__list.facets-gem-grid .mobile-facets__checkbox {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-facets__list.facets-layout-grid--image .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .facets__image-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Explicit size, matched to the rendered gemstone swatch. Sizing from
+     --swatch-input--size resolved far smaller here than it does for the
+     swatch component, so it is not a safe shared token at this scope. */
+  width: 4rem;
+  height: 4rem;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  transition: border-color var(--animation-speed) var(--animation-easing);
+}
+
+.mobile-facets__list.facets-layout-grid--image .facets__image,
+.mobile-facets__list.facets-gem-grid .facets__image,
+.mobile-facets__list.facets-layout-grid--image .facets__image-wrapper svg,
+.mobile-facets__list.facets-gem-grid .facets__image-wrapper svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* selection marker */
+.mobile-facets__list.facets-layout-grid--image .mobile-facets__checkbox:checked ~ .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .mobile-facets__checkbox:checked ~ .facets__image-wrapper,
+.mobile-facets__list.facets-layout-grid--image .facets__label.active .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .facets__label.active .facets__image-wrapper {
+  border-color: #1a1a1a;
+}
+
+.mobile-facets__list.facets-layout-grid--image .facet-checkbox__text,
+.mobile-facets__list.facets-gem-grid .facet-checkbox__text,
+.mobile-facets__list.facets-layout-grid--image .facet-checkbox__text-label,
+.mobile-facets__list.facets-gem-grid .facet-checkbox__text-label {
+  display: block;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* out-of-stock / zero-count values stay readable but recede */
+.mobile-facets__list.facets-layout-grid--image .visually-disabled ~ .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .visually-disabled ~ .facets__image-wrapper {
+  opacity: 0.55;
+}
+
+/* Outside the drawer the old compact thumbnail is still the right size. */
+.facets__list .facets__image-wrapper,
+.facets__list--vertical .facets__image-wrapper {
+  height: 3.2rem;
+  width: 3.2rem;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}
+
+/* Filter drawer — image / swatch tiles ------------------------------
+
+   Values that carry an image render as a tile: the artwork centred on a
+   light panel with its label underneath, rather than a 32px thumbnail on
+   a checkbox row. The selected tile is marked with a border, so the
+   choice survives at a glance while scrolling a long list.
+
+   The native checkbox is hidden (not removed) — it is still the form
+   control FacetFiltersForm serialises. */
+
+.mobile-facets__list.facets-layout-grid--image {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.4rem 0.8rem;
+  padding: 2rem 0 !important;
+}
+
+.mobile-facets__list.facets-layout-grid--image .list-menu__item,
+.mobile-facets__list.facets-gem-grid .list-menu__item {
+  margin: 0;
+  padding: 0;
+}
+
+.mobile-facets__list.facets-layout-grid--image .facets__label,
+.mobile-facets__list.facets-gem-grid .facets__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* the checkbox still submits; only its box is out of the way */
+.mobile-facets__list.facets-layout-grid--image .mobile-facets__checkbox,
+.mobile-facets__list.facets-gem-grid .mobile-facets__checkbox {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-facets__list.facets-layout-grid--image .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .facets__image-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Explicit size, matched to the rendered gemstone swatch. Sizing from
+     --swatch-input--size resolved far smaller here than it does for the
+     swatch component, so it is not a safe shared token at this scope. */
+  width: 4rem;
+  height: 4rem;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  transition: border-color var(--animation-speed) var(--animation-easing);
+}
+
+.mobile-facets__list.facets-layout-grid--image .facets__image,
+.mobile-facets__list.facets-gem-grid .facets__image,
+.mobile-facets__list.facets-layout-grid--image .facets__image-wrapper svg,
+.mobile-facets__list.facets-gem-grid .facets__image-wrapper svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* selection marker */
+.mobile-facets__list.facets-layout-grid--image .mobile-facets__checkbox:checked ~ .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .mobile-facets__checkbox:checked ~ .facets__image-wrapper,
+.mobile-facets__list.facets-layout-grid--image .facets__label.active .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .facets__label.active .facets__image-wrapper {
+  border-color: #1a1a1a;
+}
+
+.mobile-facets__list.facets-layout-grid--image .facet-checkbox__text,
+.mobile-facets__list.facets-gem-grid .facet-checkbox__text,
+.mobile-facets__list.facets-layout-grid--image .facet-checkbox__text-label,
+.mobile-facets__list.facets-gem-grid .facet-checkbox__text-label {
+  display: block;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* out-of-stock / zero-count values stay readable but recede */
+.mobile-facets__list.facets-layout-grid--image .visually-disabled ~ .facets__image-wrapper,
+.mobile-facets__list.facets-gem-grid .visually-disabled ~ .facets__image-wrapper {
+  opacity: 0.55;
+}
+
+/* Outside the drawer the old compact thumbnail is still the right size. */
+.facets__list .facets__image-wrapper,
+.facets__list--vertical .facets__image-wrapper {
+  height: 3.2rem;
+  width: 3.2rem;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
+}
+
+/* Collection category row — hide the carousel arrows on mobile --------
+
+   The prev/next controls sit on top of the category thumbnails and, at
+   phone width, cover the images they are meant to help scroll. The row
+   is still swipeable, so the arrows are redundant there. Desktop keeps
+   them. Both the theme's slider-button and swiper-button namings are
+   covered, since the row's markup comes from the shared grid component
+   rather than from categories-list.liquid itself. */
 @media screen and (max-width: 749px) {
-  [data-shopify-editor-block*="group_QQkUjp"] {
-    position: static !important;
-    transform: none !important;
-    width: 100%;
-    max-width: none;
-    padding-inline: 1.6rem;
-    background: transparent !important;
-  }
-}
-
-@media screen and (min-width: 750px) {
-  body.template-index [id$="__section_7XcF39"] .group-block--content-overlay > .group-block__media-wrapper,
-  body.template-index [id$="__section_7XcF39"] .group-block--content-overlay > .group-block__media-wrapper :is(.background-image-container, .video-background) {
-    position: absolute;
-    inset: 0;
-    aspect-ratio: auto;
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_cq7tSe"] > .group-block__media-wrapper::before,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(1) > .group-block__media-wrapper::before,
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_FB8GJK"] > .group-block__media-wrapper::before,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(2) > .group-block__media-wrapper::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background-position: center top;
-    background-size: cover;
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_cq7tSe"] > .group-block__media-wrapper::before,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(1) > .group-block__media-wrapper::before {
-    background-image: url("./desktop-hero-ring-text-safe.png");
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_FB8GJK"] > .group-block__media-wrapper::before,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(2) > .group-block__media-wrapper::before {
-    background-image: url("./desktop-hero-stack-text-safe.png");
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_cq7tSe"] > .group-block__media-wrapper .background-image-container,
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_FB8GJK"] > .group-block__media-wrapper .background-image-container,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(1) > .group-block__media-wrapper .background-image-container,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(2) > .group-block__media-wrapper .background-image-container {
-    opacity: 0;
-  }
-
-  body.template-index [id$="__section_7XcF39"] .group-block--content-overlay > .group-block-content {
-    position: relative;
-    min-height: inherit;
-    z-index: 2;
-  }
-}
-
-@media screen and (max-width: 749px) {
-  [class*="ai-diamond-shape-carousel-arrow"] {
+  .categories-list .slider-button,
+  .categories-list .slider-button--prev,
+  .categories-list .slider-button--next,
+  .categories-list .swiper-button,
+  .categories-list .swiper-button-prev,
+  .categories-list .swiper-button-next,
+  .categories-list-container .slider-button,
+  .categories-list-container .swiper-button,
+  .categories-list-container .swiper-button-prev,
+  .categories-list-container .swiper-button-next {
     display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper {
-    align-items: center !important;
-    gap: 0 !important;
-    padding-top: 0 !important;
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_cq7tSe"],
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_FB8GJK"],
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(1),
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(2) {
-    min-height: 32svh !important;
-    width: 100%;
-    overflow: hidden;
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_cq7tSe"],
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(1) {
-    min-height: 34svh !important;
-  }
-
-  body.template-index [id$="__section_7XcF39"] .group-block--content-overlay > .group-block__media-wrapper,
-  body.template-index [id$="__section_7XcF39"] .group-block--content-overlay > .group-block__media-wrapper :is(.background-image-container, .video-background) {
-    position: absolute;
-    inset: 0;
-    aspect-ratio: auto;
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_cq7tSe"] > .group-block__media-wrapper::before,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(1) > .group-block__media-wrapper::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background-image: url("./mobile-hero-ring-text-safe.png");
-    background-position: center 46%;
-    background-size: cover;
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_cq7tSe"] > .group-block__media-wrapper::after,
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_FB8GJK"] > .group-block__media-wrapper::after,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(1) > .group-block__media-wrapper::after,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(2) > .group-block__media-wrapper::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 12%, rgba(0, 0, 0, 0.16) 44%, rgba(0, 0, 0, 0.78) 100%);
-    pointer-events: none;
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_FB8GJK"] > .group-block__media-wrapper::before,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(2) > .group-block__media-wrapper::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background-image: url("./mobile-hero-stack-text-safe.png");
-    background-position: center 56%;
-    background-size: cover;
-  }
-
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_cq7tSe"] > .group-block__media-wrapper .background-image-container,
-  body.template-index [id$="__section_7XcF39"] [data-shopify-editor-block*="group_FB8GJK"] > .group-block__media-wrapper .background-image-container,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(1) > .group-block__media-wrapper .background-image-container,
-  body.template-index [id$="__section_7XcF39"] .section-content-wrapper > .group-block:nth-child(2) > .group-block__media-wrapper .background-image-container {
-    opacity: 0;
-  }
-
-  body.template-index [id$="__section_7XcF39"] .group-block--content-overlay > .group-block-content {
-    position: relative;
-    min-height: inherit;
-    z-index: 3;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    gap: 0.7rem !important;
-    padding: 2rem 1.6rem 1rem !important;
-    text-align: center;
-  }
-
-  body.template-index [id$="__section_7XcF39"] h1 {
-    max-width: none;
-    margin: 0 !important;
-    font-size: clamp(2.2rem, 6.2vw, 2.8rem) !important;
-    font-weight: 600 !important;
-    line-height: 1.05 !important;
-    white-space: nowrap;
-    color: #fff !important;
-    text-shadow: 0 3px 16px rgba(0, 0, 0, 0.7);
-  }
-
-  body.template-index [id$="__section_7XcF39"] .group-block-content > .shopify-block:first-child {
-    padding-bottom: 0 !important;
-  }
-
-  body.template-index [id$="__section_7XcF39"] .group-block-content > .shopify-block:has(> .button) {
-    display: flex !important;
-    justify-content: center !important;
-    width: fit-content !important;
-    max-width: calc(100vw - 4rem) !important;
-    height: auto !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-    flex: 0 0 auto !important;
-    align-self: center !important;
-  }
-
-  body.template-index [id$="__section_7XcF39"] .button {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: min(18rem, calc(100vw - 9rem)) !important;
-    min-width: 0 !important;
-    max-width: min(18rem, calc(100vw - 9rem)) !important;
-    height: 3.8rem !important;
-    min-height: 3.8rem !important;
-    max-height: 3.8rem !important;
-    padding: 0 1.6rem !important;
-    background: #fff !important;
-    border-color: #fff !important;
-    color: #111 !important;
-    font-weight: 600 !important;
-    line-height: 1 !important;
-    box-sizing: border-box !important;
-    flex: 0 0 auto !important;
-    align-self: center !important;
-  }
-
-  body.template-index [id$="__section_7XcF39"] .button .button-overflow {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: auto !important;
-    min-height: 0 !important;
-  }
-
-  body.template-index [id$="__section_7XcF39"] .button * {
-    color: inherit !important;
   }
 }
 
-body.template-index [id$="__marquee_PKziKG"] .marquee__repeated-items > *:nth-child(2n) {
-  margin-inline-end: 40px;
+/* Breadcrumb — left inline space -------------------------------------
+
+   The breadcrumb section renders full-width (section--full-width) with
+   no page-margin modifier, so its content spans edge-to-edge and "Home"
+   sits flush against the viewport edge. Give the breadcrumb nav its own
+   small left gutter — the shared --page-margin token, so it grows in
+   step with the rest of the theme's spacing rather than a one-off
+   number. */
+.breadcrumbs {
+  padding-inline-start: var(--page-margin);
 }
 
-body.template-index [id$="__marquee_PKziKG"] marquee-component .marquee__repeated-items p,
-body.template-index [id$="__marquee_PKziKG"] marquee-component .marquee__repeated-items span {
-  font-family: var(--font-body--family);
-  font-size: 16px;
+/* Desktop Sort By — bordered pill, one line, sentence case -----------
+
+   Rebuilt to read "Sort By: Price (Low to High)" in a single bordered
+   box, matching the reference: not the theme's uppercase/letter-spaced
+   caption styling (which produced "SORT BY  PRICE, LOW TO HIGH" as two
+   visually disconnected runs), and not the grow-on-select dash/indent
+   the dropdown *rows* used (component-facets.css) — that stays for the
+   open list; only the closed trigger changes here. */
+.facet-filters__sort--boxed .facets__summary {
+  display: inline-flex;
+  border: var(--style-border-width, 1px) solid var(--color-border, #d1d1d1);
+  border-radius: var(--style-border-radius-buttons-primary, 4px);
+  padding: 1.2rem 1.6rem;
+}
+
+.facet-filters__sort-label {
+  font-size: 1.5rem;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  color: var(--color-foreground);
+  white-space: nowrap;
+}
+
+.facet-filters__sort-value {
   font-weight: 400;
 }
 
-body.template-index [id$="__marquee_PKziKG"] marquee-component .marquee__repeated-items svg,
-body.template-index [id$="__marquee_PKziKG"] marquee-component .marquee__repeated-items img {
-  width: 20px;
-  height: 20px;
+.facet-filters__sort--boxed .icon-caret {
+  width: 1.2rem;
+  margin-inline-start: 0.4rem;
+}
+
+/* Collection toolbar — Filters, results count and Sort By on one line -
+
+   These three used to come from three separate DOM regions (Filters
+   trigger and results count both nested inside snippets/facets.liquid
+   in different places, Sort By an unrelated sibling block rendered by
+   blocks/filters.liquid) with no shared flex parent, which is why they
+   landed on two lines. blocks/filters.liquid now captures the Sort By
+   form as vertical_sort_markup and passes it into render 'facets',
+   which prints it — and the results count — as siblings of the Filters
+   <details>, all inside .mobile-facets__wrapper. This lays that shared
+   row out and gives the two visually distinct controls (filled Filters
+   button, bordered Sort By pill) one matching height. */
+.mobile-facets__wrapper {
+  align-items: center;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+}
+
+.mobile-facets__wrapper .mobile-facets__disclosure {
+  flex: 0 0 auto;
+}
+
+.facet-toolbar__count {
+  color: var(--color-foreground);
+  opacity: 0.7;
+  font-size: 1.4rem;
+  white-space: nowrap;
+}
+
+.mobile-facets__wrapper .facets-vertical-sort {
+  margin-inline-start: auto;
+}
+
+/* min-height alone left them different heights — whichever control
+   had the smaller content+padding just stayed smaller than the floor
+   implied. Force an exact height instead, drop each control's own
+   vertical padding to 0 so it can't push past that height, and center
+   content inside it. !important because at least one of these already
+   carries a same-specificity !important rule elsewhere, so plain
+   overrides could lose depending on source order. */
+.mobile-facets__wrapper .mobile-facets__open-wrapper,
+.mobile-facets__wrapper .mobile-facets__open,
+.mobile-facets__wrapper .facet-filters__sort--boxed .facets__summary {
+  height: 4.6rem !important;
+  padding-block: 0 !important;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
 }

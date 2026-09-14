@@ -251,3 +251,29 @@
   }
 }
 
+
+/* The Signature Edit — tab buttons ---------------------------------- */
+
+/* These tabs are theme buttons, so they inherit .button-hover--effect:
+   the real label slides up and a duplicate drawn as
+   .button-overflow::after (content: attr(data-button-text)) slides in
+   behind it. That duplicate is absolutely positioned at width:100% of
+   a span whose own max-width is 100%, so a label wider than the span
+   gets clipped by its overflow:hidden — "Engagement Rings" lost its
+   last characters on hover and on the selected tab.
+
+   Tabs don't need a text-reveal; only the colour sweep matters. Drop
+   the duplicate and leave the real label in place. */
+body.template-index [id$="__featured_collection_list_YeVaRD"] .tabs-component-panel-trigger.button .button-overflow {
+  max-width: none;
+  overflow: visible;
+}
+
+body.template-index [id$="__featured_collection_list_YeVaRD"] .tabs-component-panel-trigger.button .button-overflow::after {
+  content: none;
+}
+
+body.template-index [id$="__featured_collection_list_YeVaRD"] .tabs-component-panel-trigger.button:hover .button-text-main {
+  transform: none;
+  opacity: 1;
+}

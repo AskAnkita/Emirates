@@ -133,6 +133,84 @@
       {% content_for 'blocks' %}
     {%- endcapture -%}
 
+    {%- comment -%}
+      Filters (drawer trigger, inside render 'facets'), the results count
+      (also inside render 'facets', in active-facets-vertical-filter) and
+      this Sort By form used to render as three unrelated DOM regions —
+      two nested inside snippets/facets.liquid, one a sibling block after
+      it entirely — so no shared flex parent existed to put them on one
+      line. Capture the Sort By form here and hand it to render 'facets'
+      as vertical_sort_markup so the snippet can place it beside the
+      Filters trigger instead of printing it as a disconnected sibling
+      below. IDs and JS hooks (FacetSortForm, facet-filters-form) are
+      unchanged, just relocated.
+    {%- endcomment -%}
+    {%- assign vertical_sort_markup = '' -%}
+    {%- if bl_stts.filter_style == 'vertical' -%}
+      {%- liquid
+        assign sort_by = results.sort_by | default: results.default_sort_by
+        assign enable_divider_sorting_vertical = bl_stts.enable_divider_sorting_vertical
+        assign selected_sort_by = results.sort_options | where: 'value', sort_by | first
+        assign padding_block_start = bl_stts.sorting_vertical_padding_block_start
+        assign padding_block_end = bl_stts.sorting_vertical_padding_block_end
+      -%}
+      {%- capture vertical_sort_markup -%}
+        <facet-filters-form class="facets facets-vertical-sort facets-vertical-sort--vertical{% if enable_divider_sorting_vertical %} facets-vertical-sort--vertical-divider{% endif %}">
+          <form
+            class="facets-vertical-form"
+            id="FacetSortForm"
+            style="--pt: {{ padding_block_start }}px; --pb: {{ padding_block_end }}px;"
+          >
+            <div class="sorting-wrapper flex items-center gap-lg">
+              {%- if enable_grid_view -%}
+                {% render 'switcher-grid',
+                  columns_desktop: columns_desktop,
+                  filter_type: filter_type,
+                  style: style,
+                  enable_hover_reveal: enable_hover_reveal,
+                  heading_label_case: heading_label_case,
+                  heading_label_font_size: heading_label_font_size,
+                  text_label_case: text_label_case,
+                  text_label_font_size: text_label_font_size
+                %}
+              {%- endif -%}
+
+              <div class="sorting-wrapper-rightcol flex justify-end gap-lg medium-hide">
+                {%- if enable_products_per_page -%}
+                  <div class="facet-per-page products-per-page caption">
+                    {% render 'products-per-page',
+                      limit: limit,
+                      style: style,
+                      enable_hover_reveal: enable_hover_reveal,
+                      heading_label_case: heading_label_case,
+                      heading_label_font_size: heading_label_font_size,
+                      text_label_case: text_label_case,
+                      text_label_font_size: text_label_font_size,
+                    %}
+                  </div>
+                {%- endif -%}
+
+                {%- if enable_sorting -%}
+                  {% render 'facets-sort-by',
+                    results: results,
+                    sort_by: sort_by,
+                    selected_sort_by: selected_sort_by,
+                    enable_hover_reveal: enable_hover_reveal,
+                    style: style,
+                    filter_type: filter_type,
+                    heading_label_case: heading_label_case,
+                    heading_label_font_size: heading_label_font_size,
+                    text_label_case: text_label_case,
+                    text_label_font_size: text_label_font_size
+                  %}
+                {%- endif -%}
+              </div>
+            </div>
+          </form>
+        </facet-filters-form>
+      {%- endcapture -%}
+    {%- endif -%}
+
     {% render 'facets',
       bl_stts: bl_stts,
       results: results,
@@ -160,74 +238,11 @@
       filter_label_all: filter_label_all,
       show_filter_by_tags_sidebar: show_filter_by_tags_sidebar,
       number_filters: number_filters,
-      enable_count: enable_count
+      enable_count: enable_count,
+      vertical_sort_markup: vertical_sort_markup
     %}
   </div>
 </div>
-
-{%- if bl_stts.filter_style == 'vertical' -%}
-  {%- liquid
-    assign sort_by = results.sort_by | default: results.default_sort_by
-    assign enable_divider_sorting_vertical = bl_stts.enable_divider_sorting_vertical
-    assign selected_sort_by = results.sort_options | where: 'value', sort_by | first
-    assign padding_block_start = bl_stts.sorting_vertical_padding_block_start
-    assign padding_block_end = bl_stts.sorting_vertical_padding_block_end
-  -%}
-
-  <facet-filters-form class="facets facets-vertical-sort facets-vertical-sort--vertical{% if enable_divider_sorting_vertical %} facets-vertical-sort--vertical-divider{% endif %}">
-    <form
-      class="facets-vertical-form"
-      id="FacetSortForm"
-      style="--pt: {{ padding_block_start }}px; --pb: {{ padding_block_end }}px;"
-    >
-      <div class="sorting-wrapper flex items-center gap-lg">
-        {%- if enable_grid_view -%}
-          {% render 'switcher-grid',
-            columns_desktop: columns_desktop,
-            filter_type: filter_type,
-            style: style,
-            enable_hover_reveal: enable_hover_reveal,
-            heading_label_case: heading_label_case,
-            heading_label_font_size: heading_label_font_size,
-            text_label_case: text_label_case,
-            text_label_font_size: text_label_font_size
-          %}
-        {%- endif -%}
-
-        <div class="sorting-wrapper-rightcol flex justify-end gap-lg medium-hide">
-          {%- if enable_products_per_page -%}
-            <div class="facet-per-page products-per-page caption">
-              {% render 'products-per-page',
-                limit: limit,
-                style: style,
-                enable_hover_reveal: enable_hover_reveal,
-                heading_label_case: heading_label_case,
-                heading_label_font_size: heading_label_font_size,
-                text_label_case: text_label_case,
-                text_label_font_size: text_label_font_size,
-              %}
-            </div>
-          {%- endif -%}
-
-          {%- if enable_sorting -%}
-            {% render 'facets-sort-by',
-              results: results,
-              sort_by: sort_by,
-              selected_sort_by: selected_sort_by,
-              enable_hover_reveal: enable_hover_reveal,
-              style: style,
-              filter_type: filter_type,
-              heading_label_case: heading_label_case,
-              heading_label_font_size: heading_label_font_size,
-              text_label_case: text_label_case,
-              text_label_font_size: text_label_font_size
-            %}
-          {%- endif -%}
-        </div>
-      </div>
-    </form>
-  </facet-filters-form>
-{%- endif -%}
 
 {% schema %}
 {

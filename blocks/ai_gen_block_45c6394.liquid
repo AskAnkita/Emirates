@@ -117,16 +117,11 @@
     margin-top: 32px;
   }
 
-  /* Filled primary CTA (inverted primary button colours) so it stands apart from the outlined secondary */
-  .ai-editorial-feature__actions-{{ ai_gen_id }} .button.ai-editorial-feature__cta--primary-{{ ai_gen_id }} {
-    --button-color: var(--color-primary-button-background);
-    --button-border-color: var(--color-primary-button-text);
-    background-color: var(--color-primary-button-text);
-  }
-
-  .ai-editorial-feature__actions-{{ ai_gen_id }} .button.ai-editorial-feature__cta--primary-{{ ai_gen_id }}:hover {
-    background-color: var(--color-primary-button-hover-background);
-  }
+  /* The primary CTA is deliberately NOT restyled here. Both buttons are
+     meant to rest white with a border and sweep to the scheme's grey on
+     hover, and that is already what .button and .button-secondary do in
+     scheme-1 — so the block inherits it. This used to invert the primary
+     to a black fill; don't reintroduce that. */
 
   @media screen and (max-width: 749px) {
     .ai-editorial-feature-{{ ai_gen_id }} {

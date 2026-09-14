@@ -183,9 +183,14 @@
   }
 
   .ai-mm-button-{{ uid }}:hover {
-    background-color: {{ s.button_hover_background }};
-    color: {{ s.button_hover_text_color }};
-    border-color: {{ s.button_hover_border_color }};
+    background-color: #f3f3f3;
+    color: {{ s.button_text_color }};
+    border-color: #9a9a9a;
+  }
+
+  .ai-mm-button-{{ uid }}:focus-visible {
+    outline: 2px solid #bdbdbd;
+    outline-offset: 2px;
   }
 
   @media screen and (max-width: 1199px) {

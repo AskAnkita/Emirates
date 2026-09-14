@@ -1,8 +1,42 @@
+{%- comment -%}
+  Renders the icon for one diamond shape filter option.
+
+  Looks up a matching entry in the "Diamond shapes" metaobject
+  (shopify.metaobjects.diamond_shapes) by comparing its display name
+  (e.g. "Trillion Shape") against the shape name, and uses that
+  entry's uploaded image when found. Falls back to a hand-drawn SVG
+  outline for any shape without a matching entry.
+
+  Accepts:
+  - shape: {String} The shape name, e.g. "Trillion"
+{%- endcomment -%}
+
 {%- liquid
   assign shape_name = shape | strip | downcase
   assign shape_handle = shape | handle
+  assign shape_image = blank
+  assign shape_image_keys = 'shape_name,image,shape_image,icon,photo,file' | split: ','
+  for shape_entry in shopify.metaobjects.diamond_shapes.values
+    assign entry_title = shape_entry.title | downcase | strip | replace: ' shape', ''
+    assign entry_handle = shape_entry.handle | remove: '_shape' | remove: '-shape'
+    if entry_title == shape_name or entry_handle == shape_handle
+      for image_key in shape_image_keys
+        assign candidate_image = shape_entry[image_key]
+        if candidate_image != blank
+          assign shape_image = candidate_image
+          break
+        endif
+      endfor
+      break
+    endif
+  endfor
 -%}
 
+{%- if shape_image != blank -%}
+  <span class="facets__shape-icon facets__shape-icon--{{ shape_handle }} facets__shape-icon--image" aria-hidden="true">
+    {{ shape_image | image_url: width: 88 | image_tag: loading: 'lazy', widths: '44, 88, 132', alt: shape }}
+  </span>
+{%- else -%}
 <span class="facets__shape-icon facets__shape-icon--{{ shape_handle }}" aria-hidden="true">
   <svg viewBox="0 0 44 44" focusable="false" role="presentation">
     {%- case shape_name -%}
@@ -48,3 +82,4 @@
     {%- endcase -%}
   </svg>
 </span>
+{%- endif -%}

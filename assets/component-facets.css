@@ -2130,6 +2130,12 @@ dialog-component.facets-block-wrapper:not(:has(.facets--drawer[open])) {
   stroke-linejoin: round;
 }
 
+.facets__shape-icon--image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .facets--horizontal .facets__item.swatch-item {
   border: none;
 }

@@ -541,8 +541,13 @@
                         endunless
                       endfor
                       assign active_values_size = count_tag_active
+                      assign skip_all_tags_leftover = false
+                      if filter_label == filter_label_all and show_filter_by_tags_sidebar
+                        assign skip_all_tags_leftover = true
+                      endif
                     -%}
 
+                    {%- unless skip_all_tags_leftover -%}
                     <details
                       id="Details-{{ filter.param_name | escape }}-{{ section.id }}"
                       class="facets__panel facets__panel--{{ style }} {% if filter_type == 'horizontal' %}details--dropdown disclosure-has-popup relative facets__disclosure{% else %} facets__disclosure-vertical{% endif %} js-filter"
@@ -776,6 +781,7 @@
                         {%- endif -%}
                       </div>
                     </details>
+                    {%- endunless -%}
                   {% when 'price_range' %}
                     <details
                       id="Details-{{ filter.param_name | escape }}-{{ section.id }}"
@@ -1551,6 +1557,13 @@
                           {% endfor %}
                         {% endif %}
 
+                        {%- liquid
+                          assign skip_all_tags_leftover_mobile = false
+                          if filter_label == filter_label_all and show_filter_by_tags_sidebar
+                            assign skip_all_tags_leftover_mobile = true
+                          endif
+                        -%}
+                        {%- unless skip_all_tags_leftover_mobile -%}
                         <accordion-custom>
                           <details
                             id="Details-Mobile-{{ filter.param_name | escape }}-{{ section.id }}"
@@ -1711,6 +1724,7 @@
                             </div>
                           </details>
                         </accordion-custom>
+                        {%- endunless -%}
                       {% when 'price_range' %}
                         <accordion-custom>
                           <details

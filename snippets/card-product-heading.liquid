@@ -5,6 +5,14 @@
   else
     assign href_product_url = card_product.url
   endif
+
+  capture shuffle_variant_id
+    render 'card-shuffle-variant', product: card_product
+  endcapture
+  assign shuffle_variant_id = shuffle_variant_id | strip
+  if shuffle_variant_id != blank
+    assign href_product_url = href_product_url | append: '?variant=' | append: shuffle_variant_id
+  endif
 -%}
 
 <div class="card__heading">

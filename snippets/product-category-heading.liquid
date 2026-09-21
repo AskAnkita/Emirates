@@ -1,0 +1,25 @@
+{%- doc -%}
+  Outputs a heading for the product's main category — "Popular Necklaces", "Popular Engagement Rings"
+  — or "You May Also Like" when the product isn't in one of the main category collections.
+  Text blocks swap it in for the [category_heading] placeholder.
+
+  @param {object} product - the product whose category to name
+{%- enddoc -%}
+{%- liquid
+  assign category_heading = 'You May Also Like'
+  if product != blank
+    assign collection_handles = product.collections | map: 'handle'
+    if collection_handles contains 'engagement-rings'
+      assign category_heading = 'Popular Engagement Rings'
+    elsif collection_handles contains 'rings'
+      assign category_heading = 'Popular Rings'
+    elsif collection_handles contains 'earrings'
+      assign category_heading = 'Popular Earrings'
+    elsif collection_handles contains 'necklaces'
+      assign category_heading = 'Popular Necklaces'
+    elsif collection_handles contains 'bracelets'
+      assign category_heading = 'Popular Bracelets'
+    endif
+  endif
+  echo category_heading
+-%}

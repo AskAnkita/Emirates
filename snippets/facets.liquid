@@ -444,13 +444,15 @@
                                                   if images[background_image] != blank
                                                     assign background_image = background_image | file_url
                                                   else
-                                                    assign background_image = ''
+                                                    capture background_image
+                                                      render 'swatch-image', value: value.value
+                                                    endcapture
                                                   endif
                                                 %}
                                                 <span
                                                   class="swatch block color-swacth-color--{{ value.value | handle }}"
                                                   style="
-                                                    --swatch--background-color: {{ value.value | split: ' ' | last | handle }};
+                                                    --swatch--background-color: {% render 'swatch-color', value: value.value %};
                                                     {% if background_image != blank %}--swatch--background: url({{ background_image }});{% endif %}
                                                   "
                                                 ></span>
@@ -701,13 +703,15 @@
                                           if images[background_image] != blank
                                             assign background_image = background_image | file_url
                                           else
-                                            assign background_image = ''
+                                            capture background_image
+                                              render 'swatch-image', value: value.value
+                                            endcapture
                                           endif
                                         %}
                                         <span
                                           class="swatch block color-swacth-color--{{ value.value | handle }}"
                                           style="
-                                            --swatch--background-color: {{ value.value | split: ' ' | last | handle }};
+                                            --swatch--background-color: {% render 'swatch-color', value: value.value %};
                                             {% if background_image != blank %}--swatch--background: url({{ background_image }});{% endif %}
                                           "
                                         ></span>
@@ -1493,13 +1497,15 @@
                                                       if images[background_image] != blank
                                                         assign background_image = background_image | file_url
                                                       else
-                                                        assign background_image = ''
+                                                        capture background_image
+                                                          render 'swatch-image', value: value.value
+                                                        endcapture
                                                       endif
                                                     %}
                                                     <span
                                                       class="swatch block color-swacth-color--{{ value.value | handle }}"
                                                       style="
-                                                        --swatch--background-color: {{ value.value | split: ' ' | last | handle }};
+                                                        --swatch--background-color: {% render 'swatch-color', value: value.value %};
                                                         {% if background_image != blank %}--swatch--background: url({{ background_image }});{% endif %}
                                                       "
                                                     ></span>
@@ -1667,13 +1673,15 @@
                                               if images[background_image] != blank
                                                 assign background_image = background_image | file_url
                                               else
-                                                assign background_image = ''
+                                                capture background_image
+                                                  render 'swatch-image', value: value.value
+                                                endcapture
                                               endif
                                             %}
                                             <span
                                               class="swatch block color-swacth-color--{{ value.value | handle }}"
                                               style="
-                                                --swatch--background-color: {{ value.value | split: ' ' | last | handle }};
+                                                --swatch--background-color: {% render 'swatch-color', value: value.value %};
                                                 {% if background_image != blank %}--swatch--background: url({{ background_image }});{% endif %}
                                               "
                                             ></span>

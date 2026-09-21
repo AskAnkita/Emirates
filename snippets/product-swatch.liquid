@@ -6,6 +6,7 @@
   assign color = ''
   assign count = 0
   assign digit_chars = '0,1,2,3,4,5,6,7,8,9' | split: ','
+  assign metal_keys = 'white-gold,rose-gold,yellow-gold,platinum,silver' | split: ','
   if settings.enable_custom_position_swatch_layout_card_1
     assign number_limit = 5
   else
@@ -24,6 +25,32 @@
   if active_color_handle == blank
     assign active_color_handle = product.options_with_values[index].values.first | handle
   endif
+
+  # One swatch per metal on cards: "10k/14k/18k Yellow Gold" share a single YG circle,
+  # which selects the first variant of that metal. Non-metal values are left as they are.
+  # On collection pages the card may show a different metal than the featured image
+  # (card-shuffle-variant) — mark that one active so circle and photo agree.
+  capture shuffle_variant_id
+    render 'card-shuffle-variant', product: product
+  endcapture
+  assign shuffle_variant_id = shuffle_variant_id | strip | plus: 0
+  if shuffle_variant_id > 0
+    for shuffle_variant in product.variants
+      if shuffle_variant.id == shuffle_variant_id
+        assign active_color_handle = shuffle_variant.title | handle
+        break
+      endif
+    endfor
+  endif
+
+  assign active_group = active_color_handle
+  for metal_key in metal_keys
+    if active_color_handle contains metal_key
+      assign active_group = metal_key
+      break
+    endif
+  endfor
+  assign seen_groups = '|'
 -%}
 
 {%- capture class_swatch -%}
@@ -43,8 +70,27 @@
       >
         {%- for color in product.options_with_values[index].values -%}
           {%- liquid
-            assign variant = color.variant
             assign color_handle = color | handle
+            assign swatch_group = color_handle
+            assign swatch_label = color
+            for metal_key in metal_keys
+              if color_handle contains metal_key
+                assign swatch_group = metal_key
+                assign swatch_label = metal_key | replace: '-', ' ' | capitalize
+                if metal_key == 'silver'
+                  assign swatch_label = 'Sterling Silver'
+                elsif metal_key contains '-gold'
+                  assign swatch_label = metal_key | split: '-' | first | capitalize | append: ' Gold'
+                endif
+                break
+              endif
+            endfor
+            assign group_marker = '|' | append: swatch_group | append: '|'
+          -%}
+          {%- if seen_groups contains group_marker -%}{%- continue -%}{%- endif -%}
+          {%- liquid
+            assign seen_groups = seen_groups | append: swatch_group | append: '|'
+            assign variant = color.variant
             assign enable_variant_image = false
             case swatch_type
               when 'variant_image'
@@ -57,7 +103,9 @@
               if images[background_image] != blank
                 assign background_image = background_image | file_url
               else
-                assign background_image = ''
+                capture background_image
+                  render 'swatch-image', value: color, lettered: true
+                endcapture
               endif
                 assign enable_variant_image = true
               when 'metaobjects'
@@ -138,46 +186,46 @@
 
           -%}
           {%- if count < number_limit -%}
-            <li class="swatch-item cursor-pointer relative{% if color_handle == active_color_handle %} active{% endif %}">
+            <li class="swatch-item cursor-pointer relative{% if swatch_group == active_group %} active{% endif %}">
                 <span
                   {% if enable_variant_image %}
                     class="{{ class_swatch }} color-swacth-color--{{ color | handle }}"
                     style="
-                      {%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                      {%- if swatch_type == 'color' -%}--swatch--background-color: {% render 'swatch-color', value: color %};{%- endif -%}
                       {%- if has_metaobject -%}--swatch--background-color: {{ background_color }};{%- endif -%}
                       {% comment %} {%- if has_metaobject and metaobject_color == blank -%}--swatch--background-color: {{ background_color }};{%- endif -%} {% endcomment %}
                       {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}
                     "
                     data-title="{{ color | handle }}"
                     data-variant-id="{{ variant.id }}"
-                    data-variant-img="{% if variant.image != blank %}{{ variant.image.src | image_url: width: '800x' }}{% endif %}"
+                    data-variant-img="{% if variant.image != blank %}{{ variant.image | image_url: width: 400, format: 'webp' }} 400w, {{ variant.image | image_url: width: 700, format: 'webp' }} 700w, {{ variant.image | image_url: width: 1000, format: 'webp' }} 1000w{% endif %}"
                   {% else %}
                     class="{{ class_swatch }} color-swacth-color--{{ color | handle }} swatch--unavailable"
                   {% endif %}
                 ></span>
-                <span class="{{ class_tooltip }}">{{ color | escape }}</span>
+                <span class="{{ class_tooltip }}">{{ swatch_label | escape }}</span>
             </li>
           {%- else -%}
             {%- if count == number_limit -%}
               <li class="group-swatch " style="--gap-x: 0.5rem; display: none">
             {%- endif -%}
-            <div class="swatch-item cursor-pointer relative{% if color_handle == active_color_handle %} active{% endif %}">
+            <div class="swatch-item cursor-pointer relative{% if swatch_group == active_group %} active{% endif %}">
                 <span
                   {% if enable_variant_image %}
                     class="{{ class_swatch }} color-swacth-color--{{ color | handle }}"
                     style="
-                      {%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                      {%- if swatch_type == 'color' -%}--swatch--background-color: {% render 'swatch-color', value: color %};{%- endif -%}
                       {%- if has_metaobject and metaobject_color != blank -%}--swatch--background-color: {{ background_color }};{%- endif -%}
                       {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}
                     "
                     data-title="{{ color | handle }}"
                     data-variant-id="{{ variant.id }}"
-                    data-variant-img="{% if variant.image != blank %}{{ variant.image.src | image_url: width: '800x' }}{% endif %}"
+                    data-variant-img="{% if variant.image != blank %}{{ variant.image | image_url: width: 400, format: 'webp' }} 400w, {{ variant.image | image_url: width: 700, format: 'webp' }} 700w, {{ variant.image | image_url: width: 1000, format: 'webp' }} 1000w{% endif %}"
                   {% else %}
                     class="{{ class_swatch }} color-swacth-color--{{ color | handle }} swatch--unavailable"
                   {% endif %}
                 ></span>
-                <span class="{{ class_tooltip }}">{{ color | escape }}</span>
+                <span class="{{ class_tooltip }}">{{ swatch_label | escape }}</span>
             </div>
             {%- if forloop.last -%}
               </li>

@@ -12,12 +12,36 @@
 
 {%- liquid
   assign f_media = card_product.featured_media
-  assign f_media_width = f_media.width
   assign media = card_product.media
-  assign media_width = media.width
+  assign secondary_media = media[1]
+
+  # Collection pages mix the metals shown: use the picked variant's photo, and the next photo
+  # of that same metal (same alt text) on hover, instead of always the yellow-gold set.
+  capture shuffle_variant_id
+    render 'card-shuffle-variant', product: card_product
+  endcapture
+  assign shuffle_variant_id = shuffle_variant_id | strip
+  if shuffle_variant_id != blank
+    assign shuffle_id_num = shuffle_variant_id | plus: 0
+    for card_variant in card_product.variants
+      if card_variant.id == shuffle_id_num
+        assign f_media = card_variant.featured_media
+        break
+      endif
+    endfor
+    for card_media in media
+      if card_media.id != f_media.id and card_media.alt == f_media.alt and card_media.media_type == 'image'
+        assign secondary_media = card_media
+        break
+      endif
+    endfor
+  endif
+
+  assign f_media_width = f_media.width
+  assign media_width = secondary_media.width
 
   assign f_media_alt = f_media.alt | default: card_product.title | append: ' ' | append: f_media_alt | strip
-  assign media_alt = media.alt | default: card_product.title | append: ' ' | append: media_alt | strip
+  assign media_alt = secondary_media.alt | default: card_product.title | append: ' ' | append: media_alt | strip
 
   assign sizes = sizes
 
@@ -33,12 +57,15 @@
   else
     assign href_product_url = card_product.url
   endif
-
-  if f_media.presentation.focal_point != blank
-    assign focal_point_style = '--image-focal-point: ' | append: media[0].presentation.focal_point | append: ';'
+  if shuffle_variant_id != blank
+    assign href_product_url = href_product_url | append: '?variant=' | append: shuffle_variant_id
   endif
 
-  assign secondary_focal_point_style = '--image-focal-point: ' | append: media[1].presentation.focal_point | append: ';'
+  if f_media.presentation.focal_point != blank
+    assign focal_point_style = '--image-focal-point: ' | append: f_media.presentation.focal_point | append: ';'
+  endif
+
+  assign secondary_focal_point_style = '--image-focal-point: ' | append: secondary_media.presentation.focal_point | append: ';'
 -%}
 
 <card-media class="card__media block{% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ settings.card_color_scheme }}{% endif %}">
@@ -49,20 +76,20 @@
     {% else %}
       {{ 'product-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
     {% endif %}
-    {%- if media[1] != null and show_secondary_image -%}
-      {%- case media[1].media_type -%}
+    {%- if secondary_media != null and show_secondary_image -%}
+      {%- case secondary_media.media_type -%}
         {%- when 'image' -%}
-          {{ media[1] | image_url: width: media_width , format: 'webp' | image_tag: sizes: sizes, widths: m_widths, loading: 'lazy', alt: media_alt, class: 'motion-reduce', loading: 'lazy', id: secondary_media_id, style: secondary_focal_point_style }}
+          {{ secondary_media | image_url: width: media_width , format: 'webp' | image_tag: sizes: sizes, widths: m_widths, loading: 'lazy', alt: media_alt, class: 'motion-reduce', loading: 'lazy', id: secondary_media_id, style: secondary_focal_point_style }}
         {%- when 'video', 'external_video' -%}
           {%- render 'video',
-            video: media[1],
+            video: secondary_media,
             widths: widths,
             sizes: sizes,
             loading: loading,
             disable_controls: true,
             video_autoplay: true,
             video_loop: true,
-            video_id: media[1].id,
+            video_id: secondary_media.id,
             section_id: section.id,
             id: secondary_media_id
           -%}

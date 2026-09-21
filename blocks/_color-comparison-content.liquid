@@ -30,7 +30,14 @@
                     assign enable_variant_image = true
                   endif
                 when 'color'
-                  assign background_image = color | handle | append: '.png' | file_url
+                  assign background_image = color | handle | append: '.png'
+                  if images[background_image] != blank
+                    assign background_image = background_image | file_url
+                  else
+                    capture background_image
+                      render 'swatch-image', value: color
+                    endcapture
+                  endif
                   assign enable_variant_image = true
                 when 'metaobjects'
                   assign metaobject_color = color.swatch.color
@@ -58,7 +65,7 @@
                 <span
                   {% if enable_variant_image %}
                     class="swatch color-swacth-color--{{ color | handle }} block max-w-full"
-                    style="{%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                    style="{%- if swatch_type == 'color' -%}--swatch--background-color: {% render 'swatch-color', value: color %};{%- endif -%}
                     {%- if has_metaobject -%}--swatch--background-color: {{ background_color }};{%- endif -%}
                     {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}"
                     data-title="{{ color }}"

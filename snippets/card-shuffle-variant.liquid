@@ -1,0 +1,30 @@
+{%- doc -%}
+  On collection pages, picks which metal a product card shows so the grid isn't all yellow gold:
+  one of the product's yellow / white / rose gold variants, chosen from the product id so it's
+  stable between page loads (no flicker, cache-friendly) but varies from card to card.
+  Outputs that variant's id, or nothing (card keeps its default image) outside collection pages
+  or when the product has fewer than two photographed metals.
+
+  @param {object} product - the card's product
+{%- enddoc -%}
+{%- liquid
+  if template.name == 'collection' and product != blank
+    assign metal_keys = 'yellow-gold,white-gold,rose-gold' | split: ','
+    assign candidate_ids = ''
+    for metal_key in metal_keys
+      for variant in product.variants
+        assign variant_handle = variant.title | handle
+        if variant_handle contains metal_key and variant.featured_media != blank
+          assign candidate_ids = candidate_ids | append: variant.id | append: ','
+          break
+        endif
+      endfor
+    endfor
+
+    assign candidates = candidate_ids | split: ','
+    if candidates.size > 1
+      assign pick = product.id | modulo: candidates.size
+      echo candidates[pick]
+    endif
+  endif
+-%}

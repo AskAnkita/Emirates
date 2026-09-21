@@ -2549,11 +2549,26 @@ class RecentlyViewedProducts extends HTMLElement {
   }
 
   init() {
+    // Nothing viewed yet (the current product doesn't count): hide the whole section, title
+    // included, instead of showing a heading over skeleton cards until the fetch comes back empty.
+    if (this.getHistoryIds().length === 0) {
+      this.classList.add("hidden");
+      return;
+    }
+
     theme.initSectionVisible({
       element: this,
       callback: this.load.bind(this),
       threshold: 400,
     });
+  }
+
+  getHistoryIds() {
+    const listItems = JSON.parse(
+      localStorage.getItem("_halo_recently_viewed") || "[]"
+    );
+    const currentId = parseInt(this.dataset.productId);
+    return listItems.filter((id) => id !== currentId);
   }
 
   load() {
@@ -2568,10 +2583,10 @@ class RecentlyViewedProducts extends HTMLElement {
 
         this.innerHTML = recentlyViewed.innerHTML;
 
-        const recentlyViewedProducts = this.querySelector(".collection--grid-layout");
-
-        if (recentlyViewedProducts && recentlyViewedProducts.textContent.trim() === '') {
+        // History can point at products that are gone or unpublished, so check for real cards
+        if (!this.querySelector(".grid__item:not(.recently-viewed-products__skeleton-item)")) {
           this.classList.add("hidden");
+          return;
         }
 
         const cardMedias = this.querySelectorAll("card-media");
@@ -2597,18 +2612,9 @@ class RecentlyViewedProducts extends HTMLElement {
   }
 
   getUrl() {
-    const listItems = JSON.parse(
-      localStorage.getItem("_halo_recently_viewed") || "[]"
-    );
-
-    if (
-      this.dataset.productId &&
-      listItems.includes(parseInt(this.dataset.productId))
-    )
-      listItems.splice(listItems.indexOf(parseInt(this.dataset.productId)), 1);
     return (
       this.dataset.url +
-      listItems
+      this.getHistoryIds()
         .map((id) => "id:" + id)
         .slice(0, parseInt(this.dataset.limit))
         .join("%20OR%20")
@@ -3212,6 +3218,18 @@ class ColorSwatch extends HTMLElement {
       "click",
       this.handleSwatchClick.bind(this)
     );
+    // Warm the variant photos while the pointer is over the swatches, so a click swaps instantly
+    this.swatchList?.addEventListener("pointerenter", this.preloadVariantImages.bind(this), { once: true });
+  }
+
+  preloadVariantImages() {
+    const cardImage = this.closest(".card-wrapper")?.querySelector(".card__media img");
+    this.querySelectorAll("[data-variant-img]").forEach((swatch) => {
+      if (!swatch.dataset.variantImg) return;
+      const img = new Image();
+      if (cardImage?.sizes) img.sizes = cardImage.sizes;
+      img.srcset = swatch.dataset.variantImg;
+    });
   }
 
   handleSwatchClickActive(event) {

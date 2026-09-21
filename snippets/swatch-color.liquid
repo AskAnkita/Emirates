@@ -1,0 +1,23 @@
+{%- doc -%}
+  Outputs the CSS colour for a colour/metal option value.
+  Metals are matched by full name (the value's last word alone turns every "... Gold" yellow);
+  anything else falls back to the last word as a CSS colour name, e.g. "Navy Blue" -> blue.
+
+  @param {string} value - option value, e.g. "14k Rose Gold"
+{%- enddoc -%}
+{%- liquid
+  assign swatch_handle = value | handle
+  if swatch_handle contains 'white-gold'
+    echo '#D6D6D6'
+  elsif swatch_handle contains 'rose-gold'
+    echo '#E8B4A0'
+  elsif swatch_handle contains 'yellow-gold'
+    echo '#D4AF37'
+  elsif swatch_handle contains 'platinum'
+    echo '#E5E4E2'
+  elsif swatch_handle contains 'silver'
+    echo '#C0C0C0'
+  else
+    echo value | split: ' ' | last | handle
+  endif
+-%}

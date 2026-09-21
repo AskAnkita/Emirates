@@ -1,0 +1,44 @@
+{%- doc -%}
+  Outputs the image URL for a metal option value, or nothing for non-metals.
+  An image uploaded to Settings > Files named after the metal (yellow-gold.png, white-gold.png,
+  rose-gold.png, silver.png, platinum.png) wins. Otherwise the theme's lettered badge
+  (assets/swatch-<metal>.webp: SS / YG / RG / WG) when `lettered` is set, else the plain texture
+  (assets/swatch-<metal>.svg).
+
+  With `karat` set, values that have their own badge (assets/swatch-<value-handle>.webp:
+  925SS, 10K/14K/18K per gold colour) use it first.
+
+  @param {string} value - option value, e.g. "14k Rose Gold"
+  @param {boolean} [lettered] - use the lettered badge images (product cards)
+  @param {boolean} [karat] - use the per-karat badge images (product page)
+{%- enddoc -%}
+{%- liquid
+  assign swatch_handle = value | handle
+  assign karat_badges = '|925-sterling-silver|10k-yellow-gold|10k-white-gold|10k-rose-gold|14k-yellow-gold|14k-white-gold|14k-rose-gold|18k-yellow-gold|18k-white-gold|18k-rose-gold|'
+  assign badge_marker = '|' | append: swatch_handle | append: '|'
+  assign metal = ''
+  if karat and karat_badges contains badge_marker
+    echo 'swatch-' | append: swatch_handle | append: '.webp' | asset_url
+  elsif swatch_handle contains 'white-gold'
+    assign metal = 'white-gold'
+  elsif swatch_handle contains 'rose-gold'
+    assign metal = 'rose-gold'
+  elsif swatch_handle contains 'yellow-gold'
+    assign metal = 'yellow-gold'
+  elsif swatch_handle contains 'platinum'
+    assign metal = 'platinum'
+  elsif swatch_handle contains 'silver'
+    assign metal = 'silver'
+  endif
+
+  if metal != blank
+    assign uploaded = metal | append: '.png'
+    if images[uploaded] != blank
+      echo images[uploaded] | image_url: width: 120
+    elsif lettered and metal != 'platinum'
+      echo 'swatch-' | append: metal | append: '.webp' | asset_url
+    else
+      echo 'swatch-' | append: metal | append: '.svg' | asset_url
+    endif
+  endif
+-%}

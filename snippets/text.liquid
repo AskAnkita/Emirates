@@ -53,6 +53,14 @@
     assign text = fallback_text | default: bl_stts.text
   endif
 
+  if text contains '[category_heading]'
+    capture category_heading
+      render 'product-category-heading', product: product
+    endcapture
+    assign text = text | replace: '[category_heading]', category_heading
+    assign plain_text = plain_text | replace: '[category_heading]', category_heading
+  endif
+
   if bl_stts.font_size contains 'heading-lg' or bl_stts.font_size contains 'heading-xl'
     assign type = 'display'
   elsif bl_stts.font_size contains 'heading'

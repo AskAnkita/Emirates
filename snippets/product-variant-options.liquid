@@ -54,6 +54,14 @@
           for suffix in karat_suffixes
             assign variant_filter_handle = variant_filter_handle | remove_last: suffix
           endfor
+
+          # Filter to the photo group of the variant's own featured image: gallery slides are
+          # tagged from their alt text (e.g. "#Jewelry material_Rose gold"), which never equals
+          # the option value, so this is what actually matches. Silver then shows the white-gold
+          # set it's photographed with. Same slug as the slides in _product-media-gallery.liquid.
+          if variant_image_group == blank and variant_for_value.featured_media.alt != blank
+            assign variant_filter_handle = variant_for_value.featured_media.alt | escape | downcase | replace: ' ', '-' | replace: '(', '-' | replace: ')', '-'
+          endif
         endif
       -%}
 
@@ -120,7 +128,9 @@
                   if images[background_image] != blank
                     assign background_image = background_image | file_url
                   else
-                    assign background_image = ''
+                    capture background_image
+                      render 'swatch-image', value: color, karat: true
+                    endcapture
                   endif
                   assign enable_variant_image = true
                 when 'metaobjects'
@@ -163,7 +173,7 @@
             <span
               {% if enable_variant_image %}
                 class="{{ class_swatch }}"
-                style="{%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                style="{%- if swatch_type == 'color' -%}--swatch--background-color: {% render 'swatch-color', value: color %};{%- endif -%}
                   {%- if has_metaobject and metaobject_color != blank -%}--swatch--background-color: {{ background_color }};{%- endif -%}
                   {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}
                   {%- if swatch_size != blank -%}--swatch-input--size: {{ swatch_size }}px;{%- endif -%}
@@ -173,7 +183,7 @@
                 data-variant-img="{{ variant.image.src | image_url: '800x' }}"
               {% else %}
                 class="{{ class_swatch }} swatch--unavailable"
-                style="{%- if swatch_type == 'color' -%}--swatch--background-color: {{ color | split: ' ' | last | handle }};{%- endif -%}
+                style="{%- if swatch_type == 'color' -%}--swatch--background-color: {% render 'swatch-color', value: color %};{%- endif -%}
                   {%- if has_metaobject and metaobject_color != blank -%}--swatch--background-color: {{ background_color }};{%- endif -%}
                   {%- if background_image != blank -%}--swatch--background: url({{ background_image }});{%- endif -%}
                   {%- if swatch_size != blank -%}--swatch-input--size: {{ swatch_size }}px;{%- endif -%}

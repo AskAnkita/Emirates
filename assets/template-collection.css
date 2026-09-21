@@ -193,3 +193,9 @@
     display: none;
   }
 }
+
+/* Product recommendations: the section's Gap setting never reached the space between the
+   heading and the product slider (their wrapper isn't a flex/grid box), so apply it here. */
+product-recommendations .section-resource-list__content:not(:empty) {
+  margin-block-end: var(--gap, 2.8rem);
+}

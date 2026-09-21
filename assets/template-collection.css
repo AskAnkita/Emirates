@@ -133,3 +133,55 @@
     padding-inline: 0 !important;
   }
 }
+
+/* Category strip image zoom — 1 = no zoom, 1.5 = 50% bigger.
+   --strip-shift moves the image down (positive) or up (negative). */
+.collection-category-strip {
+  --strip-zoom: 1.4;
+  --strip-shift: 0%;
+}
+
+/* Per collection template */
+.collection-category-strip.collection-category-strip--bracelets-collections {
+  --strip-zoom: 1.2;
+}
+.collection-category-strip.collection-category-strip--earrings-collections {
+  --strip-zoom: 1.4;
+}
+.collection-category-strip.collection-category-strip--necklaces-collections {
+  --strip-zoom: 1.4;
+}
+.collection-category-strip.collection-category-strip--gifting-collections {
+  --strip-zoom: 1.4;
+}
+
+/* Per tile, by its label — bands fill more of their photo */
+.collection-category-strip :is([data-label='eternity'], [data-label='plain-metal'], [data-label='bands']) {
+  --strip-zoom: 1.2;
+  --strip-shift: 6%;
+}
+
+.collection-category-strip .image-block {
+  overflow: hidden;
+}
+.collection-category-strip .image-block__image {
+  transform: scale(var(--strip-zoom)) translateY(var(--strip-shift));
+}
+
+/* Slider arrows are desktop-only; touch screens swipe. The theme only reveals
+   arrows on hover, which hides the fact that more categories exist. */
+@media screen and (min-width: 1024px) {
+  .collection-category-strip .swiper-button:not(.swiper-button-disabled) {
+    opacity: 1;
+    transform: none;
+  }
+  .collection-category-strip .swiper-button-disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+@media screen and (max-width: 1023px) {
+  .collection-category-strip .swiper-btns-wrap {
+    display: none;
+  }
+}

@@ -1135,7 +1135,7 @@
             "group_CQHtFA": {
               "type": "group",
               "settings": {
-                "link": "",
+                "link": "shopify://collections/eternity-rings",
                 "open_in_new_tab": false,
                 "hide_on_tablet": false,
                 "hide_on_mobile": false,

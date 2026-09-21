@@ -41,14 +41,29 @@
   if block.settings.navigation == 'pagination' or block.settings.navigation == 'arrows-pagination'
     assign enable_pagination = true
   endif
+
+  # Collection category strip: 8 per view on desktop, arrows appear once there are more.
+  assign is_collection_strip = false
+  if block.settings.layout_type == 'carousel' and section.id contains 'section_NDH8PA'
+    assign is_collection_strip = true
+    assign columns_desktop = 8
+    assign enable_navigation = true
+  endif
+
+  assign columns_laptop = columns_tablet
+  if is_collection_strip
+    assign columns_laptop = columns_desktop
+  endif
 -%}
 
 {% capture list_items %}
   {% for child_block in block.blocks %}
+    {%- capture child_html -%}{% render child_block %}{%- endcapture -%}
     <li id="Slide-{{ child_block.id }}-{{ forloop.index }}" class="grid__item{% if show_mobile_slider or block.settings.layout_type == 'carousel' %} swiper-slide{% endif %}{% if block.settings.border_separator_items %} border-separator-item{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
       {% if settings.animations_reveal_on_scroll %} style="--animation-order: {{ forloop.index }};"{% endif %}
+      {% if is_collection_strip %} data-label="{{ child_html | strip_html | strip | handleize }}"{% endif %}
     >
-      {% render child_block %}
+      {{ child_html }}
     </li>
 
     {% unless forloop.last %}
@@ -131,12 +146,12 @@
       {%- capture breakpoints -%}
         {
           "768": { "slidesPerView": {{ columns_tablet }} },
-          "1024": { "slidesPerView": {{ columns_tablet }} },
+          "1024": { "slidesPerView": {{ columns_laptop }} },
           "1400": { "slidesPerView": {{ columns_desktop }} }
         }
       {%- endcapture -%}
       <swiper-component
-        class="collection-carousel-swiper-component w-full block"
+        class="collection-carousel-swiper-component w-full block{% if is_collection_strip %} collection-category-strip collection-category-strip--{{ template.suffix | default: 'default' }}{% endif %}"
         {%- render 'swiper-data',
           settings: block.settings,
           slides_per_view: slides_per_view,

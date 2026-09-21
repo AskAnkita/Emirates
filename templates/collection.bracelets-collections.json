@@ -611,7 +611,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Yellow_Gold.png",
+                    "image": "shopify://shop_images/AJLB206-2CTS-R1.png",
                     "link": "shopify://collections/tennis-bracelets",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -733,6 +733,7 @@
             },
             "group_CKX9qq": {
               "type": "group",
+              "disabled": true,
               "settings": {
                 "link": "",
                 "open_in_new_tab": false,
@@ -1011,7 +1012,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/White_Gold.png",
+                    "image": "shopify://shop_images/AJLB221-W1.png",
                     "link": "shopify://collections/everyday-bracelets",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1632,6 +1633,7 @@
             "fbt_tags_list_4": "Yellow Gold,White Gold,Rose Gold,Platinum,Silver",
             "fbt_heading_5": "Shape",
             "fbt_tags_list_5": "Oval,Emerald,Round,Pear,Asscher,Marquise,Radiant,Cushion,Princess,Heart",
+            "fbt_image_headings": "Gemstone",
             "enable_divider_sorting_vertical": false,
             "enable_sorting": true,
             "enable_count": true,
@@ -1807,9 +1809,7 @@
                   ]
                 }
               },
-              "block_order": [
-
-              ]
+              "block_order": []
             },
             "blog_post_sidebar_text_QgiPNy": {
               "type": "_blog-post-sidebar-text",
@@ -2277,14 +2277,12 @@
               ]
             }
           },
-          "block_order": [
-
-          ]
+          "block_order": []
         }
       },
       "custom_css": [
         ".facets-vertical-sort--vertical .facets-vertical-form .sorting-wrapper {justify-content: flex-end;}",
-        "@media (min-width: 750px) { .product-grid:is(.product-grid--grid) { --product-grid-columns-desktop: repeat(4, 1fr); } }"
+        "@media (min-width: 750px) {.product-grid:is(.product-grid--grid) {--product-grid-columns-desktop: repeat(4, 1fr); }}"
       ],
       "settings": {
         "layout_type": "grid",

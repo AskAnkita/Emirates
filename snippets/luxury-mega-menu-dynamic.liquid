@@ -466,9 +466,10 @@
                 <div class="luxury-mm-image-item-{{ uid }}">
                   {% if es[image_url_key] != blank %}<a href="{{ es[image_url_key] }}">{% endif %}
                   {% if image != blank %}
+                    {%- comment -%} Loaded on first hover/focus of the menu item (header-menu.liquid) — otherwise every dropdown's images download with every page {%- endcomment -%}
                     <img
-                      src="{{ image | image_url: width: 600 }}"
-                      srcset="{{ image | image_url: width: 400 }} 400w, {{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w"
+                      data-mm-src="{{ image | image_url: width: 600 }}"
+                      data-mm-srcset="{{ image | image_url: width: 400 }} 400w, {{ image | image_url: width: 600 }} 600w, {{ image | image_url: width: 900 }} 900w"
                       sizes="(min-width: 990px) 360px, 100vw"
                       alt="{{ image.alt | escape }}"
                       loading="lazy"

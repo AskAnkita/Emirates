@@ -534,7 +534,7 @@
             "group_BPzwex": {
               "type": "group",
               "settings": {
-                "link": "",
+                "link": "shopify://collections/yellow-gold-necklaces",
                 "open_in_new_tab": false,
                 "hide_on_tablet": false,
                 "hide_on_mobile": false,
@@ -611,7 +611,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Yellow_Gold.png",
+                    "image": "shopify://shop_images/AJPD78-2.00_CTS-Y1.png",
                     "link": "shopify://collections/solitaire-pendants-necklaces",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -647,7 +647,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Solitaire</p>",
+                    "text": "<p>Yellow Gold</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,
@@ -734,7 +734,7 @@
             "group_CKX9qq": {
               "type": "group",
               "settings": {
-                "link": "",
+                "link": "shopify://collections/tennis-necklaces",
                 "open_in_new_tab": false,
                 "hide_on_tablet": false,
                 "hide_on_mobile": false,
@@ -811,7 +811,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Platinum.png",
+                    "image": "shopify://shop_images/AJNT26-33CTS-R1.png",
                     "link": "shopify://collections/tennis-necklaces",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -934,7 +934,7 @@
             "group_4LTGAV": {
               "type": "group",
               "settings": {
-                "link": "",
+                "link": "shopify://collections/pendent",
                 "open_in_new_tab": false,
                 "hide_on_tablet": false,
                 "hide_on_mobile": false,
@@ -1011,7 +1011,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/White_Gold.png",
+                    "image": "shopify://shop_images/AJPD243-0.50CTS-W1.png",
                     "link": "shopify://collections/halo-pendants-necklaces",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1047,7 +1047,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Halo</p>",
+                    "text": "<p>Pendent</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,
@@ -1211,7 +1211,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Eternity.png",
+                    "image": "shopify://shop_images/AJPD278-R1.png",
                     "link": "shopify://collections/layering-necklaces",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1247,7 +1247,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Layering</p>",
+                    "text": "<p>Under $500</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,
@@ -1334,7 +1334,7 @@
             "group_jUPKni": {
               "type": "group",
               "settings": {
-                "link": "",
+                "link": "shopify://collections/wedding-necklaces",
                 "open_in_new_tab": false,
                 "hide_on_tablet": false,
                 "hide_on_mobile": false,
@@ -1411,8 +1411,8 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Curved.png",
-                    "link": "shopify://collections/zodiac-necklaces",
+                    "image": "shopify://shop_images/AJNT27-W1.png",
+                    "link": "shopify://collections/wedding-necklaces",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
                     "width": "fit-content",
@@ -1447,7 +1447,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Zodiac</p>",
+                    "text": "<p>Wedding </p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,
@@ -1632,6 +1632,7 @@
             "fbt_tags_list_4": "Yellow Gold,White Gold,Rose Gold,Platinum,Silver",
             "fbt_heading_5": "Shape",
             "fbt_tags_list_5": "Oval,Emerald,Round,Pear,Asscher,Marquise,Radiant,Cushion,Princess,Heart",
+            "fbt_image_headings": "Gemstone",
             "enable_divider_sorting_vertical": false,
             "enable_sorting": true,
             "enable_count": true,
@@ -1807,9 +1808,7 @@
                   ]
                 }
               },
-              "block_order": [
-
-              ]
+              "block_order": []
             },
             "blog_post_sidebar_text_QgiPNy": {
               "type": "_blog-post-sidebar-text",
@@ -2277,14 +2276,12 @@
               ]
             }
           },
-          "block_order": [
-
-          ]
+          "block_order": []
         }
       },
       "custom_css": [
         ".facets-vertical-sort--vertical .facets-vertical-form .sorting-wrapper {justify-content: flex-end;}",
-        "@media (min-width: 750px) { .product-grid:is(.product-grid--grid) { --product-grid-columns-desktop: repeat(4, 1fr); } }"
+        "@media (min-width: 750px) {.product-grid:is(.product-grid--grid) {--product-grid-columns-desktop: repeat(4, 1fr); }}"
       ],
       "settings": {
         "layout_type": "grid",

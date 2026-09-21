@@ -57,5 +57,20 @@
         {%- endfor -%}
       </ul>
     </nav>
+    <script>
+      (() => {
+        const nav = document.currentScript.previousElementSibling;
+        const load = (event) => {
+          const item = event.target.closest && event.target.closest('.header__inline-menu > ul > li');
+          if (!item || !nav.contains(item)) return;
+          item.querySelectorAll('img[data-mm-srcset]').forEach((img) => {
+            img.srcset = img.dataset.mmSrcset;
+            img.src = img.dataset.mmSrc;
+            img.removeAttribute('data-mm-srcset');
+          });
+        };
+        ['pointerover', 'focusin', 'touchstart'].forEach((type) => nav.addEventListener(type, load, { passive: true }));
+      })();
+    </script>
   </div>
 </div>

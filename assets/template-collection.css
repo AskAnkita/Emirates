@@ -146,7 +146,7 @@
   --strip-zoom: 1.2;
 }
 .collection-category-strip.collection-category-strip--earrings-collections {
-  --strip-zoom: 1.4;
+  --strip-zoom: 1;
 }
 .collection-category-strip.collection-category-strip--necklaces-collections {
   --strip-zoom: 1.4;
@@ -159,6 +159,14 @@
 .collection-category-strip :is([data-label='eternity'], [data-label='plain-metal'], [data-label='bands']) {
   --strip-zoom: 1.2;
   --strip-shift: 6%;
+}
+
+/* Tennis and wedding necklaces — no zoom */
+.collection-category-strip--necklaces-collections [data-label='tennis'],
+.collection-category-strip--necklaces-collections [data-label='wedding'],
+.collection-category-strip [data-label='tennis-necklaces'] {
+  --strip-zoom: 1;
+  --strip-shift: 0%;
 }
 
 .collection-category-strip .image-block {

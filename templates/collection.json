@@ -611,7 +611,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Yellow_Gold.png",
+                    "image": "shopify://shop_images/AJLR211-1CTS-Y1.png",
                     "link": "shopify://collections/wedding-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -733,6 +733,7 @@
             },
             "group_CKX9qq": {
               "type": "group",
+              "disabled": true,
               "settings": {
                 "link": "",
                 "open_in_new_tab": false,
@@ -1011,7 +1012,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/White_Gold.png",
+                    "image": "shopify://shop_images/AJLR262-2CTS-W1.png",
                     "link": "shopify://collections/best-sellers",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1211,7 +1212,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Eternity.png",
+                    "image": "shopify://shop_images/AJLR255-R1.png",
                     "link": "shopify://collections/engagement-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1411,7 +1412,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Plain_Metal.png",
+                    "image": "shopify://shop_images/AJLR274-W1.png",
                     "link": "shopify://collections/engagement-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",

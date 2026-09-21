@@ -611,7 +611,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Wedding.png",
+                    "image": "shopify://shop_images/AJLR134-2CTS-Y1.png",
                     "link": "shopify://collections/solitaire-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -811,7 +811,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Engagement.png",
+                    "image": "shopify://shop_images/AJLR257-2CTS-R1.png",
                     "link": "shopify://collections/side-stones-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1011,7 +1011,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Vintage_3ee0876f-430a-4405-a9f3-67fa9090c229.png",
+                    "image": "shopify://shop_images/AJLR299-2CTS-W1.png",
                     "link": "shopify://collections/halo-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1211,7 +1211,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Promise.png",
+                    "image": "shopify://shop_images/AJLR272-R1.png",
                     "link": "shopify://collections/trilogy-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1411,7 +1411,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Wishbone.png",
+                    "image": "shopify://shop_images/AJLR255-Y1.png",
                     "link": "shopify://collections/vintage-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -1447,7 +1447,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Vintage</p>",
+                    "text": "<p>Eternity</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,
@@ -1611,7 +1611,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Stacking.png",
+                    "image": "shopify://shop_images/AJLR379-W1.png",
                     "link": "shopify://collections/promise-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -2011,7 +2011,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Bridal_sets_7550972b-c4e0-42ad-a5c8-879ba7dd2360.png",
+                    "image": "shopify://shop_images/AJLR307-2CTS-W1.png",
                     "link": "shopify://collections/bridal-sets",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -2211,7 +2211,7 @@
                   "type": "image",
                   "name": "t:names.image",
                   "settings": {
-                    "image": "shopify://shop_images/Men.png",
+                    "image": "shopify://shop_images/AJLR274-W1.png",
                     "link": "shopify://collections/mens-diamond-rings",
                     "hide_on_mobile": false,
                     "image_ratio": "adapt",
@@ -2247,7 +2247,7 @@
                   "type": "text",
                   "name": "t:names.text",
                   "settings": {
-                    "text": "<p>Men's Rings</p>",
+                    "text": "<p>Bands</p>",
                     "collection_description_only": false,
                     "collapse_text": false,
                     "typing_text": false,
@@ -2348,9 +2348,7 @@
       "block_order": [
         "multicolumn_x8kfPe"
       ],
-      "custom_css": [
-
-      ],
+      "custom_css": [],
       "name": "t:names.multicolumn",
       "settings": {
         "content_direction": "column",
@@ -2436,6 +2434,7 @@
             "fbt_tags_list_4": "Yellow Gold,White Gold,Rose Gold,Platinum,Silver",
             "fbt_heading_5": "Shape",
             "fbt_tags_list_5": "Oval,Emerald,Round,Pear,Asscher,Marquise,Radiant,Cushion,Princess,Heart",
+            "fbt_image_headings": "Gemstone",
             "enable_divider_sorting_vertical": false,
             "enable_sorting": true,
             "enable_count": true,
@@ -2465,9 +2464,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-
-          ]
+          "block_order": []
         },
         "collection-header": {
           "type": "_collection-header",
@@ -2903,14 +2900,12 @@
               ]
             }
           },
-          "block_order": [
-
-          ]
+          "block_order": []
         }
       },
       "custom_css": [
         ".facets-vertical-sort--vertical .facets-vertical-form .sorting-wrapper {justify-content: flex-end;}",
-        "@media (min-width: 750px) { .product-grid:is(.product-grid--grid) { --product-grid-columns-desktop: repeat(4, 1fr); } }"
+        "@media (min-width: 750px) {.product-grid:is(.product-grid--grid) {--product-grid-columns-desktop: repeat(4, 1fr); }}"
       ],
       "settings": {
         "layout_type": "grid",

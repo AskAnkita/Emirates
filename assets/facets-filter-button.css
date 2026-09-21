@@ -1276,8 +1276,10 @@ body:has(.facets-block-wrapper--horizontal .mobile-facets__disclosure.menu-openi
   .facets-block-wrapper--horizontal .facets-container {
     flex-wrap: nowrap;
     align-items: center;
-    gap: 1.4rem;
-    padding-inline: 65px !important;
+    gap: 1.5rem;
+    /* container edge already sits on the page gutter — keep the toolbar flush
+       with the category strip and product grid instead of insetting it */
+    padding-inline: 0 !important;
   }
 
   .facets-block-wrapper--horizontal .facets-container > .mobile-facets__wrapper {

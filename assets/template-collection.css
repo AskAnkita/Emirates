@@ -107,3 +107,29 @@
     grid-column: 1 / 1;
   }
 }
+
+/* ==========================================================================
+   Collection gutter alignment
+
+   The three rows of a collection page each arrive at a different left edge:
+   the category strip carries its own section padding (set in the theme
+   editor), and the product grid carries a section padding *plus* one grid
+   gutter that no setting can reach. Pin all of them to --page-margin, which
+   is the gutter the filter toolbar and every page-width section already use.
+   ========================================================================== */
+@media screen and (min-width: 750px) {
+  /* Category strip — the section id is shared by every collection template.
+     Drop its own padding and drop it into the section grid's centre column, so
+     it lands on the gutter whether the section is set to page or full width. */
+  [id$='__section_NDH8PA'] .section > * {
+    grid-column: 2;
+  }
+  [id$='__section_NDH8PA'] .section-content-wrapper {
+    padding-inline: 0 !important;
+  }
+
+  .template-collection .main-collection-grid {
+    grid-column: 1 / -1;
+    padding-inline: 0 !important;
+  }
+}

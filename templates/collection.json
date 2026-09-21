@@ -534,7 +534,7 @@
             "group_BPzwex": {
               "type": "group",
               "settings": {
-                "link": "",
+                "link": "shopify://collections/yellow-gold-rings",
                 "open_in_new_tab": false,
                 "hide_on_tablet": false,
                 "hide_on_mobile": false,
@@ -2348,10 +2348,7 @@
       "block_order": [
         "multicolumn_x8kfPe"
       ],
-      "disabled": true,
-      "custom_css": [
-
-      ],
+      "custom_css": [],
       "name": "t:names.multicolumn",
       "settings": {
         "content_direction": "column",
@@ -2437,6 +2434,7 @@
             "fbt_tags_list_4": "Yellow Gold,White Gold,Rose Gold,Platinum,Silver",
             "fbt_heading_5": "Shape",
             "fbt_tags_list_5": "Oval,Emerald,Round,Pear,Asscher,Marquise,Radiant,Cushion,Princess,Heart",
+            "fbt_image_headings": "Gemstone",
             "enable_divider_sorting_vertical": false,
             "enable_sorting": true,
             "enable_count": true,
@@ -2612,9 +2610,7 @@
                   ]
                 }
               },
-              "block_order": [
-
-              ]
+              "block_order": []
             },
             "blog_post_sidebar_text_QgiPNy": {
               "type": "_blog-post-sidebar-text",
@@ -3082,14 +3078,12 @@
               ]
             }
           },
-          "block_order": [
-
-          ]
+          "block_order": []
         }
       },
       "custom_css": [
         ".facets-vertical-sort--vertical .facets-vertical-form .sorting-wrapper {justify-content: flex-end;}",
-        "@media (min-width: 750px) { .product-grid:is(.product-grid--grid) { --product-grid-columns-desktop: repeat(4, 1fr); } }"
+        "@media (min-width: 750px) {.product-grid:is(.product-grid--grid) {--product-grid-columns-desktop: repeat(4, 1fr); }}"
       ],
       "settings": {
         "layout_type": "grid",

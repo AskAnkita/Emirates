@@ -386,7 +386,7 @@
           "name": "Rings Mega Menu",
           "settings": {
             "nav_label": "Rings",
-            "nav_link": "",
+            "nav_link": "shopify://collections/rings",
             "col1_heading1": "METAL TYPE",
             "col1_link1_label": "Gold",
             "col1_link1_url": "",

@@ -5,10 +5,24 @@
   assign color_list = '|'
   assign color = ''
   assign count = 0
+  assign digit_chars = '0,1,2,3,4,5,6,7,8,9' | split: ','
   if settings.enable_custom_position_swatch_layout_card_1
     assign number_limit = 5
   else
     assign number_limit = 4
+  endif
+
+  assign active_color_handle = ''
+  if product.featured_image
+    for featured_color in product.options_with_values[index].values
+      if featured_color.variant.image.id == product.featured_image.id
+        assign active_color_handle = featured_color | handle
+        break
+      endif
+    endfor
+  endif
+  if active_color_handle == blank
+    assign active_color_handle = product.options_with_values[index].values.first | handle
   endif
 -%}
 
@@ -30,6 +44,7 @@
         {%- for color in product.options_with_values[index].values -%}
           {%- liquid
             assign variant = color.variant
+            assign color_handle = color | handle
             assign enable_variant_image = false
             case swatch_type
               when 'variant_image'
@@ -49,16 +64,57 @@
                 assign metaobject_color = color.swatch.color
                 assign metaobject_image = color.swatch.image
                 assign has_metaobject = false
-                if metaobject_image != blank
+                assign metal_type_value = variant.metafields.custom.metal_type
+                assign metal_type_found = false
+
+                if metal_type_value != blank
+                  assign mt_words = metal_type_value | replace: '-', ' ' | split: ' '
+                  assign metal_type_color_name = ''
+                  for word in mt_words
+                    assign has_digit = false
+                    for digit in digit_chars
+                      if word contains digit
+                        assign has_digit = true
+                      endif
+                    endfor
+                    unless has_digit or word == 'k'
+                      assign metal_type_color_name = metal_type_color_name | append: word | append: ' '
+                    endunless
+                  endfor
+                  assign metal_type_color_name = metal_type_color_name | strip | downcase | replace: ' ', '-'
+
+                  case metal_type_color_name
+                    when 'white-gold', 'silver', 'sterling-silver'
+                      assign background_color = '#D6D6D6'
+                      assign metal_type_found = true
+                    when 'yellow-gold', 'gold'
+                      assign background_color = '#D4AF37'
+                      assign metal_type_found = true
+                    when 'rose-gold'
+                      assign background_color = '#E8B4A0'
+                      assign metal_type_found = true
+                    when 'platinum'
+                      assign background_color = '#E5E4E2'
+                      assign metal_type_found = true
+                  endcase
+
+                  if metal_type_found
+                    assign background_image = ''
+                    assign enable_variant_image = true
+                    assign has_metaobject = true
+                  endif
+                endif
+
+                if metaobject_image != blank and metal_type_found == false
                   assign background_image = metaobject_image | image_url: width: '40x'
                   assign enable_variant_image = true
                   assign has_metaobject = true
-                elsif metaobject_color != blank
+                elsif metaobject_color != blank and metal_type_found == false
                   assign background_color = metaobject_color
                   assign enable_variant_image = true
                   assign has_metaobject = true
                   assign background_image = ''
-                elsif variant.image
+                elsif metal_type_found == false and variant.image
                   assign background_image = variant.image.src | image_url: width: '40x'
                   assign enable_variant_image = true
 
@@ -72,7 +128,7 @@
                       assign image = item_image | file_url
                     endif
                   endfor
-                else
+                elsif metal_type_found == false
                   assign background_color = color | handle
                   assign has_metaobject = true
                   assign enable_variant_image = true
@@ -82,7 +138,7 @@
 
           -%}
           {%- if count < number_limit -%}
-            <li class="swatch-item cursor-pointer relative{% if forloop.first %} active{% endif %}">
+            <li class="swatch-item cursor-pointer relative{% if color_handle == active_color_handle %} active{% endif %}">
                 <span
                   {% if enable_variant_image %}
                     class="{{ class_swatch }} color-swacth-color--{{ color | handle }}"
@@ -105,7 +161,7 @@
             {%- if count == number_limit -%}
               <li class="group-swatch " style="--gap-x: 0.5rem; display: none">
             {%- endif -%}
-            <div class="swatch-item cursor-pointer relative">
+            <div class="swatch-item cursor-pointer relative{% if color_handle == active_color_handle %} active{% endif %}">
                 <span
                   {% if enable_variant_image %}
                     class="{{ class_swatch }} color-swacth-color--{{ color | handle }}"
